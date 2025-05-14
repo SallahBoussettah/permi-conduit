@@ -1,0 +1,194 @@
+@startuml Driving Exam Platform - Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+' User and Role classes
+class User {
+  +id: bigint
+  +name: string
+  +email: string
+  +password: string
+  +role_id: bigint
+  +email_verified_at: timestamp
+  +remember_token: string
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class Role {
+  +id: bigint
+  +name: string
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+' Exam Structure classes
+class ExamType {
+  +id: bigint
+  +name: string
+  +pdf_reference: string
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class ExamSection {
+  +id: bigint
+  +exam_type_id: bigint
+  +name: string
+  +official_max_points: integer
+  +sequence_order: integer
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class ExamItem {
+  +id: bigint
+  +exam_section_id: bigint
+  +description: string
+  +scoring_type: enum
+  +reference_in_pdf: string
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class Exam {
+  +id: bigint
+  +candidate_id: bigint
+  +inspector_id: bigint
+  +exam_type_id: bigint
+  +exam_date: date
+  +status: enum
+  +location_details: string
+  +qcm_passed_at: timestamp
+  +qcm_score_correct_answers: integer
+  +qcm_notation: integer
+  +qcm_is_eliminatory: boolean
+  +inspector_notes: text
+  +total_points: integer
+  +passed: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class ExamResult {
+  +id: bigint
+  +exam_id: bigint
+  +exam_item_id: bigint
+  +score_achieved: string
+  +notes_by_inspector: text
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+' Course Management classes
+class Course {
+  +id: bigint
+  +title: string
+  +description: text
+  +exam_section_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class CourseMaterial {
+  +id: bigint
+  +course_id: bigint
+  +title: string
+  +material_type: enum
+  +content_path_or_url: string
+  +description: text
+  +sequence_order: integer
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class CandidateCourseMaterialProgress {
+  +id: bigint
+  +user_id: bigint
+  +course_material_id: bigint
+  +status: enum
+  +last_accessed_at: timestamp
+  +completion_percentage: integer
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+' QCM classes
+class QcmQuestion {
+  +id: bigint
+  +qcm_set_id: string
+  +question_text: text
+  +exam_section_id: bigint
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class QcmAnswer {
+  +id: bigint
+  +qcm_question_id: bigint
+  +answer_text: text
+  +is_correct: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class CandidateQcmAttempt {
+  +id: bigint
+  +exam_id: bigint
+  +qcm_question_id: bigint
+  +selected_qcm_answer_id: bigint
+  +is_correct_at_submission: boolean
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+' Other classes
+class OralTestTheme {
+  +id: bigint
+  +name: string
+  +description: text
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+class Notification {
+  +id: bigint
+  +user_id: bigint
+  +message: string
+  +read_at: timestamp
+  +link: string
+  +created_at: timestamp
+  +updated_at: timestamp
+}
+
+' Relationships
+User "1" -- "1" Role : has >
+User "1" -- "many" Exam : as candidate >
+User "1" -- "many" Exam : as inspector >
+User "1" -- "many" CandidateCourseMaterialProgress : tracks >
+User "1" -- "many" Notification : receives >
+
+ExamType "1" -- "many" ExamSection : contains >
+ExamType "1" -- "many" Exam : defines >
+
+ExamSection "1" -- "many" ExamItem : contains >
+ExamSection "1" -- "many" Course : relates to >
+ExamSection "1" -- "many" QcmQuestion : contains >
+
+ExamItem "1" -- "many" ExamResult : evaluated in >
+
+Exam "1" -- "many" ExamResult : contains >
+Exam "1" -- "many" CandidateQcmAttempt : includes >
+
+Course "1" -- "many" CourseMaterial : contains >
+
+CourseMaterial "1" -- "many" CandidateCourseMaterialProgress : tracked in >
+
+QcmQuestion "1" -- "many" QcmAnswer : has >
+QcmQuestion "1" -- "many" CandidateQcmAttempt : attempted in >
+
+QcmAnswer "1" -- "many" CandidateQcmAttempt : selected in >
+
+@enduml 
