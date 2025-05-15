@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
@@ -19,57 +18,55 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check URL parameter first (highest priority)
-        $locale = $request->query('lang');
-        
-        // If not in URL, check session
-        if (!$locale && Session::has('locale')) {
-            $locale = Session::get('locale');
+        $locale = null;
+        $source = 'init'; // For logging the source of the locale
+
+        // 1. Check URL parameter (highest priority)
+        if ($request->has('lang')) {
+            $urlLocale = $request->query('lang');
+            if (in_array($urlLocale, config('app.available_locales_codes', ['en', 'fr']))) {
+                $locale = $urlLocale;
+                $source = 'url';
+            }
         }
-        
-        // If not in session, check cookie
+
+        // 2. If not from URL, check Cookie (second priority)
         if (!$locale && $request->hasCookie('locale')) {
-            $locale = $request->cookie('locale');
-        }
-        
-        // If still no locale, use default from config
-        if (!$locale) {
-            $locale = config('app.locale', 'en');
-        }
-        
-        // Validate locale - force to be either 'en' or 'fr'
-        if (!in_array($locale, ['en', 'fr'])) {
-            $locale = config('app.fallback_locale', 'en');
-        }
-        
-        // IMPORTANT: Set the locale in all possible places
-        App::setLocale($locale);
-        Session::put('locale', $locale);
-        Config::set('app.locale', $locale);
-        
-        // Force config to update available_locales if needed
-        if (!isset(Config::get('app.available_locales')[$locale])) {
-            $availableLocales = Config::get('app.available_locales', []);
-            $availableLocales[$locale] = $locale === 'en' ? 'English' : 'Français';
-            Config::set('app.available_locales', $availableLocales);
-        }
-        
-        // Log the locale being used
-        Log::debug('Using locale: ' . $locale . ' for path: ' . $request->path());
-        
-        // Get the response
-        $response = $next($request);
-        
-        // If it's a view response, we can check if the locale was properly applied
-        if (method_exists($response, 'getContent')) {
-            $content = $response->getContent();
-            if (is_string($content)) {
-                // Force replace any hardcoded locale references in the HTML
-                $content = preg_replace('/<html lang="[^"]*"/', '<html lang="' . $locale . '"', $content);
-                $response->setContent($content);
+            $cookieLocale = $request->cookie('locale');
+            if (in_array($cookieLocale, config('app.available_locales_codes', ['en', 'fr']))) {
+                $locale = $cookieLocale;
+                $source = 'cookie';
             }
         }
         
-        return $response;
+        // 3. If not from URL or Cookie, check Session (third priority)
+        if (!$locale && Session::has('locale')) {
+            $sessionLocale = Session::get('locale');
+            if (in_array($sessionLocale, config('app.available_locales_codes', ['en', 'fr']))) {
+                $locale = $sessionLocale;
+                $source = 'session';
+            }
+        }
+        
+        // 4. If still no locale, use fallback from config
+        if (!$locale) {
+            $locale = config('app.fallback_locale', 'en');
+            $source = 'fallback_config';
+        }
+        
+        // Final validation (e.g., ensure $locale is one of the allowed codes)
+        if (!in_array($locale, config('app.available_locales_codes', ['en', 'fr']))) {
+            $original_locale_before_force_fallback = $locale;
+            $locale = config('app.fallback_locale', 'en'); 
+            $source .= '_forced_to_fallback (original: ' . $original_locale_before_force_fallback . ')';
+        }
+        
+        App::setLocale($locale);
+        // ALWAYS update session to the determined locale for consistency
+        Session::put('locale', $locale); 
+        
+        Log::debug('SetLocale Middleware: Locale determined from ' . $source . ', set to: ' . $locale . ' for path: ' . $request->path());
+        
+        return $next($request);
     }
 } 

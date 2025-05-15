@@ -60,10 +60,10 @@
                             </svg>
                         </button>
                         <div id="language-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                            <a href="{{ url(request()->path() . '?lang=en&t=' . time()) }}" onclick="document.cookie='locale=en;path=/;max-age=31536000'" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <a href="{{ url(request()->path()) }}" onclick="document.cookie='locale=en;path=/;max-age=31536000;SameSite=Lax'" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 English
                             </a>
-                            <a href="{{ url(request()->path() . '?lang=fr&t=' . time()) }}" onclick="document.cookie='locale=fr;path=/;max-age=31536000'" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <a href="{{ url(request()->path()) }}" onclick="document.cookie='locale=fr;path=/;max-age=31536000;SameSite=Lax'" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 Français
                             </a>
                         </div>
@@ -111,13 +111,13 @@
                              x-transition:leave-start="transform opacity-100 scale-100"
                              x-transition:leave-end="transform opacity-0 scale-95"
                              class="mt-2 pl-4 border-l border-gray-700 space-y-1">
-                            <a href="{{ url(request()->path() . '?lang=en&t=' . time()) }}" 
-                               onclick="document.cookie='locale=en;path=/;max-age=31536000'" 
+                            <a href="{{ url(request()->path()) }}" 
+                               onclick="document.cookie='locale=en;path=/;max-age=31536000;SameSite=Lax'" 
                                class="block py-2 text-gray-300 hover:text-white {{ app()->getLocale() == 'en' ? 'text-white font-medium' : '' }}">
                                 English
                             </a>
-                            <a href="{{ url(request()->path() . '?lang=fr&t=' . time()) }}" 
-                               onclick="document.cookie='locale=fr;path=/;max-age=31536000'" 
+                            <a href="{{ url(request()->path()) }}" 
+                               onclick="document.cookie='locale=fr;path=/;max-age=31536000;SameSite=Lax'" 
                                class="block py-2 text-gray-300 hover:text-white {{ app()->getLocale() == 'fr' ? 'text-white font-medium' : '' }}">
                                 Français
                             </a>

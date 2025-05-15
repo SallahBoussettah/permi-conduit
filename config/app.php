@@ -95,6 +95,17 @@ return [
         'fr' => 'Français',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Available Application Locale Codes
+    |--------------------------------------------------------------------------
+    |
+    | This array contains the codes for the available locales (e.g., 'en', 'fr').
+    | Used by the SetLocale middleware for validation.
+    |
+    */
+    'available_locales_codes' => ['en', 'fr'],
+
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
