@@ -16,12 +16,12 @@ This document outlines the specific tasks needed to complete the Laravel-based d
 
 ## Phase 2: Authentication & User Management
 
-- [ ] Implement role-based authentication system
-- [ ] Create user registration flow for candidates
-- [ ] Create admin-controlled registration for inspectors
-- [ ] Implement user profile management
-- [ ] Set up role-based middleware and route protection
-- [ ] Create user dashboards (candidate, inspector, admin)
+- [x] Implement role-based authentication system
+- [x] Create user registration flow for candidates
+- [x] Create admin-controlled registration for inspectors
+- [x] Implement user profile management
+- [x] Set up role-based middleware and route protection
+- [x] Create user dashboards (candidate, inspector, admin)
 
 ## Phase 3: Course Module
 

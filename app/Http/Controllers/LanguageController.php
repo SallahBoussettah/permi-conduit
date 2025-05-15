@@ -38,26 +38,44 @@ class LanguageController extends Controller
         // Log the change
         Log::info('Language switched to: ' . $locale);
         
-        // Get the URL to redirect to
-        $redirect = $request->query('redirect', null);
-        
-        // If no redirect URL is specified, use the referer
-        if (!$redirect) {
-            $referer = $request->headers->get('referer');
-            
-            // If referer is available and not a language route
-            if ($referer && !str_contains($referer, '/language/') && !str_contains($referer, '/en') && !str_contains($referer, '/fr')) {
-                $redirect = $referer;
-            } else {
-                // Default to home page
-                $redirect = url('/');
-            }
-        }
+        // Determine the redirect URL
+        $redirectUrl = $this->getRedirectUrl($request);
         
         // Add a query parameter to bust cache
-        $redirectUrl = $redirect . (parse_url($redirect, PHP_URL_QUERY) ? '&' : '?') . 'lang=' . $locale . '&t=' . time();
+        $redirectUrl .= (parse_url($redirectUrl, PHP_URL_QUERY) ? '&' : '?') . 'lang=' . $locale . '&t=' . time();
         
         // Redirect with cookie
         return redirect($redirectUrl)->withCookie($cookie);
+    }
+    
+    /**
+     * Get the URL to redirect to after language change.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    protected function getRedirectUrl(Request $request)
+    {
+        // If the request has a redirect parameter, use that
+        if ($request->has('redirect')) {
+            return $request->input('redirect');
+        }
+        
+        // Get the referer
+        $referer = $request->headers->get('referer');
+        
+        // If referer exists and is not a language route
+        if ($referer) {
+            // URL decode the referer
+            $referer = urldecode($referer);
+            
+            // Check if the referer is a language switch route
+            if (!preg_match('#/language/|/en$|/fr$#', $referer)) {
+                return $referer;
+            }
+        }
+        
+        // If no valid referer, fall back to the home page
+        return url('/');
     }
 } 

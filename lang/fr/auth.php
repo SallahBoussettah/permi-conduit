@@ -12,6 +12,7 @@ return [
     'forgot_password' => 'Mot de passe oublié ?',
     'need_account' => 'Vous n\'avez pas de compte ?',
     'register_now' => 'Inscrivez-vous',
+    'logout' => 'Déconnexion',
     
     // Registration page
     'register_title' => 'Rejoignez Notre Plateforme',

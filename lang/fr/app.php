@@ -7,6 +7,9 @@ return [
     'services' => 'Services',
     'contact' => 'Contact',
     'language' => 'Langue',
+    'dashboard' => 'Tableau de Bord',
+    'profile' => 'Profil',
+    'logout' => 'Déconnexion',
     
     // User spaces
     'candidate_space' => 'Espace Candidat',

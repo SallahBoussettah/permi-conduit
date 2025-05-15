@@ -4,6 +4,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LegalController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -82,6 +83,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Dashboard - already accessible to all authenticated users
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+    
+    // Admin routes
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        // Inspector management
+        Route::get('/inspectors', [AdminController::class, 'listInspectors'])->name('inspectors');
+        Route::get('/inspectors/register', [AdminController::class, 'showRegisterInspector'])->name('register.inspector');
+        Route::post('/inspectors/register', [AdminController::class, 'registerInspector'])->name('register.inspector.submit');
+    });
+    
+    // Inspector routes
+    Route::middleware('role:inspector')->prefix('inspector')->name('inspector.')->group(function () {
+        // Add inspector-specific routes here
+    });
+    
+    // Candidate routes
+    Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->group(function () {
+        // Add candidate-specific routes here
+    });
 });
 
 require __DIR__.'/auth.php';

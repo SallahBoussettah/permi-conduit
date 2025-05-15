@@ -60,23 +60,51 @@
                             </svg>
                         </button>
                         <div id="language-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                            <a href="{{ url(request()->path()) }}" onclick="document.cookie='locale=en;path=/;max-age=31536000;SameSite=Lax'" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <a href="{{ route('language.switch', ['locale' => 'en']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() == 'en' ? 'bg-gray-100 font-medium' : '' }}">
                                 English
                             </a>
-                            <a href="{{ url(request()->path()) }}" onclick="document.cookie='locale=fr;path=/;max-age=31536000;SameSite=Lax'" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <a href="{{ route('language.switch', ['locale' => 'fr']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() == 'fr' ? 'bg-gray-100 font-medium' : '' }}">
                                 Français
                             </a>
                         </div>
                     </div>
 
-                    <!-- User Space Buttons - Hidden on mobile -->
+                    <!-- User Authentication Links - Hidden on mobile -->
                     <div class="hidden md:flex items-center space-x-2">
-                        <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border border-yellow-500 rounded-md font-semibold text-xs text-yellow-500 uppercase tracking-widest hover:bg-gray-800 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
-                            {{ __('app.candidate_space') }}
-                        </a>
-                        <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-gray-900 uppercase tracking-widest hover:bg-yellow-400 active:bg-yellow-600 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
-                            {{ __('app.inspector_space') }}
-                        </a>
+                        @guest
+                            <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border border-yellow-500 rounded-md font-semibold text-xs text-yellow-500 uppercase tracking-widest hover:bg-gray-800 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                {{ __('app.candidate_space') }}
+                            </a>
+                            <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-gray-900 uppercase tracking-widest hover:bg-yellow-400 active:bg-yellow-600 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                {{ __('app.inspector_space') }}
+                            </a>
+                        @else
+                            <div class="relative">
+                                <button id="user-menu-button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-300 hover:text-white focus:outline-none transition ease-in-out duration-150">
+                                    {{ Auth::user()->name }}
+                                    <svg class="ml-1 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        {{ __('app.dashboard') }}
+                                    </a>
+                                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        {{ __('app.profile') }}
+                                    </a>
+                                    <!-- Logout Form -->
+                                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                                        @csrf
+                                        <a href="{{ route('logout') }}" 
+                                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                                           class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('app.logout') }}
+                                        </a>
+                                    </form>
+                                </div>
+                            </div>
+                        @endguest
                     </div>
                 </div>
             </div>
@@ -91,6 +119,14 @@
                 <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                     {{ __('app.contact') }}
                 </a>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        {{ __('app.dashboard') }}
+                    </a>
+                    <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        {{ __('app.profile') }}
+                    </a>
+                @endauth
             </div>
             <div class="pt-2 pb-3 border-t border-gray-700">
                 <!-- Language options in mobile menu -->
@@ -111,13 +147,11 @@
                              x-transition:leave-start="transform opacity-100 scale-100"
                              x-transition:leave-end="transform opacity-0 scale-95"
                              class="mt-2 pl-4 border-l border-gray-700 space-y-1">
-                            <a href="{{ url(request()->path()) }}" 
-                               onclick="document.cookie='locale=en;path=/;max-age=31536000;SameSite=Lax'" 
+                            <a href="{{ route('language.switch', ['locale' => 'en']) }}" 
                                class="block py-2 text-gray-300 hover:text-white {{ app()->getLocale() == 'en' ? 'text-white font-medium' : '' }}">
                                 English
                             </a>
-                            <a href="{{ url(request()->path()) }}" 
-                               onclick="document.cookie='locale=fr;path=/;max-age=31536000;SameSite=Lax'" 
+                            <a href="{{ route('language.switch', ['locale' => 'fr']) }}" 
                                class="block py-2 text-gray-300 hover:text-white {{ app()->getLocale() == 'fr' ? 'text-white font-medium' : '' }}">
                                 Français
                             </a>
@@ -126,14 +160,29 @@
                 </div>
             </div>
             <div class="pt-4 pb-3 border-t border-gray-700">
-                <div class="flex items-center px-4 space-x-2">
-                    <a href="{{ route('login') }}" class="block w-full text-center px-4 py-2 border border-yellow-500 rounded-md font-semibold text-xs text-yellow-500 uppercase tracking-widest hover:bg-gray-800 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
-                        {{ __('app.candidate_space') }}
-                    </a>
-                    <a href="{{ route('login') }}" class="block w-full text-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-gray-900 uppercase tracking-widest hover:bg-yellow-400 active:bg-yellow-600 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
-                        {{ __('app.inspector_space') }}
-                    </a>
-                </div>
+                @guest
+                    <div class="flex items-center px-4 space-x-2">
+                        <a href="{{ route('login') }}" class="block w-full text-center px-4 py-2 border border-yellow-500 rounded-md font-semibold text-xs text-yellow-500 uppercase tracking-widest hover:bg-gray-800 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
+                            {{ __('app.candidate_space') }}
+                        </a>
+                        <a href="{{ route('login') }}" class="block w-full text-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-gray-900 uppercase tracking-widest hover:bg-yellow-400 active:bg-yellow-600 focus:outline-none focus:border-yellow-600 focus:ring ring-yellow-300 disabled:opacity-25 transition ease-in-out duration-150">
+                            {{ __('app.inspector_space') }}
+                        </a>
+                    </div>
+                @else
+                    <div class="px-4 py-2">
+                        <div class="font-medium text-white">{{ Auth::user()->name }}</div>
+                        <div class="text-sm text-gray-400">{{ Auth::user()->email }}</div>
+                    </div>
+                    <div class="mt-3 px-4">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('app.logout') }}
+                            </button>
+                        </form>
+                    </div>
+                @endguest
             </div>
         </div>
     </header>
@@ -214,13 +263,23 @@
                         languageMenu.classList.add('hidden');
                     }
                 });
+            }
+            
+            // User menu toggle
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userMenu = document.getElementById('user-menu');
+            
+            if (userMenuButton && userMenu) {
+                userMenuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    userMenu.classList.toggle('hidden');
+                });
                 
-                // No event.preventDefault() for language links to ensure they work
-                const languageLinks = languageMenu.querySelectorAll('a');
-                languageLinks.forEach(function(link) {
-                    link.addEventListener('click', function() {
-                        // Allow default action to happen
-                    });
+                // Close the menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                        userMenu.classList.add('hidden');
+                    }
                 });
             }
             

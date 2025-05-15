@@ -12,6 +12,7 @@ return [
     'forgot_password' => 'Forgot your password?',
     'need_account' => 'Don\'t have an account?',
     'register_now' => 'Register now',
+    'logout' => 'Log Out',
     
     // Registration page
     'register_title' => 'Join Our Platform',
