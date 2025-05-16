@@ -46,6 +46,22 @@ class AuthenticatedSessionController extends Controller
                 ->with('reason', $user->rejection_reason);
         }
         
+        // Check if account has expired
+        if ($user->hasExpired()) {
+            // Automatically deactivate expired accounts
+            $user->is_active = false;
+            $user->save();
+            
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('account.inactive')
+                ->with('error', __('Your account has expired on :date. Please contact an administrator for assistance.', [
+                    'date' => $user->expires_at->format('Y-m-d')
+                ]));
+        }
+        
         // Check if user account is inactive
         if (!$user->is_active) {
             Auth::logout();

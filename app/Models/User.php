@@ -30,6 +30,7 @@ class User extends Authenticatable
         'is_active',
         'approved_at',
         'approved_by',
+        'expires_at',
     ];
 
     /**
@@ -54,6 +55,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
             'approved_at' => 'datetime',
+            'expires_at' => 'datetime',
         ];
     }
 
@@ -239,7 +241,46 @@ class User extends Authenticatable
      */
     public function isActive(): bool
     {
+        // Check if account has expired
+        if ($this->hasExpired()) {
+            return false;
+        }
+        
         return $this->is_active;
+    }
+
+    /**
+     * Check if the user account has expired.
+     *
+     * @return bool
+     */
+    public function hasExpired(): bool
+    {
+        if (!$this->expires_at) {
+            return false;
+        }
+        
+        // Compare dates only to avoid timezone issues
+        return now()->startOfDay()->gt($this->expires_at->startOfDay());
+    }
+
+    /**
+     * Get the days remaining until account expiration.
+     *
+     * @return int|null
+     */
+    public function daysUntilExpiration(): ?int
+    {
+        if (!$this->expires_at) {
+            return null;
+        }
+        
+        $now = now();
+        if ($now->gt($this->expires_at)) {
+            return 0;
+        }
+        
+        return $now->diffInDays($this->expires_at);
     }
 
     /**

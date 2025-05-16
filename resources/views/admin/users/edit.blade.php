@@ -111,6 +111,89 @@
                             @enderror
                         </div>
 
+                        <div class="sm:col-span-3">
+                            <label for="expires_at" class="block text-sm font-medium text-gray-700">{{ __('Account Expiration Date') }}</label>
+                            <div class="mt-1">
+                                <input type="date" name="expires_at" id="expires_at" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" value="{{ old('expires_at', $user->expires_at ? $user->expires_at->format('Y-m-d') : '') }}">
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Leave empty for no expiration') }}</p>
+                            @error('expires_at')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            @if($user->expires_at)
+                                <div class="mt-2">
+                                    @if($user->hasExpired())
+                                        <div class="p-2 bg-red-100 border-l-4 border-red-500 text-red-700 mb-2">
+                                            <p class="font-medium">{{ __('Account expired on') }} {{ $user->expires_at->format('Y-m-d') }}</p>
+                                            <p class="text-sm">{{ __('The account is currently inactive due to expiration.') }}</p>
+                                        </div>
+                                        <button type="button" class="text-sm bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded" 
+                                                onclick="extendAndActivateAccount()">
+                                            {{ __('Extend by 30 days and reactivate') }}
+                                        </button>
+                                        
+                                        <script>
+                                            function extendAndActivateAccount() {
+                                                // Set the expiration date to 30 days from now
+                                                document.getElementById('expires_at').value = '{{ now()->addDays(30)->format('Y-m-d') }}';
+                                                
+                                                // Set account to active
+                                                document.getElementById('is_active').value = '1';
+                                                
+                                                // Create and show toast notification
+                                                const toast = document.createElement('div');
+                                                toast.className = 'fixed bottom-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-lg transform transition-transform duration-300 ease-in-out z-50';
+                                                toast.innerHTML = `
+                                                    <div class="flex items-center">
+                                                        <div class="flex-shrink-0">
+                                                            <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="ml-3">
+                                                            <p class="text-sm font-medium">
+                                                                {{ __('Account will be extended by 30 days and reactivated when you save the form.') }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="ml-auto pl-3">
+                                                            <div class="-mx-1.5 -my-1.5">
+                                                                <button type="button" onclick="this.parentElement.parentElement.parentElement.remove()" class="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                                    <span class="sr-only">{{ __('Dismiss') }}</span>
+                                                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                                
+                                                document.body.appendChild(toast);
+                                                
+                                                // Auto remove after 5 seconds
+                                                setTimeout(() => {
+                                                    toast.classList.add('translate-y-2', 'opacity-0');
+                                                    setTimeout(() => {
+                                                        toast.remove();
+                                                    }, 300);
+                                                }, 5000);
+                                            }
+                                        </script>
+                                    @else
+                                        <div class="p-2 {{ $user->daysUntilExpiration() < 7 ? 'bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700' : 'bg-blue-100 border-l-4 border-blue-500 text-blue-700' }}">
+                                            <p class="font-medium">
+                                                {{ __('Account will expire in') }} {{ $user->daysUntilExpiration() }} {{ __('days') }}
+                                                ({{ $user->expires_at->format('Y-m-d') }})
+                                            </p>
+                                            @if($user->daysUntilExpiration() < 7)
+                                                <p class="text-sm">{{ __('Warning: This account will expire soon.') }}</p>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+
                         <div id="rejection_reason_container" class="sm:col-span-6 {{ old('approval_status', $user->approval_status) !== 'rejected' ? 'hidden' : '' }}">
                             <label for="rejection_reason" class="block text-sm font-medium text-gray-700">{{ __('Rejection Reason') }}</label>
                             <div class="mt-1">

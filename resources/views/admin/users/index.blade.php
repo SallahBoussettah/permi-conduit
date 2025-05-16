@@ -126,6 +126,19 @@
                                                 {{ __('Inactive') }}
                                             </span>
                                         @endif
+                                        
+                                        <!-- Expiration Status -->
+                                        @if($user->expires_at)
+                                            @if($user->hasExpired())
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800" title="{{ __('Expired on') }} {{ $user->expires_at->format('Y-m-d') }}">
+                                                    {{ __('Expired') }}
+                                                </span>
+                                            @else
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->daysUntilExpiration() < 7 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}" title="{{ __('Expires on') }} {{ $user->expires_at->format('Y-m-d') }}">
+                                                    {{ __('Expires in') }} {{ $user->daysUntilExpiration() }} {{ __('days') }}
+                                                </span>
+                                            @endif
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -205,15 +218,12 @@
                                         <!-- Approval Actions -->
                                         @if($user->approval_status === 'pending')
                                             <div class="flex space-x-2">
-                                                <form action="{{ route('admin.users.approve', $user) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="text-green-600 hover:text-green-900">
-                                                        <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        {{ __('Approve') }}
-                                                    </button>
-                                                </form>
+                                                <a href="{{ route('admin.users.show-approve', $user) }}" class="text-green-600 hover:text-green-900">
+                                                    <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    {{ __('Approve') }}
+                                                </a>
                                                 <a href="{{ route('admin.users.show-reject', $user) }}" class="text-red-600 hover:text-red-900">
                                                     <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

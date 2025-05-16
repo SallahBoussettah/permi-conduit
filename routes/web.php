@@ -105,6 +105,7 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         
         // User approval management
         Route::post('/users/{user}/approve', [\App\Http\Controllers\Admin\UserController::class, 'approve'])->name('users.approve');
+        Route::get('/users/{user}/approve', [\App\Http\Controllers\Admin\UserController::class, 'showApprove'])->name('users.show-approve');
         Route::get('/users/{user}/reject', [\App\Http\Controllers\Admin\UserController::class, 'showReject'])->name('users.show-reject');
         Route::post('/users/{user}/reject', [\App\Http\Controllers\Admin\UserController::class, 'reject'])->name('users.reject');
         Route::post('/users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])->name('users.toggle-active');

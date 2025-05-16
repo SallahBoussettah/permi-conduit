@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip this migration if the column doesn't exist
+        if (!Schema::hasColumn('users', 'permit_category_id')) {
+            return;
+        }
+
         // First, migrate existing permit category data to the pivot table
         $users = DB::table('users')->whereNotNull('permit_category_id')->get();
         foreach ($users as $user) {

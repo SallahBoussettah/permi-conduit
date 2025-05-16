@@ -102,6 +102,7 @@ class UserController extends Controller
             'approval_status' => ['nullable', 'in:pending,approved,rejected'],
             'rejection_reason' => ['nullable', 'string', 'required_if:approval_status,rejected'],
             'is_active' => ['nullable', 'boolean'],
+            'expires_at' => ['nullable', 'date'],
         ]);
         
         $user->name = $validated['name'];
@@ -132,6 +133,11 @@ class UserController extends Controller
         // Update active status if provided
         if (isset($validated['is_active'])) {
             $user->is_active = $validated['is_active'];
+        }
+        
+        // Update expiration date if provided
+        if (isset($validated['expires_at'])) {
+            $user->expires_at = $validated['expires_at'];
         }
         
         $user->save();
@@ -197,21 +203,52 @@ class UserController extends Controller
     /**
      * Approve a user.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function approve(User $user)
+    public function approve(Request $request, User $user)
     {
+        $validated = $request->validate([
+            'expiration_type' => ['required', 'in:none,days,date'],
+            'expires_after' => ['nullable', 'integer', 'min:1', 'required_if:expiration_type,days'],
+            'expiration_date' => ['nullable', 'date', 'required_if:expiration_type,date'],
+        ]);
+        
         $user->approval_status = 'approved';
         $user->approved_at = now();
         $user->approved_by = auth()->id();
         $user->rejection_reason = null;
+        $user->is_active = true;
+        
+        // Set expiration date based on the selected option
+        if ($validated['expiration_type'] === 'days' && isset($validated['expires_after']) && $validated['expires_after'] > 0) {
+            $user->expires_at = now()->addDays($validated['expires_after']);
+        } elseif ($validated['expiration_type'] === 'date' && isset($validated['expiration_date'])) {
+            $user->expires_at = $validated['expiration_date'];
+        } else {
+            // No expiration (none)
+            $user->expires_at = null;
+        }
+        
         $user->save();
         
         // Here you can add code to send an approval notification email
         
-        return redirect()->back()
-            ->with('success', 'User has been approved successfully.');
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User has been approved successfully.' . 
+                ($user->expires_at ? ' Account will expire on ' . $user->expires_at->format('Y-m-d') : ''));
+    }
+
+    /**
+     * Show the approval form for a user.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\View\View
+     */
+    public function showApprove(User $user)
+    {
+        return view('admin.users.approve', compact('user'));
     }
 
     /**
