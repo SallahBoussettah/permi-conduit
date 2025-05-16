@@ -96,4 +96,67 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
+
+    /**
+     * Get the course materials that the user has progress on.
+     */
+    public function courseMaterialsProgress()
+    {
+        return $this->hasMany(UserCourseProgress::class);
+    }
+
+    /**
+     * Get the completed course materials for the user.
+     */
+    public function completedMaterials()
+    {
+        return $this->hasMany(UserCourseProgress::class)->where('completed', true);
+    }
+
+    /**
+     * Get the completed courses for the user.
+     */
+    public function completedCourses()
+    {
+        return $this->belongsToMany(Course::class, 'user_course_completions')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if the user has completed a specific course.
+     *
+     * @param  \App\Models\Course|int  $course
+     * @return bool
+     */
+    public function hasCompletedCourse($course)
+    {
+        $courseId = $course instanceof Course ? $course->id : $course;
+        
+        return $this->completedCourses()->where('course_id', $courseId)->exists();
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->name}";
+    }
+
+    // Course progress relationship
+    public function courseProgress()
+    {
+        return $this->hasMany(UserCourseProgress::class);
+    }
+
+    // Course completions relationship - using the existing completedCourses relationship
+    public function courseCompletions()
+    {
+        return $this->completedCourses();
+    }
+
+    // Get progress for a specific course
+    public function getProgressForCourse($courseId)
+    {
+        return $this->completedCourses()
+            ->where('course_id', $courseId)
+            ->first();
+    }
 }

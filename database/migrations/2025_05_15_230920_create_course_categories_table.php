@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exam_types', function (Blueprint $table) {
+        Schema::create('course_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // e.g., "Catégorie C - Épreuve Hors Circulation"
-            $table->text('description')->nullable(); // Description of the exam type
-            $table->string('pdf_reference')->nullable(); // Reference to PDF documentation
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('exam_types');
+        Schema::dropIfExists('course_categories');
     }
 };

@@ -37,5 +37,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'candidate@example.com',
             'role_id' => Role::where('name', 'candidate')->first()->id,
         ]);
+
+        $this->call([
+            ExamTypeSeeder::class,    // Must run before ExamSectionSeeder
+            ExamSectionSeeder::class,
+            CourseSeeder::class,
+        ]);
     }
 }

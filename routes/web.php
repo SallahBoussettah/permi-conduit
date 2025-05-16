@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
     
     // Admin routes
-    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
         // Inspector management
         Route::get('/inspectors', [AdminController::class, 'listInspectors'])->name('inspectors');
         Route::get('/inspectors/register', [AdminController::class, 'showRegisterInspector'])->name('register.inspector');
@@ -98,13 +98,39 @@ Route::middleware('auth')->group(function () {
     });
     
     // Inspector routes
-    Route::middleware('role:inspector')->prefix('inspector')->name('inspector.')->group(function () {
-        // Add inspector-specific routes here
+    Route::middleware(['auth', 'role:inspector'])->prefix('inspector')->name('inspector.')->group(function () {
+        // Courses
+        Route::get('/courses', [\App\Http\Controllers\Inspector\CourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/create', [\App\Http\Controllers\Inspector\CourseController::class, 'create'])->name('courses.create');
+        Route::post('/courses', [\App\Http\Controllers\Inspector\CourseController::class, 'store'])->name('courses.store');
+        Route::get('/courses/{course}', [\App\Http\Controllers\Inspector\CourseController::class, 'show'])->name('courses.show');
+        Route::get('/courses/{course}/edit', [\App\Http\Controllers\Inspector\CourseController::class, 'edit'])->name('courses.edit');
+        Route::put('/courses/{course}', [\App\Http\Controllers\Inspector\CourseController::class, 'update'])->name('courses.update');
+        Route::delete('/courses/{course}', [\App\Http\Controllers\Inspector\CourseController::class, 'destroy'])->name('courses.destroy');
+        
+        // Course Materials
+        Route::get('/courses/{course}/materials', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'index'])->name('courses.materials.index');
+        Route::get('/courses/{course}/materials/create', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'create'])->name('courses.materials.create');
+        Route::post('/courses/{course}/materials', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'store'])->name('courses.materials.store');
+        Route::get('/courses/{course}/materials/{material}', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'show'])->name('courses.materials.show');
+        Route::get('/courses/{course}/materials/{material}/edit', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'edit'])->name('courses.materials.edit');
+        Route::put('/courses/{course}/materials/{material}', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'update'])->name('courses.materials.update');
+        Route::delete('/courses/{course}/materials/{material}', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'destroy'])->name('courses.materials.destroy');
+        Route::post('/courses/{course}/materials/update-order', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'updateOrder'])->name('courses.materials.update-order');
+        Route::get('/courses/{course}/materials/{material}/pdf', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'servePdf'])->name('courses.materials.pdf');
     });
     
     // Candidate routes
-    Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->group(function () {
-        // Add candidate-specific routes here
+    Route::middleware(['auth', 'role:candidate'])->prefix('candidate')->name('candidate.')->group(function () {
+        // Courses
+        Route::get('/courses', [\App\Http\Controllers\Candidate\CourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/{course}', [\App\Http\Controllers\Candidate\CourseController::class, 'show'])->name('courses.show');
+        
+        // Course Materials
+        Route::get('/courses/{course}/materials/{material}', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'show'])->name('courses.materials.show');
+        Route::get('/courses/{course}/materials/{material}/pdf', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'servePdf'])->name('courses.materials.pdf');
+        Route::post('/courses/{course}/materials/{material}/progress', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'updateProgress'])->name('courses.materials.progress');
+        Route::post('/courses/{course}/materials/{material}/complete', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'markAsComplete'])->name('courses.materials.complete');
     });
 });
 

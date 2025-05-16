@@ -18,6 +18,7 @@ class ExamType extends Model
     protected $fillable = [
         'name',
         'pdf_reference',
+        'description',
     ];
 
     /**

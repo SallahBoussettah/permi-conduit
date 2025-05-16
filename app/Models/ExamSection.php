@@ -17,10 +17,9 @@ class ExamSection extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'exam_type_id',
         'name',
-        'official_max_points',
-        'sequence_order',
+        'description',
+        'order',
     ];
 
     /**
@@ -40,7 +39,7 @@ class ExamSection extends Model
     }
 
     /**
-     * Get the courses for the exam section.
+     * Get the courses for this exam section.
      */
     public function courses(): HasMany
     {
