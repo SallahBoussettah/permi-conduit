@@ -5,16 +5,32 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header Section -->
         <div class="mb-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between">
                 <div class="flex-1 min-w-0">
-                    <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl sm:tracking-tight">
-                        {{ $course->title }}
-                    </h1>
-                    @if($course->category)
-                    <p class="mt-2 text-lg text-gray-500">
-                        {{ $course->category->name }}
-                    </p>
-                    @endif
+                    <div class="flex md:items-center">
+                        @if($course->thumbnail)
+                            <div class="flex-shrink-0 h-24 w-24 rounded-lg overflow-hidden bg-gray-100 mr-4">
+                                <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="h-24 w-24 object-cover">
+                            </div>
+                        @endif
+                        <div>
+                            <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl sm:tracking-tight">
+                                {{ $course->title }}
+                            </h1>
+                            @if($course->category)
+                            <p class="mt-2 text-lg text-gray-500">
+                                {{ $course->category->name }}
+                            </p>
+                            @endif
+                            @if($course->examSection)
+                            <div class="mt-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                    {{ $course->examSection->name }}
+                                </span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-4 md:mt-0 flex-shrink-0">
                     <a href="{{ route('candidate.courses.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">

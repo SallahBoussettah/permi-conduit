@@ -95,10 +95,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/inspectors', [AdminController::class, 'listInspectors'])->name('inspectors');
         Route::get('/inspectors/register', [AdminController::class, 'showRegisterInspector'])->name('register.inspector');
         Route::post('/inspectors/register', [AdminController::class, 'registerInspector'])->name('register.inspector.submit');
+        
+        // User management
+        Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+        Route::patch('/users/{user}/permit-category', [\App\Http\Controllers\Admin\UserController::class, 'updatePermitCategory'])->name('users.update-permit-category');
     });
     
     // Inspector routes
     Route::middleware(['auth', 'role:inspector'])->prefix('inspector')->name('inspector.')->group(function () {
+        // Permit Categories
+        Route::resource('permit-categories', \App\Http\Controllers\Inspector\PermitCategoryController::class);
+        
         // Courses
         Route::get('/courses', [\App\Http\Controllers\Inspector\CourseController::class, 'index'])->name('courses.index');
         Route::get('/courses/create', [\App\Http\Controllers\Inspector\CourseController::class, 'create'])->name('courses.create');

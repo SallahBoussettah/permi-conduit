@@ -20,9 +20,22 @@ class CourseController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $courses = Course::with(['materials', 'completions' => function($query) use ($user) {
+        $query = Course::with(['materials', 'completions' => function($query) use ($user) {
             $query->where('user_id', $user->id);
-        }])->orderBy('title')->paginate(9);
+        }]);
+        
+        // Filter courses by permit category if user has one
+        if ($user->permit_category_id) {
+            $query->where(function($q) use ($user) {
+                $q->where('permit_category_id', $user->permit_category_id)
+                  ->orWhereNull('permit_category_id'); // Include courses with no specific permit category
+            });
+        } else {
+            // If user doesn't have a permit category, only show courses without a permit category
+            $query->whereNull('permit_category_id');
+        }
+        
+        $courses = $query->orderBy('title')->paginate(9);
         
         // Get progress for each course
         foreach ($courses as $course) {
@@ -79,6 +92,13 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         $user = Auth::user();
+        
+        // Check if the user has permission to view this course based on permit category
+        if ($course->permit_category_id && $course->permit_category_id != $user->permit_category_id) {
+            return redirect()->route('candidate.courses.index')
+                ->with('error', 'You do not have permission to access this course.');
+        }
+        
         $materials = $course->materials()->orderBy('sequence_order')->get();
         
         // Get progress for each material

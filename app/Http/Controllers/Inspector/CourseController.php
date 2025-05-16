@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Inspector;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\ExamSection;
+use App\Models\CourseCategory;
+use App\Models\PermitCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
@@ -28,7 +33,9 @@ class CourseController extends Controller
     public function create()
     {
         $examSections = ExamSection::orderBy('name')->pluck('name', 'id');
-        return view('inspector.courses.create', compact('examSections'));
+        $categories = CourseCategory::where('status', true)->orderBy('name')->pluck('name', 'id');
+        $permitCategories = PermitCategory::where('status', true)->orderBy('name')->pluck('name', 'id');
+        return view('inspector.courses.create', compact('examSections', 'categories', 'permitCategories'));
     }
 
     /**
@@ -43,7 +50,23 @@ class CourseController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'exam_section_id' => 'nullable|exists:exam_sections,id',
+            'category_id' => 'nullable|exists:course_categories,id',
+            'permit_category_id' => 'nullable|exists:permit_categories,id',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // 2MB max
         ]);
+
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail = $request->file('thumbnail');
+            $thumbnailName = time() . '_' . Str::slug($request->title) . '.' . $thumbnail->getClientOriginalExtension();
+            $thumbnail->storeAs('thumbnails', $thumbnailName, 'public');
+            $validated['thumbnail'] = 'thumbnails/' . $thumbnailName;
+        }
+
+        // Add the authenticated inspector as the course creator
+        $validated['inspector_id'] = Auth::id();
+        $validated['created_by'] = Auth::id();
+        $validated['status'] = true;
 
         $course = Course::create($validated);
 
@@ -72,7 +95,9 @@ class CourseController extends Controller
     public function edit(Course $course)
     {
         $examSections = ExamSection::orderBy('name')->pluck('name', 'id');
-        return view('inspector.courses.edit', compact('course', 'examSections'));
+        $categories = CourseCategory::where('status', true)->orderBy('name')->pluck('name', 'id');
+        $permitCategories = PermitCategory::where('status', true)->orderBy('name')->pluck('name', 'id');
+        return view('inspector.courses.edit', compact('course', 'examSections', 'categories', 'permitCategories'));
     }
 
     /**
@@ -88,7 +113,26 @@ class CourseController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'exam_section_id' => 'nullable|exists:exam_sections,id',
+            'category_id' => 'nullable|exists:course_categories,id',
+            'permit_category_id' => 'nullable|exists:permit_categories,id',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // 2MB max
         ]);
+
+        // Handle thumbnail upload
+        if ($request->hasFile('thumbnail')) {
+            // Delete old thumbnail if exists
+            if ($course->thumbnail) {
+                Storage::disk('public')->delete($course->thumbnail);
+            }
+            
+            $thumbnail = $request->file('thumbnail');
+            $thumbnailName = time() . '_' . Str::slug($request->title) . '.' . $thumbnail->getClientOriginalExtension();
+            $thumbnail->storeAs('thumbnails', $thumbnailName, 'public');
+            $validated['thumbnail'] = 'thumbnails/' . $thumbnailName;
+        }
+
+        // Add the authenticated inspector as the course updater
+        $validated['updated_by'] = Auth::id();
 
         $course->update($validated);
 
@@ -110,6 +154,13 @@ class CourseController extends Controller
                 ->with('error', 'Cannot delete course with materials. Please remove all materials first.');
         }
 
+        // Delete thumbnail if exists
+        if ($course->thumbnail) {
+            Storage::disk('public')->delete($course->thumbnail);
+        }
+
+        // Soft delete with deleted_by
+        $course->update(['deleted_by' => Auth::id()]);
         $course->delete();
 
         return redirect()->route('inspector.courses.index')

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'permit_category_id',
     ];
 
     /**
@@ -55,6 +56,14 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the permit category that this user belongs to.
+     */
+    public function permitCategory(): BelongsTo
+    {
+        return $this->belongsTo(PermitCategory::class);
     }
 
     /**

@@ -25,6 +25,7 @@ class Course extends Model
         'category_id',
         'inspector_id',
         'thumbnail',
+        'permit_category_id',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -113,6 +114,11 @@ class Course extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(CourseCategory::class, 'category_id');
+    }
+
+    public function permitCategory(): BelongsTo
+    {
+        return $this->belongsTo(PermitCategory::class, 'permit_category_id');
     }
 
     public function createdBy(): BelongsTo

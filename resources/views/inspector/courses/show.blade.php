@@ -8,20 +8,33 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center">
-                        <div class="flex-shrink-0 h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                            <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
+                        @if($course->thumbnail)
+                            <div class="flex-shrink-0 h-16 w-16 rounded-lg overflow-hidden bg-gray-100">
+                                <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="h-16 w-16 object-cover">
+                            </div>
+                        @else
+                            <div class="flex-shrink-0 h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                                <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                        @endif
                         <div class="ml-4">
                             <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl sm:tracking-tight">
                                 {{ $course->title }}
                             </h1>
-                            @if($course->examSection)
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 mt-1">
-                                    {{ $course->examSection->name }}
-                                </span>
-                            @endif
+                            <div class="mt-1 flex flex-wrap gap-2">
+                                @if($course->examSection)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                        {{ $course->examSection->name }}
+                                    </span>
+                                @endif
+                                @if($course->category)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        {{ $course->category->name }}
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -72,6 +85,78 @@
                 </div>
             </div>
         @endif
+
+        <!-- Course Metadata -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+            <div class="px-4 py-5 sm:px-6 bg-gray-50">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Course Information') }}</h3>
+            </div>
+            <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <!-- Thumbnail -->
+                        @if($course->thumbnail)
+                            <div class="mb-4">
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Thumbnail Image') }}</p>
+                                <div class="rounded-lg overflow-hidden border border-gray-200 w-40">
+                                    <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-auto">
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($course->category)
+                            <div class="mb-4">
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Category') }}</p>
+                                <p class="text-sm text-gray-900">{{ $course->category->name }}</p>
+                            </div>
+                        @endif
+                        
+                        @if($course->permitCategory)
+                            <div class="mb-4">
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Permit Category') }}</p>
+                                <p class="text-sm text-gray-900">{{ $course->permitCategory->name }} ({{ $course->permitCategory->code }})</p>
+                            </div>
+                        @endif
+                        
+                        @if($course->examSection)
+                            <div class="mb-4">
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Exam Section') }}</p>
+                                <p class="text-sm text-gray-900">{{ $course->examSection->name }}</p>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <div>
+                        <!-- Additional course metadata can be added here -->
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Status') }}</p>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $course->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                {{ $course->status ? __('Active') : __('Inactive') }}
+                            </span>
+                        </div>
+                        
+                        @if($course->inspector)
+                            <div class="mb-4">
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Inspector') }}</p>
+                                <p class="text-sm text-gray-900">{{ $course->inspector->name }}</p>
+                            </div>
+                        @endif
+                        
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Created At') }}</p>
+                            <p class="text-sm text-gray-900">{{ $course->created_at->format('M d, Y H:i') }}</p>
+                        </div>
+                        
+                        @if($course->updated_at && $course->updated_at->ne($course->created_at))
+                            <div class="mb-4">
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Last Updated') }}</p>
+                                <p class="text-sm text-gray-900">{{ $course->updated_at->format('M d, Y H:i') }}</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Course Description -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
