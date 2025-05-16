@@ -21,6 +21,7 @@ class UserController extends Controller
     {
         $roleFilter = $request->get('role');
         $permitCategoryFilter = $request->get('permit_category');
+        $statusFilter = $request->get('status');
         $search = $request->get('search');
         
         $query = User::with(['role', 'permitCategories']);
@@ -36,6 +37,17 @@ class UserController extends Controller
             });
         }
         
+        // Apply approval status filter
+        if ($statusFilter) {
+            if ($statusFilter === 'active') {
+                $query->where('is_active', true);
+            } elseif ($statusFilter === 'inactive') {
+                $query->where('is_active', false);
+            } elseif (in_array($statusFilter, ['pending', 'approved', 'rejected'])) {
+                $query->where('approval_status', $statusFilter);
+            }
+        }
+        
         // Apply search
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -48,7 +60,7 @@ class UserController extends Controller
         $roles = Role::orderBy('name')->pluck('name', 'id');
         $permitCategories = PermitCategory::orderBy('name')->pluck('name', 'id');
         
-        return view('admin.users.index', compact('users', 'roles', 'permitCategories', 'roleFilter', 'permitCategoryFilter', 'search'));
+        return view('admin.users.index', compact('users', 'roles', 'permitCategories', 'roleFilter', 'permitCategoryFilter', 'statusFilter', 'search'));
     }
 
     /**
@@ -87,6 +99,9 @@ class UserController extends Controller
             'permit_category_ids' => ['nullable', 'array'],
             'permit_category_ids.*' => ['exists:permit_categories,id'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'approval_status' => ['nullable', 'in:pending,approved,rejected'],
+            'rejection_reason' => ['nullable', 'string', 'required_if:approval_status,rejected'],
+            'is_active' => ['nullable', 'boolean'],
         ]);
         
         $user->name = $validated['name'];
@@ -96,6 +111,27 @@ class UserController extends Controller
         // Only update password if provided
         if (isset($validated['password']) && !empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
+        }
+        
+        // Update approval status and active status if provided
+        if (isset($validated['approval_status'])) {
+            $user->approval_status = $validated['approval_status'];
+            
+            // If status is changing to approved, set approved_at and approved_by
+            if ($validated['approval_status'] === 'approved' && $user->approval_status !== 'approved') {
+                $user->approved_at = now();
+                $user->approved_by = auth()->id();
+            }
+            
+            // If status is changing to rejected, set rejection reason
+            if ($validated['approval_status'] === 'rejected') {
+                $user->rejection_reason = $validated['rejection_reason'] ?? null;
+            }
+        }
+        
+        // Update active status if provided
+        if (isset($validated['is_active'])) {
+            $user->is_active = $validated['is_active'];
         }
         
         $user->save();
@@ -156,5 +192,76 @@ class UserController extends Controller
         
         return redirect()->back()
             ->with('error', 'User does not have this permit category.');
+    }
+
+    /**
+     * Approve a user.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function approve(User $user)
+    {
+        $user->approval_status = 'approved';
+        $user->approved_at = now();
+        $user->approved_by = auth()->id();
+        $user->rejection_reason = null;
+        $user->save();
+        
+        // Here you can add code to send an approval notification email
+        
+        return redirect()->back()
+            ->with('success', 'User has been approved successfully.');
+    }
+
+    /**
+     * Show the rejection form for a user.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\View\View
+     */
+    public function showReject(User $user)
+    {
+        return view('admin.users.reject', compact('user'));
+    }
+
+    /**
+     * Reject a user with a reason.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function reject(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'rejection_reason' => ['required', 'string', 'max:500'],
+        ]);
+        
+        $user->approval_status = 'rejected';
+        $user->rejection_reason = $validated['rejection_reason'];
+        $user->save();
+        
+        // Here you can add code to send a rejection notification email
+        
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User has been rejected.');
+    }
+
+    /**
+     * Toggle the active status of a user.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function toggleActive(User $user)
+    {
+        $user->is_active = !$user->is_active;
+        $user->save();
+        
+        $status = $user->is_active ? 'activated' : 'deactivated';
+        
+        return redirect()->back()
+            ->with('success', "User account has been {$status}.");
     }
 } 

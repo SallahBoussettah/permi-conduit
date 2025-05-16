@@ -47,6 +47,18 @@
                         @endforeach
                     </select>
                 </div>
+
+                <div class="w-full md:w-1/4">
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Status') }}</label>
+                    <select name="status" id="status" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="">{{ __('All Statuses') }}</option>
+                        <option value="pending" {{ (isset($statusFilter) && $statusFilter === 'pending') ? 'selected' : '' }}>{{ __('Pending Approval') }}</option>
+                        <option value="approved" {{ (isset($statusFilter) && $statusFilter === 'approved') ? 'selected' : '' }}>{{ __('Approved') }}</option>
+                        <option value="rejected" {{ (isset($statusFilter) && $statusFilter === 'rejected') ? 'selected' : '' }}>{{ __('Rejected') }}</option>
+                        <option value="active" {{ (isset($statusFilter) && $statusFilter === 'active') ? 'selected' : '' }}>{{ __('Active') }}</option>
+                        <option value="inactive" {{ (isset($statusFilter) && $statusFilter === 'inactive') ? 'selected' : '' }}>{{ __('Inactive') }}</option>
+                    </select>
+                </div>
                 
                 <div class="flex space-x-2">
                     <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -68,6 +80,7 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Name') }}</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Email') }}</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Role') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Permit Category') }}</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
                         </tr>
@@ -85,6 +98,35 @@
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->role->name === 'admin' ? 'bg-purple-100 text-purple-800' : ($user->role->name === 'inspector' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') }}">
                                         {{ ucfirst($user->role->name) }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-col space-y-2">
+                                        <!-- Approval Status -->
+                                        @if($user->approval_status === 'pending')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                {{ __('Pending Approval') }}
+                                            </span>
+                                        @elseif($user->approval_status === 'approved')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                {{ __('Approved') }}
+                                            </span>
+                                        @elseif($user->approval_status === 'rejected')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800" title="{{ $user->rejection_reason }}">
+                                                {{ __('Rejected') }}
+                                            </span>
+                                        @endif
+                                        
+                                        <!-- Active Status -->
+                                        @if($user->is_active)
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                                                {{ __('Active') }}
+                                            </span>
+                                        @else
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                {{ __('Inactive') }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-col space-y-2">
@@ -152,17 +194,58 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900">
-                                        <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                        {{ __('Edit') }}
-                                    </a>
+                                    <div class="flex flex-col space-y-2">
+                                        <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                            {{ __('Edit') }}
+                                        </a>
+                                        
+                                        <!-- Approval Actions -->
+                                        @if($user->approval_status === 'pending')
+                                            <div class="flex space-x-2">
+                                                <form action="{{ route('admin.users.approve', $user) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="text-green-600 hover:text-green-900">
+                                                        <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        {{ __('Approve') }}
+                                                    </button>
+                                                </form>
+                                                <a href="{{ route('admin.users.show-reject', $user) }}" class="text-red-600 hover:text-red-900">
+                                                    <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                    {{ __('Reject') }}
+                                                </a>
+                                            </div>
+                                        @endif
+                                        
+                                        <!-- Toggle Active Status -->
+                                        <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="{{ $user->is_active ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900' }}">
+                                                @if($user->is_active)
+                                                    <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                                    </svg>
+                                                    {{ __('Deactivate') }}
+                                                @else
+                                                    <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    {{ __('Activate') }}
+                                                @endif
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-500">
+                                <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-500">
                                     {{ __('No users found.') }}
                                 </td>
                             </tr>
@@ -172,7 +255,7 @@
             </div>
             @if($users->hasPages())
                 <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                    {{ $users->links() }}
+                    {{ $users->appends(request()->query())->links() }}
                 </div>
             @endif
         </div>

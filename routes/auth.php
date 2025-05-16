@@ -33,6 +33,18 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+        
+    // Registration status pages
+    Route::get('registration/pending', [RegisteredUserController::class, 'showPendingApproval'])
+        ->name('registration.pending');
+        
+    Route::get('registration/rejected', function () {
+        return view('auth.rejected');
+    })->name('registration.rejected');
+    
+    Route::get('account/inactive', function () {
+        return view('auth.inactive');
+    })->name('account.inactive');
 });
 
 Route::middleware('auth')->group(function () {

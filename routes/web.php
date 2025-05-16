@@ -77,9 +77,9 @@ Route::get('/fr', function (Request $request) {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'App\Http\Middleware\CheckUserApproved'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -102,6 +102,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
         Route::patch('/users/{user}/permit-category', [\App\Http\Controllers\Admin\UserController::class, 'updatePermitCategory'])->name('users.update-permit-category');
         Route::delete('/users/{user}/permit-category/{category}', [\App\Http\Controllers\Admin\UserController::class, 'removePermitCategory'])->name('users.remove-permit-category');
+        
+        // User approval management
+        Route::post('/users/{user}/approve', [\App\Http\Controllers\Admin\UserController::class, 'approve'])->name('users.approve');
+        Route::get('/users/{user}/reject', [\App\Http\Controllers\Admin\UserController::class, 'showReject'])->name('users.show-reject');
+        Route::post('/users/{user}/reject', [\App\Http\Controllers\Admin\UserController::class, 'reject'])->name('users.reject');
+        Route::post('/users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])->name('users.toggle-active');
         
         // Permit Categories management
         Route::resource('permit-categories', \App\Http\Controllers\Admin\PermitCategoryController::class);

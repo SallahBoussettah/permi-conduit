@@ -47,17 +47,36 @@ class RegisteredUserController extends Controller
             $roleId = $role->id;
         }
 
+        // Only set inspectors to automatically approved if registered by an admin
+        // Candidates will always be pending approval
+        $approvalStatus = 'pending';
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role_id' => $roleId,
+            'approval_status' => $approvalStatus,
         ]);
 
         event(new Registered($user));
 
+        // If user is a candidate, redirect to pending approval page
+        if ($request->role === 'candidate') {
+            return redirect()->route('registration.pending');
+        }
+
+        // Only automatically log in approved users
         Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
+    }
+    
+    /**
+     * Display the registration pending approval page.
+     */
+    public function showPendingApproval(): View
+    {
+        return view('auth.pending-approval');
     }
 }

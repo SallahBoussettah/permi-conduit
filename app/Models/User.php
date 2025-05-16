@@ -25,6 +25,11 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'approval_status',
+        'rejection_reason',
+        'is_active',
+        'approved_at',
+        'approved_by',
     ];
 
     /**
@@ -47,6 +52,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -193,5 +200,53 @@ class User extends Authenticatable
         return $this->completedCourses()
             ->where('course_id', $courseId)
             ->first();
+    }
+
+    /**
+     * Check if the user is approved.
+     *
+     * @return bool
+     */
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    /**
+     * Check if the user is pending approval.
+     *
+     * @return bool
+     */
+    public function isPending(): bool
+    {
+        return $this->approval_status === 'pending';
+    }
+
+    /**
+     * Check if the user is rejected.
+     *
+     * @return bool
+     */
+    public function isRejected(): bool
+    {
+        return $this->approval_status === 'rejected';
+    }
+
+    /**
+     * Check if the user account is active.
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * Get the admin who approved this user.
+     */
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

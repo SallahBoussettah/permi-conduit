@@ -26,6 +26,35 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Check if user is pending approval
+        $user = Auth::user();
+        if ($user->approval_status === 'pending') {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('registration.pending');
+        }
+        
+        // Check if user is rejected
+        if ($user->approval_status === 'rejected') {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('registration.rejected')
+                ->with('reason', $user->rejection_reason);
+        }
+        
+        // Check if user account is inactive
+        if (!$user->is_active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('account.inactive');
+        }
+
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));

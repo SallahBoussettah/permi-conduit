@@ -85,6 +85,44 @@
                         </div>
 
                         <div class="sm:col-span-3">
+                            <label for="approval_status" class="block text-sm font-medium text-gray-700">{{ __('Approval Status') }}</label>
+                            <div class="mt-1">
+                                <select id="approval_status" name="approval_status" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    <option value="pending" {{ old('approval_status', $user->approval_status) === 'pending' ? 'selected' : '' }}>{{ __('Pending') }}</option>
+                                    <option value="approved" {{ old('approval_status', $user->approval_status) === 'approved' ? 'selected' : '' }}>{{ __('Approved') }}</option>
+                                    <option value="rejected" {{ old('approval_status', $user->approval_status) === 'rejected' ? 'selected' : '' }}>{{ __('Rejected') }}</option>
+                                </select>
+                            </div>
+                            @error('approval_status')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="is_active" class="block text-sm font-medium text-gray-700">{{ __('Account Status') }}</label>
+                            <div class="mt-1">
+                                <select id="is_active" name="is_active" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    <option value="1" {{ old('is_active', $user->is_active) ? 'selected' : '' }}>{{ __('Active') }}</option>
+                                    <option value="0" {{ old('is_active', $user->is_active) ? '' : 'selected' }}>{{ __('Inactive') }}</option>
+                                </select>
+                            </div>
+                            @error('is_active')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div id="rejection_reason_container" class="sm:col-span-6 {{ old('approval_status', $user->approval_status) !== 'rejected' ? 'hidden' : '' }}">
+                            <label for="rejection_reason" class="block text-sm font-medium text-gray-700">{{ __('Rejection Reason') }}</label>
+                            <div class="mt-1">
+                                <textarea id="rejection_reason" name="rejection_reason" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">{{ old('rejection_reason', $user->rejection_reason) }}</textarea>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Required if status is set to Rejected') }}</p>
+                            @error('rejection_reason')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="sm:col-span-3">
                             <label for="password" class="block text-sm font-medium text-gray-700">{{ __('New Password') }}</label>
                             <div class="mt-1">
                                 <input type="password" name="password" id="password" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="{{ __('Leave blank to keep current password') }}">
@@ -119,4 +157,26 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const approvalStatusSelect = document.getElementById('approval_status');
+        const rejectionReasonContainer = document.getElementById('rejection_reason_container');
+        
+        // Function to toggle the rejection reason field visibility
+        function toggleRejectionReason() {
+            if (approvalStatusSelect.value === 'rejected') {
+                rejectionReasonContainer.classList.remove('hidden');
+            } else {
+                rejectionReasonContainer.classList.add('hidden');
+            }
+        }
+        
+        // Add event listener to the approval status select
+        approvalStatusSelect.addEventListener('change', toggleRejectionReason);
+        
+        // Call the function once at page load to set initial state
+        toggleRejectionReason();
+    });
+</script>
 @endsection 
