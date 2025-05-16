@@ -10,41 +10,23 @@ use Illuminate\Support\Facades\Auth;
 class PermitCategoryController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:inspector']);
+    }
+
+    /**
      * Display a listing of the permit categories.
      */
     public function index()
     {
+        // Make sure to retrieve all permit categories regardless of status
         $permitCategories = PermitCategory::orderBy('name')->paginate(10);
         return view('inspector.permit-categories.index', compact('permitCategories'));
-    }
-
-    /**
-     * Show the form for creating a new permit category.
-     */
-    public function create()
-    {
-        return view('inspector.permit-categories.create');
-    }
-
-    /**
-     * Store a newly created permit category in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:10|unique:permit_categories,code',
-            'description' => 'nullable|string',
-            'status' => 'boolean',
-        ]);
-
-        // Set status to true if not provided
-        $validated['status'] = $validated['status'] ?? true;
-
-        $permitCategory = PermitCategory::create($validated);
-
-        return redirect()->route('inspector.permit-categories.index')
-            ->with('success', 'Permit category created successfully.');
     }
 
     /**
@@ -53,55 +35,5 @@ class PermitCategoryController extends Controller
     public function show(PermitCategory $permitCategory)
     {
         return view('inspector.permit-categories.show', compact('permitCategory'));
-    }
-
-    /**
-     * Show the form for editing the specified permit category.
-     */
-    public function edit(PermitCategory $permitCategory)
-    {
-        return view('inspector.permit-categories.edit', compact('permitCategory'));
-    }
-
-    /**
-     * Update the specified permit category in storage.
-     */
-    public function update(Request $request, PermitCategory $permitCategory)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:10|unique:permit_categories,code,' . $permitCategory->id,
-            'description' => 'nullable|string',
-            'status' => 'boolean',
-        ]);
-
-        // Set status to true if not provided
-        $validated['status'] = $validated['status'] ?? true;
-
-        $permitCategory->update($validated);
-
-        return redirect()->route('inspector.permit-categories.index')
-            ->with('success', 'Permit category updated successfully.');
-    }
-
-    /**
-     * Remove the specified permit category from storage.
-     */
-    public function destroy(PermitCategory $permitCategory)
-    {
-        // Check if permit category is used by any courses
-        if ($permitCategory->courses()->count() > 0) {
-            return back()->with('error', 'Cannot delete permit category that is used by courses.');
-        }
-
-        // Check if permit category is used by any users
-        if ($permitCategory->users()->count() > 0) {
-            return back()->with('error', 'Cannot delete permit category that is assigned to users.');
-        }
-
-        $permitCategory->delete();
-
-        return redirect()->route('inspector.permit-categories.index')
-            ->with('success', 'Permit category deleted successfully.');
     }
 } 

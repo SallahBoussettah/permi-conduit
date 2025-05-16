@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\CourseMaterial;
 use App\Models\UserCourseProgress;
 use App\Models\UserCourseCompletion;
+use App\Models\PermitCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,12 +25,24 @@ class CourseController extends Controller
             $query->where('user_id', $user->id);
         }]);
         
-        // Filter courses by permit category if user has one
+        // Check if user has a permit category and if it's active
+        $permitCategoryInactive = false;
+        $userPermitCategory = null;
+        
         if ($user->permit_category_id) {
-            $query->where(function($q) use ($user) {
-                $q->where('permit_category_id', $user->permit_category_id)
-                  ->orWhereNull('permit_category_id'); // Include courses with no specific permit category
-            });
+            $userPermitCategory = PermitCategory::find($user->permit_category_id);
+            
+            // Check if the permit category is active
+            if ($userPermitCategory && $userPermitCategory->status) {
+                $query->where(function($q) use ($user) {
+                    $q->where('permit_category_id', $user->permit_category_id)
+                      ->orWhereNull('permit_category_id'); // Include courses with no specific permit category
+                });
+            } else {
+                // If permit category is inactive, mark flag and only show general courses
+                $permitCategoryInactive = true;
+                $query->whereNull('permit_category_id');
+            }
         } else {
             // If user doesn't have a permit category, only show courses without a permit category
             $query->whereNull('permit_category_id');
@@ -80,7 +93,7 @@ class CourseController extends Controller
             $course->materials_count = $totalMaterials;
         }
         
-        return view('candidate.courses.index', compact('courses'));
+        return view('candidate.courses.index', compact('courses', 'permitCategoryInactive', 'userPermitCategory'));
     }
 
     /**
@@ -93,10 +106,20 @@ class CourseController extends Controller
     {
         $user = Auth::user();
         
-        // Check if the user has permission to view this course based on permit category
-        if ($course->permit_category_id && $course->permit_category_id != $user->permit_category_id) {
-            return redirect()->route('candidate.courses.index')
-                ->with('error', 'You do not have permission to access this course.');
+        // Check if the course is associated with a permit category
+        if ($course->permit_category_id) {
+            // Check if the user has the required permit category
+            if ($course->permit_category_id != $user->permit_category_id) {
+                return redirect()->route('candidate.courses.index')
+                    ->with('error', 'You do not have permission to access this course.');
+            }
+            
+            // Check if the permit category is active
+            $permitCategory = PermitCategory::find($course->permit_category_id);
+            if (!$permitCategory || !$permitCategory->status) {
+                return redirect()->route('candidate.courses.index')
+                    ->with('error', 'This course is currently unavailable because its permit category is inactive.');
+            }
         }
         
         $materials = $course->materials()->orderBy('sequence_order')->get();
@@ -126,31 +149,29 @@ class CourseController extends Controller
         $completion = UserCourseCompletion::where('user_id', $user->id)
             ->where('course_id', $course->id)
             ->first();
-            
-        if (!$completion) {
-            $totalMaterials = $materials->count();
-            $completedMaterials = 0;
-            
-            foreach ($materials as $material) {
-                if (isset($progress[$material->id]) && $progress[$material->id]->status === 'completed') {
-                    $completedMaterials++;
-                }
+        
+        $totalMaterials = $materials->count();
+        $completedMaterials = 0;
+        
+        foreach ($materials as $material) {
+            if (isset($progress[$material->id]) && $progress[$material->id]->status === 'completed') {
+                $completedMaterials++;
             }
-            
-            $overallProgress = $totalMaterials > 0 ? round(($completedMaterials / $totalMaterials) * 100) : 0;
-            
-            // Create or update completion record
-            $completion = UserCourseCompletion::updateOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'course_id' => $course->id
-                ],
-                [
-                    'progress_percentage' => $overallProgress,
-                    'completed_at' => $overallProgress == 100 ? now() : null
-                ]
-            );
         }
+        
+        $overallProgress = $totalMaterials > 0 ? round(($completedMaterials / $totalMaterials) * 100) : 0;
+        
+        // Create or update completion record
+        $completion = UserCourseCompletion::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'course_id' => $course->id
+            ],
+            [
+                'progress_percentage' => $overallProgress,
+                'completed_at' => $overallProgress == 100 ? now() : null
+            ]
+        );
         
         $course->progress_percentage = $completion->progress_percentage;
         

@@ -56,6 +56,26 @@
             </div>
         @endif
 
+        <!-- Inactive Permit Category Warning -->
+        @if(isset($permitCategoryInactive) && $permitCategoryInactive && $userPermitCategory)
+            <div class="mb-6 rounded-md bg-yellow-50 p-4 border border-yellow-200">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800">{{ __('Permit Category Unavailable') }}</h3>
+                        <div class="mt-2 text-sm text-yellow-700">
+                            <p>{{ __('Your permit category') }} <strong>{{ $userPermitCategory->name }} ({{ $userPermitCategory->code }})</strong> {{ __('is currently inactive.') }}</p>
+                            <p class="mt-1">{{ __('The permit category') }} <strong>({{ $userPermitCategory->code }})</strong> {{ __('will be available soon. Check back your courses later') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Permit Category Notice -->
         <div class="mb-6 rounded-md bg-blue-50 p-4">
             <div class="flex">
@@ -66,11 +86,11 @@
                 </div>
                 <div class="ml-3 flex-1 md:flex md:justify-between">
                     <p class="text-sm text-blue-700">
-                        @if(Auth::user()->permit_category_id)
+                        @if(Auth::user()->permit_category_id && (!isset($permitCategoryInactive) || !$permitCategoryInactive))
                             {{ __('You are viewing courses for permit category:') }} 
                             <span class="font-medium">{{ Auth::user()->permitCategory->name }} ({{ Auth::user()->permitCategory->code }})</span>
                         @else
-                            {{ __('You have not selected a permit category. You are only seeing general courses.') }}
+                            {{ __('You are only seeing general courses that are not specific to any permit category.') }}
                         @endif
                     </p>
                 </div>

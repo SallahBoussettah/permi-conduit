@@ -86,6 +86,30 @@
                                 </a>
                             </div>
                             
+                            <!-- Permit Categories Card -->
+                            <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+                                <a href="{{ route('admin.permit-categories.index') }}" class="block">
+                                    <div class="p-6">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                                                <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                                </svg>
+                                            </div>
+                                            <div class="ml-5">
+                                                <h3 class="text-lg font-medium text-gray-900">{{ __('Permit Categories') }}</h3>
+                                                <p class="mt-1 text-sm text-gray-500">{{ __('Manage driver permit categories (C, CE, D, etc.).') }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-6">
+                                            <a href="{{ route('admin.permit-categories.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                                {{ __('Manage Permit Categories') }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            
                             <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
                                 <div class="p-6">
                                     <div class="flex items-center">
@@ -102,27 +126,6 @@
                                     <div class="mt-6">
                                         <a href="{{ route('admin.register.inspector') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                             {{ __('Register Inspector') }}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
-                                <div class="p-6">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                            </svg>
-                                        </div>
-                                        <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('System Analytics') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('View system statistics and reports.') }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-6">
-                                        <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                            {{ __('View Analytics') }}
                                         </a>
                                     </div>
                                 </div>

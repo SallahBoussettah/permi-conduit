@@ -101,12 +101,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
         Route::patch('/users/{user}/permit-category', [\App\Http\Controllers\Admin\UserController::class, 'updatePermitCategory'])->name('users.update-permit-category');
+        
+        // Permit Categories management
+        Route::resource('permit-categories', \App\Http\Controllers\Admin\PermitCategoryController::class);
     });
     
     // Inspector routes
     Route::middleware(['auth', 'role:inspector'])->prefix('inspector')->name('inspector.')->group(function () {
-        // Permit Categories
-        Route::resource('permit-categories', \App\Http\Controllers\Inspector\PermitCategoryController::class);
+        // Permit Categories - read only
+        Route::get('/permit-categories', [\App\Http\Controllers\Inspector\PermitCategoryController::class, 'index'])->name('permit-categories.index');
+        Route::get('/permit-categories/{permitCategory}', [\App\Http\Controllers\Inspector\PermitCategoryController::class, 'show'])->name('permit-categories.show');
         
         // Courses
         Route::get('/courses', [\App\Http\Controllers\Inspector\CourseController::class, 'index'])->name('courses.index');
