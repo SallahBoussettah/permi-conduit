@@ -87,21 +87,69 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <form action="{{ route('admin.users.update-permit-category', $user) }}" method="POST" class="flex items-center space-x-2">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="permit_category_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                            <option value="">{{ __('None') }}</option>
-                                            @foreach($permitCategories as $id => $name)
-                                                <option value="{{ $id }}" {{ $user->permit_category_id == $id ? 'selected' : '' }}>{{ $name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <button type="submit" class="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </button>
-                                    </form>
+                                    <div class="flex flex-col space-y-2">
+                                        <div class="flex flex-wrap gap-1 mb-2">
+                                            @forelse($user->permitCategories as $permitCategory)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 group">
+                                                    {{ $permitCategory->code }}
+                                                    <form action="{{ route('admin.users.remove-permit-category', ['user' => $user->id, 'category' => $permitCategory->id]) }}" method="POST" class="ml-1">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="inline-flex text-blue-400 hover:text-blue-600 focus:outline-none" title="{{ __('Remove this category') }}">
+                                                            <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </span>
+                                            @empty
+                                                <span class="text-xs text-gray-500">{{ __('None') }}</span>
+                                            @endforelse
+                                        </div>
+                                        
+                                        <div class="relative">
+                                            <button type="button" 
+                                                    onclick="toggleCategoryDropdown(this, '{{ $user->id }}')" 
+                                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-1.5 bg-white text-left">
+                                                {{ __('Manage Categories') }}
+                                                <span class="ml-1 absolute right-3 top-2">
+                                                    <svg class="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </button>
+                                            <div id="dropdown-{{ $user->id }}" class="absolute z-10 hidden mt-1 max-h-60 overflow-auto w-56 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                <form action="{{ route('admin.users.update-permit-category', $user) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <div class="p-2 border-b border-gray-100">
+                                                        <p class="text-xs font-medium text-gray-700 mb-2">{{ __('Select Categories:') }}</p>
+                                                        @foreach($permitCategories as $id => $name)
+                                                            <div class="flex items-center py-1">
+                                                                <input id="category-{{ $user->id }}-{{ $id }}" 
+                                                                       name="permit_category_ids[]" 
+                                                                       value="{{ $id }}" 
+                                                                       type="checkbox" 
+                                                                       {{ in_array($id, $user->permitCategories->pluck('id')->toArray()) ? 'checked' : '' }}
+                                                                       class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                                                <label for="category-{{ $user->id }}-{{ $id }}" class="ml-2 block text-sm text-gray-700">
+                                                                    {{ $name }}
+                                                                </label>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                    <div class="p-2 flex justify-between">
+                                                        <button type="button" onclick="toggleCategoryDropdown(this, '{{ $user->id }}')" class="text-sm text-gray-500">
+                                                            {{ __('Cancel') }}
+                                                        </button>
+                                                        <button type="submit" class="inline-flex justify-center text-sm text-white px-3 py-1 bg-indigo-600 hover:bg-indigo-700 rounded">
+                                                            {{ __('Save') }}
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900">
@@ -130,4 +178,54 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Track the currently open dropdown
+    let openDropdown = null;
+
+    function toggleCategoryDropdown(el, userId) {
+        const dropdown = document.getElementById(`dropdown-${userId}`);
+        
+        // Close any open dropdown first
+        if (openDropdown && openDropdown !== dropdown) {
+            openDropdown.classList.add('hidden');
+        }
+        
+        // Toggle the clicked dropdown
+        dropdown.classList.toggle('hidden');
+        
+        // Update tracking of open dropdown
+        openDropdown = dropdown.classList.contains('hidden') ? null : dropdown;
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (openDropdown) {
+            // Check if click is outside the dropdown
+            let targetElement = event.target;
+            let clickedInsideDropdown = false;
+            
+            do {
+                if (targetElement === openDropdown) {
+                    clickedInsideDropdown = true;
+                    break;
+                }
+                
+                // Check if clicked on the toggle button
+                if (targetElement.getAttribute('onclick') && 
+                    targetElement.getAttribute('onclick').includes('toggleCategoryDropdown')) {
+                    clickedInsideDropdown = true;
+                    break;
+                }
+                
+                targetElement = targetElement.parentNode;
+            } while (targetElement);
+            
+            if (!clickedInsideDropdown) {
+                openDropdown.classList.add('hidden');
+                openDropdown = null;
+            }
+        }
+    });
+</script>
 @endsection 

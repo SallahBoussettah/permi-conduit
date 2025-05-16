@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -24,7 +25,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        'permit_category_id',
     ];
 
     /**
@@ -59,11 +59,37 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the permit category that this user belongs to.
+     * Get the permit categories that this user belongs to.
+     */
+    public function permitCategories()
+    {
+        return $this->belongsToMany(PermitCategory::class, 'user_permit_categories')
+            ->withTimestamps();
+    }
+
+    /**
+     * For backward compatibility, get the primary permit category (first one)
      */
     public function permitCategory(): BelongsTo
     {
-        return $this->belongsTo(PermitCategory::class);
+        // This is kept for backward compatibility
+        // It will return a relationship that mimics a BelongsTo
+        // but actually gets the first permit category from the many-to-many relationship
+        return $this->belongsTo(PermitCategory::class, 'id', 'id')
+            ->whereExists(function ($query) {
+                $query->select(\DB::raw(1))
+                    ->from('user_permit_categories')
+                    ->whereColumn('user_permit_categories.user_id', 'users.id')
+                    ->whereColumn('user_permit_categories.permit_category_id', 'permit_categories.id');
+            });
+    }
+
+    /**
+     * Check if user has a specific permit category.
+     */
+    public function hasPermitCategory($permitCategoryId): bool
+    {
+        return $this->permitCategories()->where('permit_categories.id', $permitCategoryId)->exists();
     }
 
     /**

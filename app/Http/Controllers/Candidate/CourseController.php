@@ -18,34 +18,43 @@ class CourseController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $query = Course::with(['materials', 'completions' => function($query) use ($user) {
             $query->where('user_id', $user->id);
         }]);
         
-        // Check if user has a permit category and if it's active
-        $permitCategoryInactive = false;
-        $userPermitCategory = null;
+        // Get user's permit categories
+        $userPermitCategories = $user->permitCategories;
+        $permitCategoryIds = $userPermitCategories->pluck('id')->toArray();
         
-        if ($user->permit_category_id) {
-            $userPermitCategory = PermitCategory::find($user->permit_category_id);
-            
-            // Check if the permit category is active
-            if ($userPermitCategory && $userPermitCategory->status) {
-                $query->where(function($q) use ($user) {
-                    $q->where('permit_category_id', $user->permit_category_id)
-                      ->orWhereNull('permit_category_id'); // Include courses with no specific permit category
-                });
+        // Check if user has any active permit categories
+        $activePermitCategories = $userPermitCategories->where('status', true);
+        $hasActivePermitCategories = $activePermitCategories->count() > 0;
+        
+        // Display inactive permit category warning if any categories are inactive
+        $permitCategoryInactive = $userPermitCategories->count() > 0 && $activePermitCategories->count() < $userPermitCategories->count();
+        $userPermitCategory = $userPermitCategories->first(); // For backward compatibility with the view
+        
+        // Handle permit category filter
+        $selectedPermitCategory = $request->input('permit_category');
+        
+        if ($selectedPermitCategory === 'null') {
+            // User wants to see only general courses (no permit category)
+            $query->whereNull('permit_category_id');
+        } elseif (!empty($selectedPermitCategory)) {
+            // User selected a specific permit category
+            // Verify the user has access to this category and it's active
+            if (in_array($selectedPermitCategory, $activePermitCategories->pluck('id')->toArray())) {
+                $query->where('permit_category_id', $selectedPermitCategory);
             } else {
-                // If permit category is inactive, mark flag and only show general courses
-                $permitCategoryInactive = true;
-                $query->whereNull('permit_category_id');
+                // Fallback to default behavior if user doesn't have access to selected category
+                $this->applyDefaultCategoryFilter($query, $hasActivePermitCategories, $activePermitCategories);
             }
         } else {
-            // If user doesn't have a permit category, only show courses without a permit category
-            $query->whereNull('permit_category_id');
+            // No specific filter applied, use default behavior
+            $this->applyDefaultCategoryFilter($query, $hasActivePermitCategories, $activePermitCategories);
         }
         
         $courses = $query->orderBy('title')->paginate(9);
@@ -93,7 +102,30 @@ class CourseController extends Controller
             $course->materials_count = $totalMaterials;
         }
         
-        return view('candidate.courses.index', compact('courses', 'permitCategoryInactive', 'userPermitCategory'));
+        return view('candidate.courses.index', compact('courses', 'permitCategoryInactive', 'userPermitCategory', 'activePermitCategories', 'userPermitCategories'));
+    }
+
+    /**
+     * Apply the default permit category filter logic
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param bool $hasActivePermitCategories
+     * @param \Illuminate\Support\Collection $activePermitCategories
+     * @return void
+     */
+    private function applyDefaultCategoryFilter($query, $hasActivePermitCategories, $activePermitCategories)
+    {
+        if ($hasActivePermitCategories) {
+            // Show courses that match user's active permit categories or have no permit category
+            $activePermitCategoryIds = $activePermitCategories->pluck('id')->toArray();
+            $query->where(function($q) use ($activePermitCategoryIds) {
+                $q->whereIn('permit_category_id', $activePermitCategoryIds)
+                  ->orWhereNull('permit_category_id'); // Include courses with no specific permit category
+            });
+        } else {
+            // If no active permit categories, only show courses without a permit category
+            $query->whereNull('permit_category_id');
+        }
     }
 
     /**
@@ -109,7 +141,7 @@ class CourseController extends Controller
         // Check if the course is associated with a permit category
         if ($course->permit_category_id) {
             // Check if the user has the required permit category
-            if ($course->permit_category_id != $user->permit_category_id) {
+            if (!$user->hasPermitCategory($course->permit_category_id)) {
                 return redirect()->route('candidate.courses.index')
                     ->with('error', 'You do not have permission to access this course.');
             }

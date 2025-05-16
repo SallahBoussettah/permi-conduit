@@ -43,9 +43,10 @@ class PermitCategory extends Model
     /**
      * Get the users with this permit category.
      */
-    public function users(): HasMany
+    public function users()
     {
-        return $this->hasMany(User::class, 'permit_category_id');
+        return $this->belongsToMany(User::class, 'user_permit_categories')
+            ->withTimestamps();
     }
 
     /**

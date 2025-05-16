@@ -67,16 +67,19 @@
                         </div>
 
                         <div class="sm:col-span-3">
-                            <label for="permit_category_id" class="block text-sm font-medium text-gray-700">{{ __('Permit Category') }}</label>
+                            <label for="permit_category_ids" class="block text-sm font-medium text-gray-700">{{ __('Permit Categories') }}</label>
                             <div class="mt-1">
-                                <select id="permit_category_id" name="permit_category_id" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                                    <option value="">{{ __('None') }}</option>
+                                <select id="permit_category_ids" name="permit_category_ids[]" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" multiple>
                                     @foreach($permitCategories as $id => $name)
-                                        <option value="{{ $id }}" {{ old('permit_category_id', $user->permit_category_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
+                                        <option value="{{ $id }}" {{ in_array($id, $user->permitCategories->pluck('id')->toArray()) ? 'selected' : '' }}>{{ $name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            @error('permit_category_id')
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Hold Ctrl (or Cmd on Mac) to select multiple categories') }}</p>
+                            @error('permit_category_ids')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            @error('permit_category_ids.*')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
         Route::patch('/users/{user}/permit-category', [\App\Http\Controllers\Admin\UserController::class, 'updatePermitCategory'])->name('users.update-permit-category');
+        Route::delete('/users/{user}/permit-category/{category}', [\App\Http\Controllers\Admin\UserController::class, 'removePermitCategory'])->name('users.remove-permit-category');
         
         // Permit Categories management
         Route::resource('permit-categories', \App\Http\Controllers\Admin\PermitCategoryController::class);

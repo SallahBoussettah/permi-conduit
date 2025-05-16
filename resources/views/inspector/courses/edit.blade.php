@@ -51,18 +51,6 @@
                                 </select>
                                 <p class="mt-1 text-sm text-gray-500">{{ __('Associate this course with a specific exam section.') }}</p>
                             </div>
-                            
-                            <!-- Category -->
-                            <div>
-                                <label for="category_id" class="block text-sm font-medium text-gray-700">{{ __('Category (Optional)') }}</label>
-                                <select name="category_id" id="category_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="">{{ __('None') }}</option>
-                                    @foreach($categories as $id => $name)
-                                    <option value="{{ $id }}" {{ (old('category_id', $course->category_id) == $id) ? 'selected' : '' }}>{{ $name }}</option>
-                                    @endforeach
-                                </select>
-                                <p class="mt-1 text-sm text-gray-500">{{ __('Assign this course to a category.') }}</p>
-                            </div>
 
                             <!-- Permit Category -->
                             <div>

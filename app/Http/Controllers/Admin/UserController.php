@@ -23,7 +23,7 @@ class UserController extends Controller
         $permitCategoryFilter = $request->get('permit_category');
         $search = $request->get('search');
         
-        $query = User::with(['role', 'permitCategory']);
+        $query = User::with(['role', 'permitCategories']);
         
         // Apply filters
         if ($roleFilter) {
@@ -31,7 +31,9 @@ class UserController extends Controller
         }
         
         if ($permitCategoryFilter) {
-            $query->where('permit_category_id', $permitCategoryFilter);
+            $query->whereHas('permitCategories', function($q) use ($permitCategoryFilter) {
+                $q->where('permit_categories.id', $permitCategoryFilter);
+            });
         }
         
         // Apply search
@@ -82,14 +84,14 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'role_id' => ['required', 'exists:roles,id'],
-            'permit_category_id' => ['nullable', 'exists:permit_categories,id'],
+            'permit_category_ids' => ['nullable', 'array'],
+            'permit_category_ids.*' => ['exists:permit_categories,id'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
         
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role_id = $validated['role_id'];
-        $user->permit_category_id = $validated['permit_category_id'];
         
         // Only update password if provided
         if (isset($validated['password']) && !empty($validated['password'])) {
@@ -98,12 +100,19 @@ class UserController extends Controller
         
         $user->save();
         
+        // Sync permit categories
+        if (isset($validated['permit_category_ids'])) {
+            $user->permitCategories()->sync($validated['permit_category_ids']);
+        } else {
+            $user->permitCategories()->detach();
+        }
+        
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully.');
     }
 
     /**
-     * Update only the permit category for a user.
+     * Update the permit categories for a user.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\User  $user
@@ -112,13 +121,40 @@ class UserController extends Controller
     public function updatePermitCategory(Request $request, User $user)
     {
         $validated = $request->validate([
-            'permit_category_id' => ['nullable', 'exists:permit_categories,id'],
+            'permit_category_ids' => ['nullable', 'array'],
+            'permit_category_ids.*' => ['exists:permit_categories,id'],
         ]);
         
-        $user->permit_category_id = $validated['permit_category_id'];
-        $user->save();
+        // Sync permit categories
+        if (isset($validated['permit_category_ids'])) {
+            $user->permitCategories()->sync($validated['permit_category_ids']);
+        } else {
+            $user->permitCategories()->detach();
+        }
         
         return redirect()->back()
-            ->with('success', 'Permit category updated successfully.');
+            ->with('success', 'Permit categories updated successfully.');
+    }
+
+    /**
+     * Remove a specific permit category from a user.
+     *
+     * @param  \App\Models\User  $user
+     * @param  int  $category
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removePermitCategory(User $user, $category)
+    {
+        // First, check if the user has this permit category
+        if ($user->hasPermitCategory($category)) {
+            // Detach only this specific permit category
+            $user->permitCategories()->detach($category);
+            
+            return redirect()->back()
+                ->with('success', 'Permit category removed successfully.');
+        }
+        
+        return redirect()->back()
+            ->with('error', 'User does not have this permit category.');
     }
 } 
