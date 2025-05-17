@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use App\Models\Role;
 
 class User extends Authenticatable
 {
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'school_id',
         'approval_status',
         'rejection_reason',
         'is_active',
@@ -289,5 +291,59 @@ class User extends Authenticatable
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the school that the user belongs to.
+     */
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    /**
+     * Check if the user is a super admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        if (!$this->role) {
+            \Log::error('User has no role: ' . $this->id . ' - ' . $this->email);
+            return false;
+        }
+        
+        \Log::info('User role check for super_admin: ' . $this->id . ' - ' . $this->email . ' - Role: ' . $this->role->name);
+        return $this->role->name === 'super_admin';
+    }
+
+    /**
+     * Check if the user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role && $this->role->name === 'admin';
+    }
+
+    /**
+     * Check if the user is a school admin (either super admin or admin).
+     */
+    public function isSchoolAdmin(): bool
+    {
+        return $this->isSuperAdmin() || $this->isAdmin();
+    }
+
+    /**
+     * Check if the user is an inspector.
+     */
+    public function isInspector(): bool
+    {
+        return $this->role && $this->role->name === 'inspector';
+    }
+
+    /**
+     * Check if the user is a candidate.
+     */
+    public function isCandidate(): bool
+    {
+        return $this->role && $this->role->name === 'candidate';
     }
 }

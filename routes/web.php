@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -153,6 +154,25 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::post('/courses/{course}/materials/{material}/progress', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'updateProgress'])->name('courses.materials.progress');
         Route::post('/courses/{course}/materials/{material}/complete', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'markAsComplete'])->name('courses.materials.complete');
     });
+});
+
+// Super Admin routes
+Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('super_admin.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+    
+    // School management
+    Route::get('/schools', [SuperAdminController::class, 'schools'])->name('schools');
+    Route::get('/schools/create', [SuperAdminController::class, 'createSchool'])->name('schools.create');
+    Route::post('/schools', [SuperAdminController::class, 'storeSchool'])->name('schools.store');
+    Route::get('/schools/{school}/edit', [SuperAdminController::class, 'editSchool'])->name('schools.edit');
+    Route::put('/schools/{school}', [SuperAdminController::class, 'updateSchool'])->name('schools.update');
+    Route::delete('/schools/{school}', [SuperAdminController::class, 'destroySchool'])->name('schools.destroy');
+    
+    // School admin management
+    Route::get('/schools/{school}/admins', [SuperAdminController::class, 'schoolAdmins'])->name('school.admins');
+    Route::get('/schools/{school}/admins/create', [SuperAdminController::class, 'assignAdmin'])->name('school.admins.create');
+    Route::post('/schools/{school}/admins', [SuperAdminController::class, 'storeAdmin'])->name('school.admins.store');
 });
 
 require __DIR__.'/auth.php';

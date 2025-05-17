@@ -63,14 +63,26 @@ class AdminController extends Controller
             $role = Role::create(['name' => 'inspector']);
         }
 
-        // Create the user
-        $user = User::create([
+        // Create user data
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role_id' => $role->id,
             'email_verified_at' => now(), // Auto-verify inspector emails
-        ]);
+            'approval_status' => 'approved',
+            'is_active' => true,
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
+        ];
+        
+        // Set the school_id to the same as the admin's school
+        if (auth()->user()->school_id) {
+            $userData['school_id'] = auth()->user()->school_id;
+        }
+
+        // Create the user
+        $user = User::create($userData);
 
         event(new Registered($user));
 
@@ -85,14 +97,18 @@ class AdminController extends Controller
      */
     public function listInspectors()
     {
-        $inspectorRole = Role::where('name', 'inspector')->first();
+        $user = auth()->user();
+        $query = User::whereHas('role', function ($query) {
+            $query->where('name', 'inspector');
+        });
         
-        if (!$inspectorRole) {
-            $inspectors = collect();
-        } else {
-            $inspectors = User::where('role_id', $inspectorRole->id)->paginate(10);
+        // Scope to the admin's school
+        if (!$user->isSuperAdmin() && $user->school_id) {
+            $query->where('school_id', $user->school_id);
         }
-
-        return view('admin.inspectors', compact('inspectors'));
+        
+        $inspectors = $query->orderBy('name')->paginate(10);
+        
+        return view('admin.inspectors.index', compact('inspectors'));
     }
 } 

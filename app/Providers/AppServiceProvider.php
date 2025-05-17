@@ -31,8 +31,9 @@ class AppServiceProvider extends ServiceProvider
         // Ensure locale is set correctly at application boot
         $this->setApplicationLocale();
 
-        // Register the role middleware
+        // Register the middleware
         $this->app['router']->aliasMiddleware('role', \App\Http\Middleware\CheckRole::class);
+        $this->app['router']->aliasMiddleware('super_admin', \App\Http\Middleware\CheckSuperAdmin::class);
     }
     
     /**

@@ -26,6 +26,7 @@ class Course extends Model
         'inspector_id',
         'thumbnail',
         'permit_category_id',
+        'school_id',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -145,6 +146,14 @@ class Course extends Model
     public function completions(): HasMany
     {
         return $this->hasMany(UserCourseCompletion::class);
+    }
+
+    /**
+     * Get the school that this course belongs to.
+     */
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
     }
 
     // Scopes

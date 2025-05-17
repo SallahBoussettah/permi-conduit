@@ -69,5 +69,7 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class,
         'approved' => \App\Http\Middleware\CheckUserApproved::class,
         'not-expired' => \App\Http\Middleware\CheckAccountExpiration::class,
+        'super_admin' => \App\Http\Middleware\CheckSuperAdmin::class,
+        'school_access' => \App\Http\Middleware\CheckSchoolAccess::class,
     ];
 } 

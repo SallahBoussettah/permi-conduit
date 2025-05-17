@@ -11,7 +11,7 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',  // Make the server listen on all addresses
         hmr: {
-            host: '192.168.11.111',
+            host: '192.168.3.233',
         },
     },
 });

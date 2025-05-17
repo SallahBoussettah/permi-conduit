@@ -20,7 +20,10 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        // Get active schools for candidates to choose from
+        $schools = \App\Models\School::where('is_active', true)->orderBy('name')->get();
+        
+        return view('auth.register', compact('schools'));
     }
 
     /**
@@ -36,6 +39,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string', 'in:candidate,inspector'],
             'terms' => ['required', 'accepted'],
+            'school_id' => ['required_if:role,candidate', 'exists:schools,id'],
         ]);
 
         // Get role ID from role name
@@ -51,13 +55,28 @@ class RegisteredUserController extends Controller
         // Candidates will always be pending approval
         $approvalStatus = 'pending';
         
-        $user = User::create([
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role_id' => $roleId,
             'approval_status' => $approvalStatus,
-        ]);
+        ];
+        
+        // Set school_id for candidates
+        if ($request->role === 'candidate' && $request->filled('school_id')) {
+            $school = \App\Models\School::find($request->school_id);
+            
+            // Verify the school is active and has capacity
+            if ($school && $school->is_active && $school->hasCapacity()) {
+                $userData['school_id'] = $school->id;
+            } else {
+                $errorMessage = 'The selected school is unavailable or at capacity. Please choose another school.';
+                return redirect()->back()->withErrors(['school_id' => $errorMessage])->withInput();
+            }
+        }
+
+        $user = User::create($userData);
 
         event(new Registered($user));
 

@@ -26,6 +26,20 @@ class UserController extends Controller
         
         $query = User::with(['role', 'permitCategories']);
         
+        // Exclude super admin users from being shown to regular admins
+        if (!auth()->user()->isSuperAdmin()) {
+            $superAdminRole = Role::where('name', 'super_admin')->first();
+            if ($superAdminRole) {
+                $query->where('role_id', '!=', $superAdminRole->id);
+            }
+            
+            // If the user is a regular admin, scope to only their school
+            if (auth()->user()->isAdmin()) {
+                $schoolId = auth()->user()->school_id;
+                $query->where('school_id', $schoolId);
+            }
+        }
+        
         // Apply filters
         if ($roleFilter) {
             $query->where('role_id', $roleFilter);
@@ -58,6 +72,15 @@ class UserController extends Controller
         
         $users = $query->orderBy('name')->paginate(10);
         $roles = Role::orderBy('name')->pluck('name', 'id');
+        
+        // If not a super admin, remove super_admin role from the dropdown list
+        if (!auth()->user()->isSuperAdmin()) {
+            $superAdminRole = Role::where('name', 'super_admin')->first();
+            if ($superAdminRole && isset($roles[$superAdminRole->id])) {
+                $roles = $roles->forget($superAdminRole->id);
+            }
+        }
+        
         $permitCategories = PermitCategory::orderBy('name')->pluck('name', 'id');
         
         return view('admin.users.index', compact('users', 'roles', 'permitCategories', 'roleFilter', 'permitCategoryFilter', 'statusFilter', 'search'));
@@ -71,7 +94,28 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        // Prevent regular admins from editing super admins
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to edit super admin users.');
+        }
+        
+        // Prevent admins from editing users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to edit users from other schools.');
+        }
+        
         $roles = Role::orderBy('name')->pluck('name', 'id');
+        
+        // If not a super admin, remove super_admin role from the dropdown
+        if (!auth()->user()->isSuperAdmin()) {
+            $superAdminRole = Role::where('name', 'super_admin')->first();
+            if ($superAdminRole && isset($roles[$superAdminRole->id])) {
+                $roles = $roles->forget($superAdminRole->id);
+            }
+        }
+        
         $permitCategories = PermitCategory::where('status', true)->orderBy('name')->pluck('name', 'id');
         
         return view('admin.users.edit', compact('user', 'roles', 'permitCategories'));
@@ -86,6 +130,18 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        // Prevent regular admins from updating super admins
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to update super admin users.');
+        }
+        
+        // Prevent admins from updating users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to update users from other schools.');
+        }
+        
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -105,9 +161,25 @@ class UserController extends Controller
             'expires_at' => ['nullable', 'date'],
         ]);
         
+        // Prevent regular admins from setting a user's role to super admin
+        if (!auth()->user()->isSuperAdmin()) {
+            $superAdminRole = Role::where('name', 'super_admin')->first();
+            if ($superAdminRole && isset($validated['role_id']) && $validated['role_id'] == $superAdminRole->id) {
+                return redirect()->route('admin.users.edit', $user)
+                    ->with('error', 'You do not have permission to assign the super admin role.')
+                    ->withInput();
+            }
+        }
+        
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role_id = $validated['role_id'];
+        
+        // Ensure school_id remains the same for admins
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            // Regular admins can only assign users to their own school
+            $user->school_id = auth()->user()->school_id;
+        }
         
         // Only update password if provided
         if (isset($validated['password']) && !empty($validated['password'])) {
@@ -162,6 +234,18 @@ class UserController extends Controller
      */
     public function updatePermitCategory(Request $request, User $user)
     {
+        // Prevent regular admins from updating super admin permit categories
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->back()
+                ->with('error', 'You do not have permission to update permit categories for super admin users.');
+        }
+        
+        // Prevent admins from updating permit categories for users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->back()
+                ->with('error', 'You do not have permission to update permit categories for users from other schools.');
+        }
+        
         $validated = $request->validate([
             'permit_category_ids' => ['nullable', 'array'],
             'permit_category_ids.*' => ['exists:permit_categories,id'],
@@ -187,6 +271,18 @@ class UserController extends Controller
      */
     public function removePermitCategory(User $user, $category)
     {
+        // Prevent regular admins from removing super admin permit categories
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->back()
+                ->with('error', 'You do not have permission to remove permit categories from super admin users.');
+        }
+        
+        // Prevent admins from removing permit categories from users of other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->back()
+                ->with('error', 'You do not have permission to remove permit categories from users of other schools.');
+        }
+        
         // First, check if the user has this permit category
         if ($user->hasPermitCategory($category)) {
             // Detach only this specific permit category
@@ -201,6 +297,29 @@ class UserController extends Controller
     }
 
     /**
+     * Show the approval form for a user.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function showApprove(User $user)
+    {
+        // Prevent regular admins from approving super admins
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to approve super admin users.');
+        }
+        
+        // Prevent admins from approving users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to approve users from other schools.');
+        }
+        
+        return view('admin.users.approve', compact('user'));
+    }
+
+    /**
      * Approve a user.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -209,6 +328,18 @@ class UserController extends Controller
      */
     public function approve(Request $request, User $user)
     {
+        // Prevent regular admins from approving super admins
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to approve super admin users.');
+        }
+        
+        // Prevent admins from approving users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to approve users from other schools.');
+        }
+        
         $validated = $request->validate([
             'expiration_type' => ['required', 'in:none,days,date'],
             'expires_after' => ['nullable', 'integer', 'min:1', 'required_if:expiration_type,days'],
@@ -241,24 +372,25 @@ class UserController extends Controller
     }
 
     /**
-     * Show the approval form for a user.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\View\View
-     */
-    public function showApprove(User $user)
-    {
-        return view('admin.users.approve', compact('user'));
-    }
-
-    /**
      * Show the rejection form for a user.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function showReject(User $user)
     {
+        // Prevent regular admins from rejecting super admins
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to reject super admin users.');
+        }
+        
+        // Prevent admins from rejecting users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to reject users from other schools.');
+        }
+        
         return view('admin.users.reject', compact('user'));
     }
 
@@ -271,6 +403,18 @@ class UserController extends Controller
      */
     public function reject(Request $request, User $user)
     {
+        // Prevent regular admins from rejecting super admins
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to reject super admin users.');
+        }
+        
+        // Prevent admins from rejecting users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to reject users from other schools.');
+        }
+        
         $validated = $request->validate([
             'rejection_reason' => ['required', 'string', 'max:500'],
         ]);
@@ -293,6 +437,18 @@ class UserController extends Controller
      */
     public function toggleActive(User $user)
     {
+        // Prevent regular admins from toggling super admin status
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to change the status of super admin users.');
+        }
+        
+        // Prevent admins from toggling status of users from other schools
+        if (auth()->user()->isAdmin() && !auth()->user()->isSuperAdmin() && $user->school_id !== auth()->user()->school_id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You do not have permission to change the status of users from other schools.');
+        }
+        
         $user->is_active = !$user->is_active;
         $user->save();
         

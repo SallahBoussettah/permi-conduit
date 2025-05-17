@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Role;
 
 class RoleSeeder extends Seeder
 {
@@ -13,14 +12,16 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create default roles
         $roles = [
-            ['name' => 'admin'],
-            ['name' => 'inspector'],
-            ['name' => 'candidate'],
+            'super_admin',
+            'admin',
+            'inspector',
+            'candidate'
         ];
 
-        foreach ($roles as $role) {
-            Role::create($role);
+        foreach ($roles as $roleName) {
+            Role::firstOrCreate(['name' => $roleName]);
         }
     }
 }

@@ -48,12 +48,28 @@
                         <!-- Role Selection -->
                         <div>
                             <label for="role" class="block text-sm font-medium text-gray-700">{{ __('auth.role') }}</label>
-                            <select name="role" id="role" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 @error('role') border-red-300 @enderror">
+                            <select name="role" id="role" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 @error('role') border-red-300 @enderror" onchange="toggleSchoolSelection()">
                                 <option value="" disabled selected>{{ __('auth.select_role') }}</option>
                                 <option value="candidate" {{ old('role') == 'candidate' ? 'selected' : '' }}>{{ __('auth.candidate') }}</option>
                                 <option value="inspector" {{ old('role') == 'inspector' ? 'selected' : '' }}>{{ __('auth.inspector') }}</option>
                             </select>
                             @error('role')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- School Selection (for candidates) -->
+                        <div id="schoolSelectionDiv" style="display: {{ old('role') == 'candidate' ? 'block' : 'none' }}">
+                            <label for="school_id" class="block text-sm font-medium text-gray-700">{{ __('Select School') }}</label>
+                            <select name="school_id" id="school_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 @error('school_id') border-red-300 @enderror">
+                                <option value="" disabled selected>{{ __('Select a school') }}</option>
+                                @foreach($schools as $school)
+                                    <option value="{{ $school->id }}" {{ old('school_id') == $school->id ? 'selected' : '' }}>
+                                        {{ $school->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('school_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -91,4 +107,25 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleSchoolSelection() {
+            var role = document.getElementById('role').value;
+            var schoolSelectionDiv = document.getElementById('schoolSelectionDiv');
+            var schoolIdField = document.getElementById('school_id');
+            
+            if (role === 'candidate') {
+                schoolSelectionDiv.style.display = 'block';
+                schoolIdField.required = true;
+            } else {
+                schoolSelectionDiv.style.display = 'none';
+                schoolIdField.required = false;
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleSchoolSelection();
+        });
+    </script>
 @endsection

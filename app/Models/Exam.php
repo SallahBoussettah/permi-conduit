@@ -83,4 +83,12 @@ class Exam extends Model
     {
         return $this->hasMany(CandidateQcmAttempt::class);
     }
+
+    /**
+     * Get the school that this exam belongs to.
+     */
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 }
