@@ -15,7 +15,7 @@
             <div class="flex items-center">
                 <div class="px-4 py-2 bg-white shadow rounded-lg mr-4">
                     <div class="text-sm text-gray-500">{{ __('Time Remaining') }}</div>
-                    <div id="timer" class="text-2xl font-bold text-gray-900" data-end-time="{{ $qcmExam->expires_at->timestamp }}">
+                    <div id="timer" class="text-2xl font-bold text-gray-900" data-end-time="{{ $qcmExam->expires_at ? $qcmExam->expires_at->timestamp : now()->addMinutes(6)->timestamp }}">
                         06:00
                     </div>
                 </div>
@@ -168,11 +168,26 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Basic elements
     var timerElement = document.getElementById('timer');
+    var examForm = document.getElementById('exam-form');
     var totalQuestions = {{ count($questions) }};
     var navButtons = document.querySelectorAll('.question-nav-btn');
     
-    // Timer setup - 6 minutes
-    var timeRemaining = 360;
+    // Timer setup - get the actual server-provided end time
+    var endTimeTimestamp = parseInt(timerElement.getAttribute('data-end-time')) * 1000; // convert to milliseconds
+    var currentTime = new Date().getTime();
+    var timeRemaining = Math.max(0, Math.floor((endTimeTimestamp - currentTime) / 1000)); // convert to seconds and ensure it's not negative
+    
+    console.log("End time: " + new Date(endTimeTimestamp).toLocaleTimeString());
+    console.log("Current time: " + new Date(currentTime).toLocaleTimeString());
+    console.log("Initial time remaining: " + timeRemaining + " seconds");
+    
+    // If the calculated time is invalid or too large, set to 6 minutes (360 seconds)
+    if (isNaN(timeRemaining) || timeRemaining <= 0 || timeRemaining > 360) {
+        timeRemaining = 360; // 6 minutes in seconds
+        console.log("Using default 6 minute timer");
+    } else {
+        console.log("Using server-calculated remaining time: " + timeRemaining + " seconds");
+    }
     
     // Question number buttons
     for (var i = 0; i < navButtons.length; i++) {
@@ -205,6 +220,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Timer functionality
     function updateTimer() {
+        // Check if we need to stop the timer
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerElement.textContent = '00:00';
+            
+            // Show a brief time's up message
+            alert('Time is up! Your exam will be submitted automatically.');
+            
+            // Submit the form
+            examForm.submit();
+            
+            // Prevent further timer updates
+            return false;
+        }
+        
+        // Calculate minutes and seconds
         var minutes = Math.floor(timeRemaining / 60);
         var seconds = timeRemaining % 60;
         
@@ -212,9 +243,10 @@ document.addEventListener('DOMContentLoaded', function() {
         var formattedMinutes = minutes.toString().padStart(2, '0');
         var formattedSeconds = seconds.toString().padStart(2, '0');
         
+        // Update the display
         timerElement.textContent = formattedMinutes + ':' + formattedSeconds;
         
-        // Update color based on time remaining
+        // Update visual styling based on time remaining
         if (timeRemaining <= 30) {
             timerElement.classList.add('text-red-600', 'animate-pulse');
         } else if (timeRemaining <= 60) {
@@ -225,17 +257,21 @@ document.addEventListener('DOMContentLoaded', function() {
             timerElement.classList.remove('text-red-600', 'animate-pulse');
         }
         
-        // Decrease time and check if time's up
+        // Decrement time remaining
         timeRemaining--;
-        if (timeRemaining < 0) {
-            clearInterval(timerInterval);
-            timerElement.textContent = '00:00';
-            document.getElementById('exam-form').submit();
-        }
+        
+        return true;
     }
     
-    var timerInterval = setInterval(updateTimer, 1000);
-    updateTimer(); // Start timer
+    // Initialize timer and start the countdown
+    var timerInterval = setInterval(function() {
+        if (!updateTimer()) {
+            clearInterval(timerInterval);
+        }
+    }, 1000);
+    
+    // Run once immediately to set initial display
+    updateTimer();
     
     // Add function to check unanswered questions when the modal is shown
     function checkUnansweredQuestions() {

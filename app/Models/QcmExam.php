@@ -21,6 +21,7 @@ class QcmExam extends Model
         'qcm_paper_id',
         'started_at',
         'completed_at',
+        'expires_at',
         'duration_seconds',
         'correct_answers_count',
         'total_questions',
@@ -38,6 +39,7 @@ class QcmExam extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'expires_at' => 'datetime',
         'is_eliminatory' => 'boolean',
     ];
 
@@ -110,13 +112,35 @@ class QcmExam extends Model
      */
     public function getRemainingTimeInSeconds(): int
     {
+        // If the exam is already completed, there's no time remaining
         if ($this->completed_at) {
+            \Log::info("Exam {$this->id} is already completed, no time remaining");
             return 0;
         }
 
-        $maxDuration = 360; // 6 minutes in seconds
-        $elapsedTime = now()->diffInSeconds($this->started_at);
+        // If expires_at is not set, calculate it based on started_at
+        if (!$this->expires_at && $this->started_at) {
+            $this->expires_at = $this->started_at->copy()->addMinutes(6); // 6 minutes (360 seconds)
+            $this->save();
+            \Log::info("Set expires_at for exam {$this->id} to {$this->expires_at}");
+        }
         
-        return max(0, $maxDuration - $elapsedTime);
+        // If we still don't have expires_at, something is wrong - default to no time
+        if (!$this->expires_at) {
+            \Log::error("Exam {$this->id} has no expires_at time and no started_at time");
+            return 0;
+        }
+        
+        // Calculate remaining time based on expires_at
+        $now = now();
+        if ($now->gt($this->expires_at)) {
+            \Log::info("Exam {$this->id} has expired at {$this->expires_at}, current time is {$now}");
+            return 0;
+        }
+        
+        $remaining = $now->diffInSeconds($this->expires_at);
+        \Log::info("Exam {$this->id} has {$remaining} seconds remaining until {$this->expires_at}");
+        
+        return $remaining;
     }
 }

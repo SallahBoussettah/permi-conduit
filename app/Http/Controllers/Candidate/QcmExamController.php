@@ -146,10 +146,13 @@ class QcmExamController extends Controller
             $exam->user_id = $user->id;
             $exam->qcm_paper_id = $paperId;
             $exam->started_at = now();
+            $exam->expires_at = now()->addMinutes(6); // Exactly 6 minutes (360 seconds)
             $exam->total_questions = 10;
             $exam->status = 'in_progress';
             $exam->school_id = $user->school_id;
             $exam->save();
+            
+            \Log::info("Created new exam {$exam->id} with expires_at: {$exam->expires_at}");
             
             DB::commit();
             
@@ -216,9 +219,12 @@ class QcmExamController extends Controller
             \Log::info("Answer for question {$answer->qcm_question_id}: selected answer ID {$answer->qcm_answer_id}, is_correct: " . ($answer->is_correct ? 'true' : 'false'));
         }
         
-        // Calculate the expiration time correctly
-        $qcmExam->expires_at = Carbon::parse($qcmExam->started_at)
-            ->addSeconds(360); // 6 minutes in seconds
+        // Make sure expires_at is set, needed for the timer
+        if (!$qcmExam->expires_at && $qcmExam->started_at) {
+            $qcmExam->expires_at = Carbon::parse($qcmExam->started_at)->addMinutes(6); // 6 minutes (360 seconds)
+            $qcmExam->save();
+            \Log::info("Set expires_at for exam {$qcmExam->id} to {$qcmExam->expires_at}");
+        }
             
         return view('candidate.qcm-exams.show', compact('qcmExam', 'questions', 'examAnswers', 'remainingTime'));
     }
