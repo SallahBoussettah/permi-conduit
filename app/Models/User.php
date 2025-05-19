@@ -128,6 +128,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the QCM exams for the user (as candidate).
+     */
+    public function qcmExams(): HasMany
+    {
+        return $this->hasMany(QcmExam::class);
+    }
+
+    /**
      * Get the course material progress records for the user.
      */
     public function courseMaterialProgress(): HasMany

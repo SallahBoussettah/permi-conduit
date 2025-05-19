@@ -25,15 +25,15 @@ This document outlines the specific tasks needed to complete the Laravel-based d
 
 ## Phase 3: Course Module
 
-- [ ] Create course management interface for inspectors/admins:
-  - [ ] CRUD operations for courses
-  - [ ] Upload/link course materials (PDF, video, audio, text)
-  - [ ] Associate courses with exam sections
-- [ ] Implement candidate course access:
-  - [ ] Course listing and navigation
-  - [ ] Material viewing interfaces (PDF viewer, video player, etc.)
-  - [ ] Progress tracking system
-  - [ ] Course completion indicators
+- [x] Create course management interface for inspectors/admins:
+  - [x] CRUD operations for courses
+  - [x] Upload/link course materials (PDF, video, audio, text)
+  - [x] Associate courses with exam sections
+- [x] Implement candidate course access:
+  - [x] Course listing and navigation
+  - [x] Material viewing interfaces (PDF viewer, video player, etc.)
+  - [x] Progress tracking system
+  - [x] Course completion indicators
 
 ## Phase 4: QCM (Multiple Choice Questions) Module
 

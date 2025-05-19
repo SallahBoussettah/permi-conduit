@@ -25,32 +25,7 @@ Route::get('/terms-of-service', [LegalController::class, 'terms'])->name('terms'
 
 Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
-// Direct language routes for easier access
-Route::get('/en', function (Request $request) {
-    App::setLocale('en');
-    Session::put('locale', 'en');
-    Config::set('app.locale', 'en');
-    
-    $cookie = cookie('locale', 'en', 525600); // 1 year
-    
-    // Get the previous URL or default to home
-    $previousUrl = url()->previous();
-    $baseUrl = url('/');
-    
-    // If the previous URL is not the current language route
-    if (!str_contains($previousUrl, '/en') && !str_contains($previousUrl, '/fr')) {
-        $redirectUrl = $previousUrl;
-    } else {
-        // If it was a language route, redirect to the home page
-        $redirectUrl = $baseUrl;
-    }
-    
-    // Add cache-busting parameter
-    $redirectUrl .= (parse_url($redirectUrl, PHP_URL_QUERY) ? '&' : '?') . 'lang=en&t=' . time();
-    
-    return redirect($redirectUrl)->withCookie($cookie);
-})->name('english');
-
+// Direct language route for easier access (French only)
 Route::get('/fr', function (Request $request) {
     App::setLocale('fr');
     Session::put('locale', 'fr');
@@ -63,7 +38,7 @@ Route::get('/fr', function (Request $request) {
     $baseUrl = url('/');
     
     // If the previous URL is not the current language route
-    if (!str_contains($previousUrl, '/en') && !str_contains($previousUrl, '/fr')) {
+    if (!str_contains($previousUrl, '/fr')) {
         $redirectUrl = $previousUrl;
     } else {
         // If it was a language route, redirect to the home page
@@ -113,6 +88,13 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         
         // Permit Categories management
         Route::resource('permit-categories', \App\Http\Controllers\Admin\PermitCategoryController::class);
+        
+        // QCM Reports
+        Route::get('/qcm-reports', [\App\Http\Controllers\Admin\QcmReportController::class, 'index'])->name('qcm-reports.index');
+        Route::get('/qcm-reports/candidates', [\App\Http\Controllers\Admin\QcmReportController::class, 'candidates'])->name('qcm-reports.candidates');
+        Route::get('/qcm-reports/candidates/{user}', [\App\Http\Controllers\Admin\QcmReportController::class, 'candidateDetail'])->name('qcm-reports.candidates.detail');
+        Route::get('/qcm-reports/statistics', [\App\Http\Controllers\Admin\QcmReportController::class, 'statistics'])->name('qcm-reports.statistics');
+        Route::get('/qcm-reports/export', [\App\Http\Controllers\Admin\QcmReportController::class, 'export'])->name('qcm-reports.export');
     });
     
     // Inspector routes
@@ -140,6 +122,35 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::delete('/courses/{course}/materials/{material}', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'destroy'])->name('courses.materials.destroy');
         Route::post('/courses/{course}/materials/update-order', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'updateOrder'])->name('courses.materials.update-order');
         Route::get('/courses/{course}/materials/{material}/pdf', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'servePdf'])->name('courses.materials.pdf');
+        
+        // QCM Papers
+        Route::resource('qcm-papers', \App\Http\Controllers\Inspector\QcmPaperController::class, [
+            'parameters' => ['qcm-papers' => 'qcmPaper']
+        ]);
+        
+        // QCM Sections
+        Route::get('/qcm-papers/{qcmPaper}/sections/create', [\App\Http\Controllers\Inspector\QcmSectionController::class, 'create'])->name('qcm-papers.sections.create');
+        Route::post('/qcm-papers/{qcmPaper}/sections', [\App\Http\Controllers\Inspector\QcmSectionController::class, 'store'])->name('qcm-papers.sections.store');
+        Route::get('/qcm-papers/{qcmPaper}/sections/{section}/edit', [\App\Http\Controllers\Inspector\QcmSectionController::class, 'edit'])->name('qcm-papers.sections.edit');
+        Route::put('/qcm-papers/{qcmPaper}/sections/{section}', [\App\Http\Controllers\Inspector\QcmSectionController::class, 'update'])->name('qcm-papers.sections.update');
+        Route::delete('/qcm-papers/{qcmPaper}/sections/{section}', [\App\Http\Controllers\Inspector\QcmSectionController::class, 'destroy'])->name('qcm-papers.sections.destroy');
+        Route::post('/qcm-papers/{qcmPaper}/sections/reorder', [\App\Http\Controllers\Inspector\QcmSectionController::class, 'reorder'])->name('qcm-papers.sections.reorder');
+        Route::post('/qcm-papers/{qcmPaper}/sections/{section}/move-questions', [\App\Http\Controllers\Inspector\QcmSectionController::class, 'moveQuestions'])->name('qcm-papers.sections.move-questions');
+        
+        // QCM Questions
+        Route::get('/qcm-papers/{qcmPaper}/questions', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'index'])->name('qcm-papers.questions.index');
+        Route::get('/qcm-papers/{qcmPaper}/questions/create', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'create'])->name('qcm-papers.questions.create');
+        Route::post('/qcm-papers/{qcmPaper}/questions', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'store'])->name('qcm-papers.questions.store');
+        Route::get('/qcm-papers/{qcmPaper}/questions/{question}', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'show'])->name('qcm-papers.questions.show');
+        Route::get('/qcm-papers/{qcmPaper}/questions/{question}/edit', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'edit'])->name('qcm-papers.questions.edit');
+        Route::put('/qcm-papers/{qcmPaper}/questions/{question}', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'update'])->name('qcm-papers.questions.update');
+        Route::delete('/qcm-papers/{qcmPaper}/questions/{question}', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'destroy'])->name('qcm-papers.questions.destroy');
+        Route::get('/qcm-papers/{qcmPaper}/activate-all', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'activateAllAnswers'])->name('qcm-papers.questions.activate-all');
+        
+        // Bulk Import for QCM Questions
+        Route::get('/qcm-papers/{qcmPaper}/import', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'showImportForm'])->name('qcm-papers.questions.import');
+        Route::post('/qcm-papers/{qcmPaper}/import', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'import'])->name('qcm-papers.questions.import.submit');
+        Route::get('/qcm-papers/template/download', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'downloadTemplate'])->name('qcm-papers.questions.template');
     });
     
     // Candidate routes
@@ -153,6 +164,15 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::get('/courses/{course}/materials/{material}/pdf', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'servePdf'])->name('courses.materials.pdf');
         Route::post('/courses/{course}/materials/{material}/progress', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'updateProgress'])->name('courses.materials.progress');
         Route::post('/courses/{course}/materials/{material}/complete', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'markAsComplete'])->name('courses.materials.complete');
+        
+        // QCM Exams
+        Route::get('/qcm-exams', [\App\Http\Controllers\Candidate\QcmExamController::class, 'index'])->name('qcm-exams.index');
+        Route::get('/qcm-exams/available', [\App\Http\Controllers\Candidate\QcmExamController::class, 'available'])->name('qcm-exams.available');
+        Route::post('/qcm-exams/start', [\App\Http\Controllers\Candidate\QcmExamController::class, 'start'])->name('qcm-exams.start');
+        Route::get('/qcm-exams/{qcmExam}', [\App\Http\Controllers\Candidate\QcmExamController::class, 'show'])->name('qcm-exams.show');
+        Route::post('/qcm-exams/{qcmExam}/answer', [\App\Http\Controllers\Candidate\QcmExamController::class, 'answer'])->name('qcm-exams.answer');
+        Route::post('/qcm-exams/{qcmExam}/submit', [\App\Http\Controllers\Candidate\QcmExamController::class, 'submit'])->name('qcm-exams.submit');
+        Route::get('/qcm-exams/{qcmExam}/results', [\App\Http\Controllers\Candidate\QcmExamController::class, 'results'])->name('qcm-exams.results');
     });
 });
 
@@ -173,6 +193,25 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('super_a
     Route::get('/schools/{school}/admins', [SuperAdminController::class, 'schoolAdmins'])->name('school.admins');
     Route::get('/schools/{school}/admins/create', [SuperAdminController::class, 'assignAdmin'])->name('school.admins.create');
     Route::post('/schools/{school}/admins', [SuperAdminController::class, 'storeAdmin'])->name('school.admins.store');
+});
+
+// Add a debug route to check the latest logs
+Route::get('/debug-latest-logs', function() {
+    if (app()->environment('local')) {
+        $logFile = storage_path('logs/laravel.log');
+        $logContent = '';
+        
+        if (file_exists($logFile)) {
+            $logLines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $logLines = array_slice($logLines, -100); // Get the last 100 lines
+            $logContent = implode("\n", $logLines);
+        }
+        
+        return response($logContent, 200)
+            ->header('Content-Type', 'text/plain');
+    }
+    
+    return 'Debug logs not available in production.';
 });
 
 require __DIR__.'/auth.php';

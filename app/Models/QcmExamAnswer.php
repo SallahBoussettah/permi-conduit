@@ -5,9 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class QcmAnswer extends Model
+class QcmExamAnswer extends Model
 {
     use HasFactory;
 
@@ -17,10 +16,10 @@ class QcmAnswer extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'qcm_exam_id',
         'qcm_question_id',
-        'answer_text',
+        'qcm_answer_id',
         'is_correct',
-        'status',
     ];
 
     /**
@@ -30,11 +29,18 @@ class QcmAnswer extends Model
      */
     protected $casts = [
         'is_correct' => 'boolean',
-        'status' => 'boolean',
     ];
 
     /**
-     * Get the QCM question that owns the QCM answer.
+     * Get the exam that owns the answer.
+     */
+    public function exam(): BelongsTo
+    {
+        return $this->belongsTo(QcmExam::class, 'qcm_exam_id');
+    }
+
+    /**
+     * Get the question that owns the answer.
      */
     public function question(): BelongsTo
     {
@@ -42,18 +48,10 @@ class QcmAnswer extends Model
     }
 
     /**
-     * Get the QCM attempts for the QCM answer.
+     * Get the selected answer.
      */
-    public function attempts(): HasMany
+    public function selectedAnswer(): BelongsTo
     {
-        return $this->hasMany(CandidateQcmAttempt::class, 'selected_qcm_answer_id');
-    }
-
-    /**
-     * Scope a query to only include active answers.
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
+        return $this->belongsTo(QcmAnswer::class, 'qcm_answer_id');
     }
 }

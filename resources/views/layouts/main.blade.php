@@ -69,24 +69,6 @@
                         </button>
                     </div>
 
-                    <!-- Language Switcher - Hidden on mobile -->
-                    <div class="relative hidden md:block">
-                        <button id="language-menu-button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-300 hover:text-white focus:outline-none transition ease-in-out duration-150">
-                            {{ config('app.available_locales')[app()->getLocale()] }}
-                            <svg class="ml-1 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div id="language-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                            <a href="{{ route('language.switch', ['locale' => 'en']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() == 'en' ? 'bg-gray-100 font-medium' : '' }}">
-                                English
-                            </a>
-                            <a href="{{ route('language.switch', ['locale' => 'fr']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() == 'fr' ? 'bg-gray-100 font-medium' : '' }}">
-                                Français
-                            </a>
-                        </div>
-                    </div>
-
                     <!-- User Authentication Links - Hidden on mobile -->
                     <div class="hidden md:flex items-center space-x-2">
                         @guest
@@ -183,34 +165,7 @@
             </div>
             <div class="pt-2 pb-3 border-t border-gray-700">
                 <!-- Language options in mobile menu -->
-                <div class="px-4 py-2">
-                    <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open" class="flex items-center justify-between w-full text-left py-2 text-gray-300 hover:text-white focus:outline-none transition-colors duration-150">
-                            <span class="font-medium">{{ __('app.language') }}: {{ config('app.available_locales')[app()->getLocale()] }}</span>
-                            <svg class="ml-1 h-4 w-4 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                 :class="{'transform rotate-180': open}">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <div x-show="open" 
-                             x-transition:enter="transition ease-out duration-100"
-                             x-transition:enter-start="transform opacity-0 scale-95"
-                             x-transition:enter-end="transform opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-75"
-                             x-transition:leave-start="transform opacity-100 scale-100"
-                             x-transition:leave-end="transform opacity-0 scale-95"
-                             class="mt-2 pl-4 border-l border-gray-700 space-y-1">
-                            <a href="{{ route('language.switch', ['locale' => 'en']) }}" 
-                               class="block py-2 text-gray-300 hover:text-white {{ app()->getLocale() == 'en' ? 'text-white font-medium' : '' }}">
-                                English
-                            </a>
-                            <a href="{{ route('language.switch', ['locale' => 'fr']) }}" 
-                               class="block py-2 text-gray-300 hover:text-white {{ app()->getLocale() == 'fr' ? 'text-white font-medium' : '' }}">
-                                Français
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <!-- Removed language options since we only use French -->
             </div>
             <div class="pt-4 pb-3 border-t border-gray-700">
                 @guest
@@ -299,26 +254,8 @@
     </footer>
 
     <script>
-        // Language menu toggle
+        // User menu toggle
         document.addEventListener('DOMContentLoaded', function() {
-            const languageMenuButton = document.getElementById('language-menu-button');
-            const languageMenu = document.getElementById('language-menu');
-            
-            if (languageMenuButton && languageMenu) {
-                languageMenuButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    languageMenu.classList.toggle('hidden');
-                });
-                
-                // Close the menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    if (!languageMenuButton.contains(event.target) && !languageMenu.contains(event.target)) {
-                        languageMenu.classList.add('hidden');
-                    }
-                });
-            }
-            
-            // User menu toggle
             const userMenuButton = document.getElementById('user-menu-button');
             const userMenu = document.getElementById('user-menu');
             

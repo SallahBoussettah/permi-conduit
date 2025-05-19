@@ -20,10 +20,8 @@ class LanguageController extends Controller
      */
     public function switch(Request $request, $locale)
     {
-        // Force the locale to be one of our available locales
-        if (!in_array($locale, ['en', 'fr'])) {
-            $locale = 'fr'; // Default to French
-        }
+        // Always use French
+        $locale = 'fr';
         
         // Set the locale in the session
         Session::put('locale', $locale);
@@ -36,7 +34,7 @@ class LanguageController extends Controller
         $cookie = cookie('locale', $locale, 525600); // 1 year in minutes
         
         // Log the change
-        Log::info('Language switched to: ' . $locale);
+        Log::info('Language set to French');
         
         // Determine the redirect URL
         $redirectUrl = $this->getRedirectUrl($request);

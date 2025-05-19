@@ -17,32 +17,109 @@ class QcmQuestion extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'qcm_set_id',
+        'qcm_paper_id',
+        'section_id',
         'question_text',
-        'exam_section_id',
+        'question_type',
+        'difficulty',
+        'points',
+        'image_path',
+        'explanation',
+        'sequence_number',
     ];
 
     /**
-     * Get the exam section that owns the QCM question.
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
      */
-    public function examSection(): BelongsTo
+    protected $casts = [
+        'points' => 'integer',
+        'sequence_number' => 'integer',
+    ];
+
+    /**
+     * Get the QCM paper that owns the question.
+     */
+    public function qcmPaper(): BelongsTo
     {
-        return $this->belongsTo(ExamSection::class);
+        return $this->belongsTo(QcmPaper::class);
     }
 
     /**
-     * Get the QCM answers for the QCM question.
+     * Get the section that owns the question.
+     */
+    public function section(): BelongsTo
+    {
+        return $this->belongsTo(QcmSection::class, 'section_id');
+    }
+
+    /**
+     * Get the answers for the question.
      */
     public function answers(): HasMany
     {
         return $this->hasMany(QcmAnswer::class);
     }
-
+    
     /**
-     * Get the QCM attempts for the QCM question.
+     * Get the correct answer for the question.
      */
-    public function attempts(): HasMany
+    public function correctAnswer()
     {
-        return $this->hasMany(CandidateQcmAttempt::class);
+        return $this->answers()->where('is_correct', true)->first();
+    }
+    
+    /**
+     * Get the exam answers for the question.
+     */
+    public function examAnswers(): HasMany
+    {
+        return $this->hasMany(ExamAnswer::class);
+    }
+    
+    /**
+     * Scope a query to only include active questions.
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereHas('answers', function ($q) {
+            $q->where('status', true);
+        });
+    }
+    
+    /**
+     * Get the image URL attribute.
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get the question type as text.
+     */
+    public function getQuestionTypeTextAttribute()
+    {
+        return [
+            'multiple_choice' => 'Multiple Choice',
+            'yes_no' => 'Yes/No',
+        ][$this->question_type] ?? $this->question_type;
+    }
+    
+    /**
+     * Get the difficulty as text.
+     */
+    public function getDifficultyTextAttribute()
+    {
+        return [
+            'easy' => 'Easy',
+            'medium' => 'Medium',
+            'hard' => 'Hard',
+        ][$this->difficulty] ?? $this->difficulty;
     }
 }

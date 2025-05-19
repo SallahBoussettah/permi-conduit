@@ -91,7 +91,6 @@ return [
     */
 
     'available_locales' => [
-        'en' => 'English',
         'fr' => 'Français',
     ],
 
@@ -104,11 +103,11 @@ return [
     | Used by the SetLocale middleware for validation.
     |
     */
-    'available_locales_codes' => ['en', 'fr'],
+    'available_locales_codes' => ['fr'],
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'fr'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'fr_FR'),
 
     /*
     |--------------------------------------------------------------------------
