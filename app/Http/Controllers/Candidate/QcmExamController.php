@@ -22,12 +22,31 @@ class QcmExamController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $exams = $user->qcmExams()
-            ->with('paper')
+        
+        // Get recent exams taken by the user
+        $recentExams = $user->qcmExams()
+            ->with('paper.permitCategory')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
         
-        return view('candidate.qcm-exams.index', compact('exams'));
+        // Get available exams for the user
+        $permitCategoryIds = $user->permitCategories->pluck('id');
+        
+        // Get a few available exams for the quick view
+        $availableExams = QcmPaper::whereIn('permit_category_id', $permitCategoryIds)
+            ->where('status', true)
+            ->where(function($query) use ($user) {
+                $query->whereNull('school_id')
+                    ->orWhere('school_id', $user->school_id);
+            })
+            ->with('permitCategory', 'questions')
+            ->orderBy('title')
+            ->take(3)
+            ->get();
+        
+        \Log::info("Loaded index view with " . count($availableExams) . " available exams and " . count($recentExams) . " recent exams");
+        
+        return view('candidate.qcm-exams.index', compact('recentExams', 'availableExams'));
     }
     
     /**

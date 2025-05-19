@@ -51,7 +51,7 @@
                 </a>
             </div>
             <div class="border-t border-gray-200">
-                @if(count($availableExams) > 0)
+                @if(isset($availableExams) && count($availableExams) > 0)
                     <ul class="divide-y divide-gray-200">
                         @foreach($availableExams as $paper)
                             <li>
@@ -126,7 +126,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-200">
-                @if(count($recentExams) > 0)
+                @if(isset($recentExams) && count($recentExams) > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -144,8 +144,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div>
-                                                    <div class="text-sm font-medium text-gray-900">{{ $exam->qcmPaper->title }}</div>
-                                                    <div class="text-sm text-gray-500">{{ $exam->qcmPaper->permitCategory->name }}</div>
+                                                    <div class="text-sm font-medium text-gray-900">{{ $exam->paper->title }}</div>
+                                                    <div class="text-sm text-gray-500">{{ $exam->paper->permitCategory->name }}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -155,26 +155,26 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($exam->completed_at)
-                                                <div class="text-sm text-gray-900">{{ $exam->score }} / {{ $exam->total_points }}</div>
-                                                <div class="text-sm text-gray-500">{{ round(($exam->score / $exam->total_points) * 100) }}%</div>
+                                                <div class="text-sm text-gray-900">{{ $exam->correct_answers_count }} / {{ $exam->total_questions }}</div>
+                                                <div class="text-sm text-gray-500">{{ number_format(($exam->correct_answers_count / $exam->total_questions) * 100, 1) }}%</div>
                                             @else
                                                 <span class="text-sm text-yellow-500">{{ __('In Progress') }}</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($exam->completed_at)
-                                                @if($exam->passed)
+                                                @if(!$exam->is_eliminatory)
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                         {{ __('Passed') }}
                                                     </span>
                                                 @else
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                        {{ __('Failed') }}
+                                                        {{ __('Eliminatory') }}
                                                     </span>
                                                 @endif
                                             @else
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    {{ __('Incomplete') }}
+                                                    {{ __('In Progress') }}
                                                 </span>
                                             @endif
                                         </td>
