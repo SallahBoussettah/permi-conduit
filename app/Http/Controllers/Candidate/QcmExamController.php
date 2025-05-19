@@ -141,18 +141,21 @@ class QcmExamController extends Controller
         DB::beginTransaction();
         
         try {
+            // Use current timestamp for started_at to ensure consistency
+            $now = now();
+            
             // Create a new exam
             $exam = new QcmExam();
             $exam->user_id = $user->id;
             $exam->qcm_paper_id = $paperId;
-            $exam->started_at = now();
-            $exam->expires_at = now()->addMinutes(6); // Exactly 6 minutes (360 seconds)
+            $exam->started_at = $now;
+            $exam->expires_at = $now->copy()->addMinutes(6); // Exactly 6 minutes (360 seconds)
             $exam->total_questions = 10;
             $exam->status = 'in_progress';
             $exam->school_id = $user->school_id;
             $exam->save();
             
-            \Log::info("Created new exam {$exam->id} with expires_at: {$exam->expires_at}");
+            \Log::info("Created new exam {$exam->id} with started_at: {$exam->started_at}, expires_at: {$exam->expires_at}");
             
             DB::commit();
             
@@ -183,8 +186,20 @@ class QcmExamController extends Controller
             return redirect()->route('candidate.qcm-exams.results', $qcmExam);
         }
         
+        // Make sure expires_at is set, needed for the timer
+        if (!$qcmExam->expires_at && $qcmExam->started_at) {
+            $qcmExam->expires_at = Carbon::parse($qcmExam->started_at)->addMinutes(6); // 6 minutes (360 seconds)
+            $qcmExam->save();
+            \Log::info("Set expires_at for exam {$qcmExam->id} to {$qcmExam->expires_at}");
+        }
+        
+        // Detailed timing information for debugging
+        \Log::info("Exam {$qcmExam->id} - started_at: {$qcmExam->started_at}, expires_at: {$qcmExam->expires_at}, current time: " . now());
+        
         // Check if the exam has timed out
         $remainingTime = $qcmExam->getRemainingTimeInSeconds();
+        \Log::info("Calculated remaining time for exam {$qcmExam->id}: {$remainingTime} seconds");
+        
         if ($remainingTime <= 0) {
             // Update the exam status to timed_out
             $qcmExam->status = 'timed_out';
@@ -217,13 +232,6 @@ class QcmExamController extends Controller
         foreach ($rawExamAnswers as $answer) {
             $examAnswers[$answer->qcm_question_id] = $answer;
             \Log::info("Answer for question {$answer->qcm_question_id}: selected answer ID {$answer->qcm_answer_id}, is_correct: " . ($answer->is_correct ? 'true' : 'false'));
-        }
-        
-        // Make sure expires_at is set, needed for the timer
-        if (!$qcmExam->expires_at && $qcmExam->started_at) {
-            $qcmExam->expires_at = Carbon::parse($qcmExam->started_at)->addMinutes(6); // 6 minutes (360 seconds)
-            $qcmExam->save();
-            \Log::info("Set expires_at for exam {$qcmExam->id} to {$qcmExam->expires_at}");
         }
             
         return view('candidate.qcm-exams.show', compact('qcmExam', 'questions', 'examAnswers', 'remainingTime'));
@@ -352,10 +360,24 @@ class QcmExamController extends Controller
             }
         }
         
-        // Calculate the duration
+        // Calculate the duration - ensure it's a positive value
         $startedAt = Carbon::parse($qcmExam->started_at);
         $completedAt = now();
-        $durationSeconds = $completedAt->diffInSeconds($startedAt);
+        
+        // Make sure the completed time is after the start time
+        if ($completedAt->lt($startedAt)) {
+            $completedAt = $startedAt->copy()->addSeconds(1); // Ensure at least 1 second duration
+            \Log::warning("Completion time was before start time for exam {$qcmExam->id}, adjusted to ensure positive duration");
+        }
+        
+        // Calculate duration in seconds
+        $durationSeconds = $startedAt->diffInSeconds($completedAt);
+        
+        // Cap duration at maximum allowed time (6 minutes = 360 seconds)
+        if ($durationSeconds > 360) {
+            $durationSeconds = 360;
+            \Log::info("Capped duration for exam {$qcmExam->id} to maximum time (360 seconds)");
+        }
         
         // Update the exam with completion details
         $qcmExam->status = 'completed';

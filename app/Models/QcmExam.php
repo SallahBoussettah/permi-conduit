@@ -133,13 +133,16 @@ class QcmExam extends Model
         
         // Calculate remaining time based on expires_at
         $now = now();
+        
+        // If current time is past the expiration time, return 0
         if ($now->gt($this->expires_at)) {
             \Log::info("Exam {$this->id} has expired at {$this->expires_at}, current time is {$now}");
             return 0;
         }
         
+        // Calculate the remaining seconds - correct order: time from now until expires_at
         $remaining = $now->diffInSeconds($this->expires_at);
-        \Log::info("Exam {$this->id} has {$remaining} seconds remaining until {$this->expires_at}");
+        \Log::info("Exam {$this->id} has {$remaining} seconds remaining until {$this->expires_at}, current time: {$now}");
         
         return $remaining;
     }

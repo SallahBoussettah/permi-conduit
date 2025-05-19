@@ -15,8 +15,10 @@
             <div class="flex items-center">
                 <div class="px-4 py-2 bg-white shadow rounded-lg mr-4">
                     <div class="text-sm text-gray-500">{{ __('Time Remaining') }}</div>
-                    <div id="timer" class="text-2xl font-bold text-gray-900" data-end-time="{{ $qcmExam->expires_at ? $qcmExam->expires_at->timestamp : now()->addMinutes(6)->timestamp }}">
-                        06:00
+                    <div id="timer" class="text-2xl font-bold text-gray-900" 
+                         data-end-time="{{ $qcmExam->expires_at ? $qcmExam->expires_at->timestamp : now()->addMinutes(6)->timestamp }}"
+                         data-remaining-seconds="{{ $remainingTime }}">
+                        {{ sprintf('%02d:%02d', floor($remainingTime / 60), $remainingTime % 60) }}
                     </div>
                 </div>
                 <div class="px-4 py-2 bg-white shadow rounded-lg">
@@ -165,174 +167,144 @@
 
 @push('scripts')
 <script>
+// Wait for the DOM to be fully loaded before running the script
 document.addEventListener('DOMContentLoaded', function() {
-    // Basic elements
-    var timerElement = document.getElementById('timer');
-    var examForm = document.getElementById('exam-form');
-    var totalQuestions = {{ count($questions) }};
-    var navButtons = document.querySelectorAll('.question-nav-btn');
+    // Get references to important elements
+    const timerElement = document.getElementById('timer');
+    const examForm = document.getElementById('exam-form');
+    const totalQuestions = {{ count($questions) }};
+    const navButtons = document.querySelectorAll('.question-nav-btn');
     
-    // Timer setup - get the actual server-provided end time
-    var endTimeTimestamp = parseInt(timerElement.getAttribute('data-end-time')) * 1000; // convert to milliseconds
-    var currentTime = new Date().getTime();
-    var timeRemaining = Math.max(0, Math.floor((endTimeTimestamp - currentTime) / 1000)); // convert to seconds and ensure it's not negative
+    // Get timer data from server
+    const endTimeTimestamp = parseInt(timerElement.getAttribute('data-end-time')) * 1000; // convert to milliseconds
+    const serverRemainingTime = parseInt(timerElement.getAttribute('data-remaining-seconds')); // seconds
     
-    console.log("End time: " + new Date(endTimeTimestamp).toLocaleTimeString());
-    console.log("Current time: " + new Date(currentTime).toLocaleTimeString());
-    console.log("Initial time remaining: " + timeRemaining + " seconds");
+    // Set up timer variables
+    let timeRemaining; 
     
-    // If the calculated time is invalid or too large, set to 6 minutes (360 seconds)
-    if (isNaN(timeRemaining) || timeRemaining <= 0 || timeRemaining > 360) {
-        timeRemaining = 360; // 6 minutes in seconds
-        console.log("Using default 6 minute timer");
+    // Determine the starting time - prefer server-calculated time if available
+    if (!isNaN(serverRemainingTime) && serverRemainingTime > 0 && serverRemainingTime <= 360) {
+        timeRemaining = serverRemainingTime;
+        console.log("Using server time: " + timeRemaining + " seconds remaining");
     } else {
-        console.log("Using server-calculated remaining time: " + timeRemaining + " seconds");
+        // Calculate from end timestamp as fallback
+        const currentTime = new Date().getTime();
+        timeRemaining = Math.max(0, Math.floor((endTimeTimestamp - currentTime) / 1000));
+        console.log("Using client time: " + timeRemaining + " seconds remaining");
     }
     
-    // Question number buttons
-    for (var i = 0; i < navButtons.length; i++) {
-        navButtons[i].addEventListener('click', function() {
-            var questionIndex = parseInt(this.getAttribute('data-question')) - 1;
-            
-            // Hide all questions
-            var questions = document.querySelectorAll('.question-slide');
-            for (var j = 0; j < questions.length; j++) {
-                questions[j].classList.add('hidden');
-            }
-            
-            // Show the clicked question
-            document.getElementById('question-' + (questionIndex + 1)).classList.remove('hidden');
-            
-            // Update counter and progress
-            document.getElementById('current-question').textContent = (questionIndex + 1);
-            document.getElementById('progress-bar').style.width = ((questionIndex + 1) / totalQuestions * 100) + '%';
-            
-            // Update active button
-            for (var k = 0; k < navButtons.length; k++) {
-                if (k === questionIndex) {
-                    navButtons[k].classList.add('ring-2', 'ring-indigo-500');
-                } else {
-                    navButtons[k].classList.remove('ring-2', 'ring-indigo-500');
-                }
-            }
-        });
+    // Safety check - if time calculation fails, default to 6 minutes
+    if (isNaN(timeRemaining) || timeRemaining <= 0 || timeRemaining > 360) {
+        timeRemaining = 360;
+        console.log("Using default time: 6 minutes (360 seconds)");
     }
     
-    // Timer functionality
-    function updateTimer() {
-        // Check if we need to stop the timer
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            timerElement.textContent = '00:00';
-            
-            // Show a brief time's up message
-            alert('Time is up! Your exam will be submitted automatically.');
-            
-            // Submit the form
-            examForm.submit();
-            
-            // Prevent further timer updates
-            return false;
-        }
-        
+    // TIMER FUNCTION - updates the timer display and handles timeout
+    function updateTimerDisplay() {
         // Calculate minutes and seconds
-        var minutes = Math.floor(timeRemaining / 60);
-        var seconds = timeRemaining % 60;
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
         
         // Format with leading zeros
-        var formattedMinutes = minutes.toString().padStart(2, '0');
-        var formattedSeconds = seconds.toString().padStart(2, '0');
+        const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
-        // Update the display
-        timerElement.textContent = formattedMinutes + ':' + formattedSeconds;
+        // Update the DOM element with the new time
+        timerElement.innerText = formattedTime;
         
         // Update visual styling based on time remaining
         if (timeRemaining <= 30) {
-            timerElement.classList.add('text-red-600', 'animate-pulse');
+            // Red pulsing for last 30 seconds
+            timerElement.className = 'text-2xl font-bold text-red-600 animate-pulse';
         } else if (timeRemaining <= 60) {
-            timerElement.classList.add('text-red-600');
-            timerElement.classList.remove('animate-pulse');
-        } else if (timeRemaining <= 120) {
-            timerElement.classList.add('text-yellow-600');
-            timerElement.classList.remove('text-red-600', 'animate-pulse');
-        }
-        
-        // Decrement time remaining
-        timeRemaining--;
-        
-        return true;
-    }
-    
-    // Initialize timer and start the countdown
-    var timerInterval = setInterval(function() {
-        if (!updateTimer()) {
-            clearInterval(timerInterval);
-        }
-    }, 1000);
-    
-    // Run once immediately to set initial display
-    updateTimer();
-    
-    // Add function to check unanswered questions when the modal is shown
-    function checkUnansweredQuestions() {
-        var unansweredWarning = document.getElementById('unanswered-warning');
-        var answeredCount = document.querySelectorAll('.answer-radio:checked').length;
-        var unansweredCount = totalQuestions - answeredCount;
-        
-        if (unansweredCount > 0) {
-            unansweredWarning.textContent = "{{ __('Warning: You have') }} " + unansweredCount + " {{ __('unanswered questions.') }}";
-            unansweredWarning.classList.remove('hidden');
+            // Yellow for last minute
+            timerElement.className = 'text-2xl font-bold text-yellow-600';
         } else {
-            unansweredWarning.classList.add('hidden');
+            // Normal styling
+            timerElement.className = 'text-2xl font-bold text-gray-900';
         }
+        
+        // Debug logging
+        console.log(`Timer updated: ${formattedTime} (${timeRemaining} seconds remaining)`);
     }
     
-    // Add MutationObserver to check when the confirmation modal becomes visible
-    var confirmationModal = document.getElementById('confirmation-modal');
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.attributeName === 'class' && 
-                !confirmationModal.classList.contains('hidden')) {
-                checkUnansweredQuestions();
+    // Start timer function - runs every second
+    function startTimer() {
+        // Update the display immediately once
+        updateTimerDisplay();
+        
+        // Set up the interval to run every 1000ms (1 second)
+        const timerInterval = setInterval(function() {
+            // Decrease remaining time
+            timeRemaining--;
+            
+            // Update the display with new time
+            updateTimerDisplay();
+            
+            // Check if timer has expired
+            if (timeRemaining <= 0) {
+                // Clear the interval to stop the timer
+                clearInterval(timerInterval);
+                
+                // Show message
+                alert('Time is up! Your exam will be submitted automatically.');
+                
+                // Submit the form
+                examForm.submit();
             }
+        }, 1000);
+        
+        console.log("Timer started with " + timeRemaining + " seconds remaining");
+        return timerInterval;
+    }
+    
+    // Initialize the timer
+    const timerInterval = startTimer();
+    
+    // Question navigation
+    navButtons.forEach(function(button, index) {
+        button.addEventListener('click', function() {
+            const questionIndex = parseInt(this.getAttribute('data-question')) - 1;
+            
+            // Hide all questions
+            document.querySelectorAll('.question-slide').forEach(function(slide) {
+                slide.classList.add('hidden');
+            });
+            
+            // Show the selected question
+            document.getElementById('question-' + (questionIndex + 1)).classList.remove('hidden');
+            
+            // Update question counter and progress bar
+            document.getElementById('current-question').textContent = (questionIndex + 1);
+            document.getElementById('progress-bar').style.width = ((questionIndex + 1) / totalQuestions * 100) + '%';
+            
+            // Update active button styles
+            navButtons.forEach(function(btn, idx) {
+                if (idx === questionIndex) {
+                    btn.classList.add('ring-2', 'ring-indigo-500');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-indigo-500');
+                }
+            });
         });
     });
     
-    observer.observe(confirmationModal, { attributes: true });
-    
-    // Cancel submission
-    document.getElementById('cancel-submit').addEventListener('click', function() {
-        document.getElementById('confirmation-modal').classList.add('hidden');
-    });
-    
-    // Save answers automatically when selected
-    var radioButtons = document.querySelectorAll('.answer-radio');
-    for (var i = 0; i < radioButtons.length; i++) {
-        radioButtons[i].addEventListener('change', function() {
-            var questionId = this.dataset.questionId;
-            var answerId = this.dataset.answerId;
+    // Handle answer selection
+    document.querySelectorAll('.answer-radio').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const questionId = this.getAttribute('data-question-id');
+            const answerId = this.getAttribute('data-answer-id');
             
-            // Find the question index and update the nav button
-            var slides = document.querySelectorAll('.question-slide');
-            var questionIndex = -1;
+            // Update button style to show question is answered
+            const questionIndex = Array.from(document.querySelectorAll('.question-slide')).findIndex(function(slide) {
+                return slide.querySelector('[data-question-id="' + questionId + '"]');
+            });
             
-            for (var j = 0; j < slides.length; j++) {
-                if (slides[j].querySelector('input[data-question-id="' + questionId + '"]')) {
-                    questionIndex = j;
-                    break;
-                }
-            }
-            
-            if (questionIndex !== -1) {
-                var navButton = document.querySelector('.question-nav-btn[data-question="' + (questionIndex + 1) + '"]');
-                if (navButton) {
-                    navButton.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
-                    navButton.classList.add('bg-indigo-600', 'text-white');
-                }
+            if (questionIndex >= 0 && questionIndex < navButtons.length) {
+                navButtons[questionIndex].classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+                navButtons[questionIndex].classList.add('bg-indigo-600', 'text-white');
             }
             
             // Save answer via AJAX
-            console.log('Saving answer:', questionId, answerId);
             fetch('{{ route('candidate.qcm-exams.answer', $qcmExam) }}', {
                 method: 'POST',
                 headers: {
@@ -346,17 +318,45 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Answer saved:', data);
+                if (data.error) {
+                    console.error('Error saving answer:', data.error);
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                } else {
+                    console.log('Answer saved successfully');
+                }
             })
-            .catch(function(error) {
-                console.error('Error saving answer:', error);
+            .catch(error => {
+                console.error('Failed to save answer:', error);
             });
         });
-    }
-
-    // Add event listener to form submit button
-    document.getElementById('exam-form').addEventListener('submit', function() {
-        console.log('Form submitted');
+    });
+    
+    // Handle exam submission
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const cancelButton = document.getElementById('cancel-submit');
+    const unansweredWarning = document.getElementById('unanswered-warning');
+    
+    // Cancel button for submission modal
+    cancelButton.addEventListener('click', function() {
+        confirmationModal.classList.add('hidden');
+    });
+    
+    // Finish exam button
+    document.querySelector('.finish-exam-btn').addEventListener('click', function() {
+        // Check for unanswered questions
+        const answeredCount = document.querySelectorAll('.question-nav-btn.bg-indigo-600').length;
+        
+        if (answeredCount < totalQuestions) {
+            unansweredWarning.classList.remove('hidden');
+            unansweredWarning.textContent = '{{ __('Warning: You have') }} ' + (totalQuestions - answeredCount) + ' {{ __('unanswered questions.') }}';
+        } else {
+            unansweredWarning.classList.add('hidden');
+        }
+        
+        // Show the confirmation modal
+        confirmationModal.classList.remove('hidden');
     });
 });
 </script>

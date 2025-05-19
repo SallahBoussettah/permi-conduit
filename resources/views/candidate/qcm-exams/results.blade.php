@@ -65,7 +65,13 @@
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm font-medium text-gray-500">{{ __('Duration') }}</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ floor($qcmExam->duration_seconds / 60) }}m {{ $qcmExam->duration_seconds % 60 }}s 
+                            @php
+                                // Ensure duration is a positive value
+                                $durationSeconds = max(1, abs($qcmExam->duration_seconds));
+                                $minutes = floor($durationSeconds / 60);
+                                $seconds = $durationSeconds % 60;
+                            @endphp
+                            {{ $minutes }}m {{ $seconds }}s 
                             <span class="text-sm text-gray-500 ml-2">({{ __('Maximum: 6 minutes') }})</span>
                         </dd>
                     </div>
