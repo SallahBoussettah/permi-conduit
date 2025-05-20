@@ -16,10 +16,10 @@
                         @endif
                     </div>
                     <h1 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-                        {{ __('Welcome back') }}, {{ Auth::user()->name }}!
+                        {{ __('Bienvenue') }}, {{ Auth::user()->name }}!
                     </h1>
                     <p class="mt-3 max-w-md text-gray-300">
-                        {{ __('Access your personalized dashboard to manage your activities and resources.') }}
+                        {{ __('Accédez à votre tableau de bord personnalisé pour gérer vos activités et ressources.') }}
                     </p>
                 </div>
                 <div class="md:w-1/3 flex justify-center p-8">
@@ -50,7 +50,7 @@
                     </div>
                     <div class="ml-3">
                         <p class="text-sm text-red-700">
-                            {{ __('Your role has not been assigned. Please contact an administrator.') }}
+                            {{ __('Votre rôle n\'a pas été assigné. Veuillez contacter un administrateur.') }}
                         </p>
                     </div>
                 </div>
@@ -65,10 +65,10 @@
                             window.location.href = "{{ route('super_admin.dashboard') }}";
                         </script>
                         <div class="p-8 text-center">
-                            <p>{{ __('Redirecting to Super Admin Dashboard...') }}</p>
+                            <p>{{ __('Redirection vers le tableau de bord de l\'administrateur...') }}</p>
                             <p class="mt-4">
                                 <a href="{{ route('super_admin.dashboard') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    {{ __('Click here if not redirected') }}
+                                    {{ __('Cliquez ici si vous n\'êtes pas redirigé') }}
                                 </a>
                             </p>
                         </div>
@@ -88,13 +88,13 @@
                                                 </svg>
                                             </div>
                                             <div class="ml-5">
-                                                <h3 class="text-lg font-medium text-gray-900">{{ __('User Management') }}</h3>
-                                                <p class="mt-1 text-sm text-gray-500">{{ __('Manage all system users.') }}</p>
+                                                <h3 class="text-lg font-medium text-gray-900">{{ __('Gestion des utilisateurs') }}</h3>
+                                                <p class="mt-1 text-sm text-gray-500">{{ __('Gérer tous les utilisateurs du système.') }}</p>
                                             </div>
                                         </div>
                                         <div class="mt-6">
                                             <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                {{ __('Manage Users') }}
+                                                {{ __('Gérer les utilisateurs') }}
                                             </a>
                                         </div>
                                     </div>
@@ -112,13 +112,13 @@
                                                 </svg>
                                             </div>
                                             <div class="ml-5">
-                                                <h3 class="text-lg font-medium text-gray-900">{{ __('Permit Categories') }}</h3>
-                                                <p class="mt-1 text-sm text-gray-500">{{ __('Manage driver permit categories (C, CE, D, etc.).') }}</p>
+                                                <h3 class="text-lg font-medium text-gray-900">{{ __('Catégories de permis') }}</h3>
+                                                <p class="mt-1 text-sm text-gray-500">{{ __('Gérer les catégories de permis de conduire (C, CE, D, etc.).') }}</p>
                                             </div>
                                         </div>
                                         <div class="mt-6">
                                             <a href="{{ route('admin.permit-categories.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                                {{ __('Manage Permit Categories') }}
+                                                {{ __('Gérer les catégories de permis') }}
                                             </a>
                                         </div>
                                     </div>
@@ -134,13 +134,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Inspector Registration') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Create and manage inspector accounts.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Inscription de l\'inspecteur') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Créer et gérer les comptes d\'inspecteurs.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('admin.register.inspector') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                                            {{ __('Register Inspector') }}
+                                            {{ __('Inscription de l\'inspecteur') }}
                                         </a>
                                     </div>
                                 </div>
@@ -150,7 +150,7 @@
                     
                     <!-- QCM Reports Section -->
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('QCM Module') }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Module QCM') }}</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
                                 <div class="p-6">
@@ -161,13 +161,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('QCM Reports') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('View candidate exam results and statistics.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Rapports QCM') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Voir les résultats des examens des candidats et les statistiques.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('admin.qcm-reports.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                            {{ __('View Reports') }}
+                                            {{ __('Voir les rapports') }}
                                         </a>
                                     </div>
                                 </div>
@@ -182,13 +182,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Candidate Performance') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('View individual candidate exam history.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Performance des candidats') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Voir l\'historique des examens des candidats.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('admin.qcm-reports.candidates') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            {{ __('View Candidates') }}
+                                            {{ __('Voir les candidats') }}
                                         </a>
                                     </div>
                                 </div>
@@ -203,13 +203,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Export Data') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Export QCM results for reporting.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Export des données') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Exporter les résultats des examens QCM pour la création de rapports.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('admin.qcm-reports.export') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                            {{ __('Export Reports') }}
+                                            {{ __('Exporter les rapports') }}
                                         </a>
                                     </div>
                                 </div>
@@ -222,7 +222,7 @@
                         <!-- Inspector Dashboard -->
                 <div class="space-y-8">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Inspector Tools') }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Outils de l\'inspecteur') }}</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
                                 <div class="p-6">
@@ -233,13 +233,14 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Course Management') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Create and manage course materials.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Gestion des cours
+') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Créer et gérer des supports de cours.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('inspector.courses.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            {{ __('Manage Courses') }}
+                                            {{ __('Gérer les cours') }}
                                         </a>
                                     </div>
                                 </div>
@@ -255,13 +256,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('QCM Management') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Create and manage QCM papers and questions.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Gestion du QCM') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Créer et gérer des QCM et des questions.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('inspector.qcm-papers.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                                            {{ __('Manage QCM Papers') }}
+                                            {{ __('Gérer les QCM') }}
                                         </a>
                                     </div>
                                 </div>
@@ -277,13 +278,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Permit Categories') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Manage driver permit categories (C, CE, D, etc.).') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Catégories de permis') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Gérer les catégories de permis de conduire (C, CE, D, etc.).') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('inspector.permit-categories.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                            {{ __('Manage Permit Categories') }}
+                                            {{ __('Gérer les catégories de permis') }}
                                         </a>
                                     </div>
                                 </div>
@@ -299,13 +300,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Profile Settings') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Update your personal information.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Paramètres du profil') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Mettre à jour vos informations personnelles.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('profile.edit') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                            {{ __('Edit Profile') }}
+                                            {{ __('Modifier le profil') }}
                                         </a>
                                     </div>
                                 </div>
@@ -318,7 +319,7 @@
                         <!-- Candidate Dashboard -->
                 <div class="space-y-8">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Learning Resources') }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Ressources d\'apprentissage') }}</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
                                 <div class="p-6">
@@ -329,13 +330,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('My Courses') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Access your learning materials.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Mes cours') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Accéder à vos supports de cours.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('candidate.courses.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                            {{ __('View Courses') }}
+                                            {{ __('Voir les cours') }}
                                         </a>
                                     </div>
                                 </div>
@@ -351,15 +352,15 @@
                                         </div>
                                         <div class="ml-5">
                                             <h3 class="text-lg font-medium text-gray-900">{{ __('QCM Exams') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Take multiple choice exams and view results.') }}</p>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Passer des examens à choix multiple et voir les résultats.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('candidate.qcm-exams.available') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                                            {{ __('Available Exams') }}
+                                            {{ __('Exams disponibles') }}
                                         </a>
                                         <a href="{{ route('candidate.qcm-exams.index') }}" class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                            {{ __('My Exam History') }}
+                                            {{ __('Mon historique d\'examens') }}
                                         </a>
                                     </div>
                                 </div>
@@ -374,13 +375,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('My Profile') }}</h3>
-                                            <p class="mt-1 text-sm text-gray-500">{{ __('Update your personal information.') }}</p>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Mon profil') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Mettre à jour vos informations personnelles.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
                                         <a href="{{ route('profile.edit') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                            {{ __('Edit Profile') }}
+                                            {{ __('Modifier le profil') }}
                                         </a>
                                     </div>
                                 </div>

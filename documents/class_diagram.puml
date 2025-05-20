@@ -82,7 +82,8 @@ class ExamResult {
   +updated_at: timestamp
 }
 
-' Course Management classes
+' Gestion des cours
+ classes
 class Course {
   +id: bigint
   +title: string

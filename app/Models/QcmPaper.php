@@ -89,4 +89,12 @@ class QcmPaper extends Model
     {
         return $query->where('status', true);
     }
+
+    /**
+     * Get the duration of the QCM paper (always 6 minutes).
+     */
+    public function getDurationAttribute()
+    {
+        return 6; // All QCM exams have a fixed duration of 6 minutes
+    }
 }

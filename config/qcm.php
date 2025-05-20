@@ -14,5 +14,5 @@ return [
     'time_limit' => 6,
 
     // Passing percentage for QCM exams
-    'passing_percentage' => 70,
+    'passing_percentage' => 60,
 ]; 

@@ -32,19 +32,42 @@ class QcmExamController extends Controller
         // Get available exams for the user
         $permitCategoryIds = $user->permitCategories->pluck('id');
         
-        // Get a few available exams for the quick view
-        $availableExams = QcmPaper::whereIn('permit_category_id', $permitCategoryIds)
+        // Build the base query for available papers
+        $baseQuery = QcmPaper::whereIn('permit_category_id', $permitCategoryIds)
             ->where('status', true)
             ->where(function($query) use ($user) {
                 $query->whereNull('school_id')
                     ->orWhere('school_id', $user->school_id);
-            })
-            ->with('permitCategory', 'questions')
-            ->orderBy('title')
-            ->take(3)
-            ->get();
+            });
+            
+        // Get the total count
+        $paperCount = $baseQuery->count();
         
-        \Log::info("Loaded index view with " . count($availableExams) . " available exams and " . count($recentExams) . " recent exams");
+        // Select only ONE random exam
+        if ($paperCount > 0) {
+            // Get all IDs, randomize, and then fetch just 1 paper
+            $allPaperIds = $baseQuery->pluck('id')->toArray();
+            
+            // Shuffle the array of IDs
+            shuffle($allPaperIds);
+            
+            // Take just the first ID
+            $selectedId = $allPaperIds[0];
+            
+            // Query that specific paper with its relationships
+            $availableExam = QcmPaper::where('id', $selectedId)
+                ->with('permitCategory', 'questions')
+                ->first();
+                
+            // Convert to collection to maintain compatibility with existing view
+            $availableExams = collect([$availableExam]);
+            
+            \Log::info("Loaded index view with 1 randomly selected available exam from {$paperCount} total and " . count($recentExams) . " recent exams");
+        } else {
+            // No papers available
+            $availableExams = collect();
+            \Log::info("No available exam papers for user {$user->id}");
+        }
         
         return view('candidate.qcm-exams.index', compact('recentExams', 'availableExams'));
     }
@@ -75,8 +98,25 @@ class QcmExamController extends Controller
             $query->where('permit_category_id', $permitCategoryFilter);
         }
         
-        $availableExams = $query->orderBy('title')
-            ->paginate(10);
+        // Instead of paginating all results, randomly select a single paper
+        // First check if there are any available papers
+        $paperCount = $query->count();
+        
+        if ($paperCount > 0) {
+            // Get a random paper with all necessary relationships
+            $randomOffset = rand(0, $paperCount - 1);
+            $availableExams = $query->with(['questions', 'permitCategory'])
+                                    ->skip($randomOffset)
+                                    ->take(1)
+                                    ->get();
+            
+            // Log the random selection
+            \Log::info("Randomly selected 1 exam paper from {$paperCount} available papers for user {$user->id}");
+        } else {
+            // No papers available
+            $availableExams = collect();
+            \Log::info("No exam papers available for user {$user->id}");
+        }
         
         return view('candidate.qcm-exams.available', compact('availableExams', 'permitCategories'));
     }

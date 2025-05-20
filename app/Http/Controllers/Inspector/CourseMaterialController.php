@@ -38,12 +38,33 @@ class CourseMaterialController extends Controller
      */
     public function store(Request $request, Course $course)
     {
-        $validator = Validator::make($request->all(), [
+        // Define validation rules based on material type
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'pdf_file' => 'required|file|mimes:pdf|max:10240', // 10MB max
-            'custom_thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // 2MB max
-        ]);
+            'material_type' => 'required|in:pdf,video',
+        ];
+
+        // Add specific rules based on material type
+        if ($request->material_type === 'pdf') {
+            $rules['pdf_file'] = 'required|file|mimes:pdf|max:10240'; // 10MB max
+            $rules['thumbnail'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048'; // 2MB max
+        } else { // video
+            $rules['video_url'] = 'required|url';
+            $rules['video_thumbnail'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048'; // 2MB max
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        // Custom validation for YouTube URL
+        $validator->after(function ($validator) use ($request) {
+            if ($request->material_type === 'video' && $request->has('video_url')) {
+                $videoId = $this->extractYoutubeId($request->video_url);
+                if (!$videoId) {
+                    $validator->errors()->add('video_url', 'The URL must be a valid YouTube video URL.');
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -51,50 +72,120 @@ class CourseMaterialController extends Controller
                 ->withInput();
         }
 
-        // Handle PDF file upload
-        if ($request->hasFile('pdf_file')) {
-            $pdf = $request->file('pdf_file');
-            $pdfName = time() . '_' . Str::slug($request->title) . '.' . $pdf->getClientOriginalExtension();
-            $pdf->storeAs('public/pdfs', $pdfName);
-            
-            // Get page count
-            $pageCount = $this->getPdfPageCount($pdf->path());
-            
-            // Generate thumbnail or use custom thumbnail
+        // Get the next sequence order
+        $nextOrder = $course->materials()->max('sequence_order') + 1;
+
+        // Initialize material data
+        $materialData = [
+            'course_id' => $course->id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'sequence_order' => $nextOrder,
+        ];
+
+        // Handle based on material type
+        if ($request->material_type === 'pdf') {
+            // Handle PDF file upload
+            if ($request->hasFile('pdf_file')) {
+                $pdf = $request->file('pdf_file');
+                $pdfName = time() . '_' . Str::slug($request->title) . '.' . $pdf->getClientOriginalExtension();
+                $pdf->storeAs('public/pdfs', $pdfName);
+                
+                // Get page count
+                $pageCount = $this->getPdfPageCount($pdf->path());
+                
+                // Generate thumbnail or use custom thumbnail
+                $thumbnailPath = null;
+                if ($request->hasFile('thumbnail')) {
+                    $thumbnail = $request->file('thumbnail');
+                    $thumbnailName = time() . '_' . Str::slug($request->title) . '.' . $thumbnail->getClientOriginalExtension();
+                    $thumbnail->storeAs('public/thumbnails', $thumbnailName);
+                    $thumbnailPath = 'thumbnails/' . $thumbnailName;
+                } else {
+                    // Generate thumbnail from PDF first page
+                    $thumbnailPath = $this->generatePdfThumbnail($pdf->path(), $request->title);
+                }
+
+                // Set PDF-specific data
+                $materialData['material_type'] = 'pdf';
+                $materialData['content_path_or_url'] = $pdfName;
+                $materialData['thumbnail_path'] = $thumbnailPath;
+                $materialData['page_count'] = $pageCount;
+            } else {
+                return redirect()->back()
+                    ->withErrors(['pdf_file' => 'Failed to upload PDF file.'])
+                    ->withInput();
+            }
+        } else { // video
+            // Process YouTube URL
+            $videoUrl = $request->video_url;
+            $videoId = $this->extractYoutubeId($videoUrl);
+
+            if (!$videoId) {
+                return redirect()->back()
+                    ->withErrors(['video_url' => 'Invalid YouTube URL. Please enter a valid YouTube video URL.'])
+                    ->withInput();
+            }
+
+            // Generate or use custom thumbnail
             $thumbnailPath = null;
-            if ($request->hasFile('custom_thumbnail')) {
-                $thumbnail = $request->file('custom_thumbnail');
+            if ($request->hasFile('video_thumbnail')) {
+                $thumbnail = $request->file('video_thumbnail');
                 $thumbnailName = time() . '_' . Str::slug($request->title) . '.' . $thumbnail->getClientOriginalExtension();
                 $thumbnail->storeAs('public/thumbnails', $thumbnailName);
                 $thumbnailPath = 'thumbnails/' . $thumbnailName;
             } else {
-                // Generate thumbnail from PDF first page
-                $thumbnailPath = $this->generatePdfThumbnail($pdf->path(), $request->title);
+                // Use YouTube thumbnail
+                $thumbnailPath = 'thumbnails/youtube_' . $videoId . '.jpg';
+                
+                // Download YouTube thumbnail if it doesn't exist
+                $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
+                $localThumbPath = storage_path('app/public/' . $thumbnailPath);
+                
+                // Create directory if it doesn't exist
+                if (!file_exists(dirname($localThumbPath))) {
+                    mkdir(dirname($localThumbPath), 0755, true);
+                }
+                
+                // Try to download the maxresdefault thumbnail (HD)
+                if (!@copy($youtubeThumbUrl, $localThumbPath)) {
+                    // If HD thumbnail not available, use the default thumbnail
+                    $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/0.jpg";
+                    @copy($youtubeThumbUrl, $localThumbPath);
+                }
             }
 
-            // Get the next sequence order
-            $nextOrder = $course->materials()->max('sequence_order') + 1;
-        
-            // Create course material
-            $material = new CourseMaterial([
-                'course_id' => $course->id,
-                'title' => $request->title,
-                'description' => $request->description,
-                'content_path_or_url' => $pdfName,
-                'thumbnail_path' => $thumbnailPath,
-                'page_count' => $pageCount,
-                'sequence_order' => $nextOrder,
-            ]);
-            
-            $material->save();
-            
-            return redirect()->route('inspector.courses.show', $course)
-                ->with('success', 'Course material added successfully.');
+            // Set video-specific data
+            $materialData['material_type'] = 'video';
+            $materialData['content_path_or_url'] = $videoId; // Store just the YouTube ID
+            $materialData['thumbnail_path'] = $thumbnailPath;
         }
         
-        return redirect()->back()
-            ->withErrors(['pdf_file' => 'Failed to upload PDF file.'])
-            ->withInput();
+        // Create course material
+        $material = new CourseMaterial($materialData);
+        $material->save();
+        
+        return redirect()->route('inspector.courses.show', $course)
+            ->with('success', 'Course material added successfully.');
+    }
+
+    /**
+     * Extract YouTube video ID from a YouTube URL
+     * 
+     * @param string $url YouTube URL
+     * @return string|null YouTube video ID or null if invalid
+     */
+    private function extractYoutubeId($url)
+    {
+        // Fix the pattern by using a different delimiter (# instead of /)
+        // This avoids conflicts with the slashes in the URL pattern
+        $pattern = '#(?:youtube\.com/(?:[^/\n\s]+/\S+/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be/)([a-zA-Z0-9_-]{11})#';
+        
+        if (preg_match($pattern, $url, $matches)) {
+            return $matches[1];
+        }
+        
+        return null;
     }
 
     /**
@@ -225,13 +316,32 @@ class CourseMaterialController extends Controller
      */
     public function update(Request $request, Course $course, CourseMaterial $material)
     {
-        $validator = Validator::make($request->all(), [
+        // Basic validation for all material types
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'pdf_file' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
+            'material_type' => 'required|in:pdf,video',
             'custom_thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // 2MB max
-            'sequence_order' => 'nullable|integer|min:1',
-        ]);
+        ];
+
+        // Add specific validation rules based on material type
+        if ($request->material_type === 'pdf') {
+            $rules['pdf_file'] = 'nullable|file|mimes:pdf|max:10240'; // 10MB max
+        } else { // video
+            $rules['video_url'] = 'required|url';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        // Custom validation for YouTube URL
+        $validator->after(function ($validator) use ($request) {
+            if ($request->material_type === 'video' && $request->has('video_url')) {
+                $videoId = $this->extractYoutubeId($request->video_url);
+                if (!$videoId) {
+                    $validator->errors()->add('video_url', 'The URL must be a valid YouTube video URL.');
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -239,123 +349,91 @@ class CourseMaterialController extends Controller
                 ->withInput();
         }
 
-        // Update basic info
+        // Update basic information
         $material->title = $request->title;
         $material->description = $request->description;
         
-        // Update sequence order if provided
-        if ($request->filled('sequence_order')) {
-            $material->sequence_order = $request->sequence_order;
-        }
-        
-        // Handle PDF upload if a new file is provided
-        if ($request->hasFile('pdf_file')) {
-            // Delete old PDF
-            if ($material->content_path_or_url) {
-                Storage::delete('public/pdfs/' . basename($material->content_path_or_url));
-            }
-            
-            $pdf = $request->file('pdf_file');
-            $pdfName = time() . '_' . Str::slug($request->title) . '.' . $pdf->getClientOriginalExtension();
-            $pdf->storeAs('public/pdfs', $pdfName);
-            
-            // Get total pages in PDF
-            try {
-                // Check if Imagick is available
-                if (class_exists('Imagick')) {
-                    $imagick = new \Imagick();
-                    $imagick->pingImage($pdf->getPathname());
-                    $totalPages = $imagick->getNumberImages();
-                    $material->page_count = $totalPages;
-                    $imagick->clear();
-                } else {
-                    // If Imagick is not available, set a default value
-                    $material->page_count = 1;
-                    Log::info('Imagick not available - using default page count for update');
-                }
-            } catch (\Exception $e) {
-                // If unable to determine page count, default to 1
-                $material->page_count = 1;
-                Log::error('Error determining PDF page count on update: ' . $e->getMessage());
-            }
-            
-            // Update content path or URL
-            $material->content_path_or_url = $pdfName;
-            
-            // Try to generate new thumbnail if none provided
-            if (!$request->hasFile('custom_thumbnail')) {
-                try {
-                    // Only attempt thumbnail generation if Imagick is available
-                    if (class_exists('Imagick')) {
-                        $tempPath = storage_path('app/temp/' . Str::random(16));
-                        if (!is_dir(storage_path('app/temp'))) {
-                            mkdir(storage_path('app/temp'), 0755, true);
-                        }
-                        
-                        $imagick = new \Imagick();
-                        $imagick->readImage($pdf->getPathname() . '[0]');  // First page only
-                        $imagick->setImageFormat('jpg');
-                        $imagick->writeImage($tempPath . '.jpg');
-                        $imagick->clear();
-                        
-                        // Clear existing thumbnail and add the generated one
-                        $material->clearMediaCollection('thumbnail');
-                        $thumbnail = $material->addMedia($tempPath . '.jpg')
-                            ->usingName($material->title . '_thumbnail')
-                            ->toMediaCollection('thumbnail');
-                            
-                            $material->thumbnail_path = $thumbnail->getPath();
-                        
-                        // Clean up temp file
-                        @unlink($tempPath . '.jpg');
-                    } else {
-                        // Default thumbnail if Imagick is not available
-                        try {
-                            // Clear existing thumbnail if any
-                            $material->clearMediaCollection('thumbnail');
-                            
-                            $defaultImage = public_path('images/default-pdf-thumbnail.jpg');
-                            $thumbnail = $material->addMedia($defaultImage)
-                                ->preservingOriginal()
-                                ->usingName($material->title . '_default_thumbnail')
-                                ->toMediaCollection('thumbnail');
-                            
-                            $material->thumbnail_path = $thumbnail->getPath();
-                            Log::info('Using default thumbnail on update - Imagick not available');
-                        } catch (\Exception $ex) {
-                            // If adding from media library fails, use direct path
-                            $material->thumbnail_path = '/images/default-pdf-thumbnail.jpg';
-                            Log::error('Error adding default thumbnail on update: ' . $ex->getMessage());
-                        }
-                    }
-                } catch (\Exception $e) {
-                    // If thumbnail generation fails, use a default thumbnail
-                    try {
-                        // Clear existing thumbnail if any
-                        $material->clearMediaCollection('thumbnail');
-                        
-                        $defaultImage = public_path('images/default-pdf-thumbnail.jpg');
-                        $thumbnail = $material->addMedia($defaultImage)
-                            ->preservingOriginal()
-                            ->usingName($material->title . '_default_thumbnail')
-                            ->toMediaCollection('thumbnail');
-                        
-                        $material->thumbnail_path = $thumbnail->getPath();
-                    } catch (\Exception $ex) {
-                        // If adding from media library fails, use direct path
-                        $material->thumbnail_path = '/images/default-pdf-thumbnail.jpg';
+        // IMPORTANT: Set the material_type from the request
+        $material->material_type = $request->material_type;
+
+        // Handle material type specific updates
+        if ($request->material_type === 'pdf') {
+            // Replace PDF file if provided
+            if ($request->hasFile('pdf_file')) {
+                // Delete old PDF
+                Storage::delete('public/pdfs/' . $material->content_path_or_url);
+                
+                // Upload new PDF
+                $pdf = $request->file('pdf_file');
+                $pdfName = time() . '_' . Str::slug($request->title) . '.' . $pdf->getClientOriginalExtension();
+                $pdf->storeAs('public/pdfs', $pdfName);
+                
+                // Update PDF-related fields
+                $material->content_path_or_url = $pdfName;
+                $material->page_count = $this->getPdfPageCount($pdf->path());
+                
+                // Generate new thumbnail if not provided
+                if (!$request->hasFile('custom_thumbnail')) {
+                    // Delete old thumbnail
+                    if ($material->thumbnail_path) {
+                        Storage::delete('public/' . $material->thumbnail_path);
                     }
                     
-                    Log::error('Error generating PDF thumbnail on update: ' . $e->getMessage());
+                    // Generate new thumbnail
+                    $material->thumbnail_path = $this->generatePdfThumbnail($pdf->path(), $request->title);
+                }
+            }
+        } else { // video
+            // Update YouTube URL if changed
+            if ($request->has('video_url')) {
+                $videoUrl = $request->video_url;
+                $videoId = $this->extractYoutubeId($videoUrl);
+                
+                if (!$videoId) {
+                    return redirect()->back()
+                        ->withErrors(['video_url' => 'Invalid YouTube URL. Please enter a valid YouTube video URL.'])
+                        ->withInput();
+                }
+                
+                // Update the video ID
+                $material->content_path_or_url = $videoId;
+                    
+                // Update thumbnail only if not provided by user
+                if (!$request->hasFile('custom_thumbnail')) {
+                    // Delete old thumbnail
+                    if ($material->thumbnail_path) {
+                        Storage::delete('public/' . $material->thumbnail_path);
+                    }
+                    
+                    // Use YouTube thumbnail
+                    $thumbnailPath = 'thumbnails/youtube_' . $videoId . '.jpg';
+                    
+                    // Download YouTube thumbnail if it doesn't exist
+                    $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
+                    $localThumbPath = storage_path('app/public/' . $thumbnailPath);
+                    
+                    // Create directory if it doesn't exist
+                    if (!file_exists(dirname($localThumbPath))) {
+                        mkdir(dirname($localThumbPath), 0755, true);
+                    }
+                    
+                    // Try to download the maxresdefault thumbnail (HD)
+                    if (!@copy($youtubeThumbUrl, $localThumbPath)) {
+                        // If HD thumbnail not available, use the default thumbnail
+                        $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/0.jpg";
+                        @copy($youtubeThumbUrl, $localThumbPath);
+                    }
+                    
+                    $material->thumbnail_path = $thumbnailPath;
                 }
             }
         }
-        
+
         // Handle custom thumbnail if provided
         if ($request->hasFile('custom_thumbnail')) {
             // Delete old thumbnail
             if ($material->thumbnail_path) {
-                Storage::delete('public/thumbnails/' . basename($material->thumbnail_path));
+                Storage::delete('public/' . $material->thumbnail_path);
             }
             
             $thumbnail = $request->file('custom_thumbnail');

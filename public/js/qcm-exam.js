@@ -4,6 +4,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('QCM Exam script loaded');
+    
     // Elements
     const examForm = document.getElementById('exam-form');
     const timerDisplay = document.getElementById('timer-display');
@@ -13,6 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevButtons = document.querySelectorAll('.prev-question');
     const submitButton = document.getElementById('submit-exam');
     const progressBar = document.getElementById('exam-progress-bar');
+    
+    // Debug log to check if timer element exists
+    if (timerDisplay) {
+        console.log('Timer display found:', timerDisplay);
+    } else {
+        console.error('Timer display element not found!');
+    }
     
     // Exam data
     const examId = examForm ? examForm.dataset.examId : null;
@@ -204,22 +213,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function startTimer() {
         if (!timerDisplay || !examDuration || !examStartTime) return;
         
-        const endTime = examStartTime + (examDuration * 60);
+        // Calculate the actual end time
+        const currentUnixTime = Math.floor(Date.now() / 1000);
+        const elapsedSeconds = currentUnixTime - examStartTime;
+        const remainingSeconds = Math.max(0, (examDuration * 60) - elapsedSeconds);
         
-        timer = setInterval(() => {
-            const now = Math.floor(Date.now() / 1000);
-            const timeLeft = endTime - now;
+        // Convert to milliseconds for JS Date calculations
+        const endTime = Date.now() + (remainingSeconds * 1000);
+        
+        // The timer function that will run frequently
+        function runTimer() {
+            const now = Date.now();
+            const diff = Math.max(0, endTime - now);
             
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                timerDisplay.innerHTML = '00:00';
-                alert('Time is up! Your exam will be submitted automatically.');
-                examForm.submit();
-                return;
-            }
-            
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
+            // Calculate minutes and seconds
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
             
             // Format the time
             const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
@@ -228,12 +237,43 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update the timer display
             timerDisplay.innerHTML = `${formattedMinutes}:${formattedSeconds}`;
             
-            // Warning when less than 5 minutes left
-            if (timeLeft < 300) {
-                timerDisplay.classList.add('text-red-600');
-                timerDisplay.classList.add('animate-pulse');
+            // Apply warning styles
+            if (diff <= 30000) { // 30 seconds
+                timerDisplay.classList.add('text-red-600', 'animate-pulse');
+                timerDisplay.classList.remove('text-yellow-600', 'text-gray-900');
+            } else if (diff <= 60000) { // 1 minute
+                timerDisplay.classList.add('text-yellow-600');
+                timerDisplay.classList.remove('text-red-600', 'animate-pulse', 'text-gray-900');
+            } else {
+                timerDisplay.classList.add('text-gray-900');
+                timerDisplay.classList.remove('text-red-600', 'text-yellow-600', 'animate-pulse');
             }
-        }, 1000);
+            
+            // Force browser to repaint timer with requestAnimationFrame
+            if (typeof window.requestAnimationFrame === 'function') {
+                window.requestAnimationFrame(() => {
+                    // This ensures the timer is always visible and updated
+                    timerDisplay.style.visibility = 'visible';
+                });
+            }
+            
+            // Check if timer has expired
+            if (diff <= 0) {
+                clearInterval(timer);
+                timerDisplay.innerHTML = '00:00';
+                alert('Time is up! Your exam will be submitted automatically.');
+                examForm.submit();
+                return;
+            }
+        }
+        
+        // Run once immediately
+        runTimer();
+        
+        // Update the timer every 500ms for smoother countdown
+        timer = setInterval(runTimer, 500);
+        
+        return timer;
     }
     
     /**

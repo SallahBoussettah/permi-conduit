@@ -1,0 +1,11 @@
+---
+description: Understanding the project
+globs: 
+alwaysApply: false
+---
+
+- Read and understand my project
+- Start by reading through all files in documents folder
+- Then read some of the migration for the database to understand it a bit
+- know how my website is built
+- keep in mind we are in 2025 now

@@ -21,6 +21,7 @@ class CourseMaterial extends Model
         'course_id',
         'title',
         'description',
+        'material_type',
         'content_path_or_url',
         'thumbnail_path',
         'page_count',

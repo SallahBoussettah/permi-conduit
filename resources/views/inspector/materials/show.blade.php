@@ -1,6 +1,31 @@
 @extends('layouts.main')
 
 @section('content')
+    <style>
+        /* Aspect ratio container for responsive videos */
+        .aspect-w-16 {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .aspect-w-16 iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 480px;
+        }
+        
+        /* Enhanced video container */
+        .video-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #000;
+            border-radius: 0.5rem;
+        }
+    </style>
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -25,16 +50,41 @@
                         <div class="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <p class="text-sm text-gray-500">Material Type</p>
-                                <p class="text-md font-medium">{{ ucfirst($material->material_type) }}</p>
+                                <p class="text-md font-medium">
+                                    @if($material->material_type === 'pdf')
+                                        <span class="inline-flex items-center">
+                                            <svg class="mr-1 h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                            PDF Document
+                                        </span>
+                                    @elseif($material->material_type === 'video')
+                                        <span class="inline-flex items-center">
+                                            <svg class="mr-1 h-4 w-4 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            YouTube Video
+                                        </span>
+                                    @else
+                                        {{ ucfirst($material->material_type) }}
+                                    @endif
+                                </p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Sequence Order</p>
                                 <p class="text-md font-medium">{{ $material->sequence_order }}</p>
                             </div>
+                            @if($material->material_type === 'pdf')
                             <div>
                                 <p class="text-sm text-gray-500">Total Pages</p>
-                                <p class="text-md font-medium" id="pdfPageCount">{{ $material->total_pages ?? 'N/A' }}</p>
+                                <p class="text-md font-medium" id="pdfPageCount">{{ $material->page_count ?? 'N/A' }}</p>
                             </div>
+                            @elseif($material->material_type === 'video')
+                            <div>
+                                <p class="text-sm text-gray-500">YouTube ID</p>
+                                <p class="text-md font-medium">{{ $material->content_path_or_url }}</p>
+                            </div>
+                            @endif
                             <div>
                                 <p class="text-sm text-gray-500">Created At</p>
                                 <p class="text-md font-medium">{{ $material->created_at->format('M d, Y') }}</p>
@@ -56,16 +106,15 @@
                     <div class="mb-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Thumbnail</h3>
                         <div class="bg-gray-50 rounded-lg p-4">
-                            @if($material->thumbnail_url)
-                                @php
-                                    // Handle both absolute URLs and relative paths
-                                    $thumbnailUrl = $material->thumbnail_url;
-                                    if (strpos($thumbnailUrl, 'http') !== 0 && strpos($thumbnailUrl, '//') !== 0) {
-                                        // If it's not an absolute URL, make it one
-                                        $thumbnailUrl = asset(ltrim($thumbnailUrl, '/'));
-                                    }
-                                @endphp
-                                <img src="{{ $thumbnailUrl }}" alt="{{ $material->title }}" class="h-32 w-32 object-cover rounded border border-gray-200">
+                            @if($material->thumbnail_path)
+                                <img src="{{ asset('storage/' . $material->thumbnail_path) }}" alt="{{ $material->title }}" class="h-32 w-auto object-cover rounded border border-gray-200">
+                                <p class="mt-2 text-xs text-gray-500">
+                                    @if($material->material_type === 'video')
+                                        This thumbnail was automatically generated from YouTube
+                                    @else
+                                        Thumbnail from PDF or custom upload
+                                    @endif
+                                </p>
                             @else
                                 <div class="h-32 w-32 flex items-center justify-center bg-gray-100 text-gray-400 rounded border border-gray-200">
                                     No thumbnail
@@ -239,6 +288,34 @@
                                         prevButton.disabled = false;
                                     });
                                 </script>
+                            @elseif($material->material_type === 'video')
+                                <div class="flex flex-col items-center">
+                                    <div class="video-container w-full">
+                                        <div class="aspect-w-16 aspect-h-9">
+                                            <iframe 
+                                                src="https://www.youtube.com/embed/{{ $material->content_path_or_url }}" 
+                                                title="{{ $material->title }}"
+                                                frameborder="0" 
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                allowfullscreen
+                                                class="w-full h-full"
+                                            ></iframe>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex items-center">
+                                        <div class="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-800 rounded-full">
+                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                                            </svg>
+                                            <span class="font-medium">YouTube Video</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <a href="https://www.youtube.com/watch?v={{ $material->content_path_or_url }}" target="_blank" class="px-4 py-2 bg-yellow-500 text-gray-900 rounded hover:bg-yellow-400 active:bg-yellow-600 font-semibold text-xs uppercase tracking-widest">
+                                            Open on YouTube
+                                        </a>
+                                    </div>
+                                </div>
                             @else
                                 <p class="text-gray-500">Preview not available for this content type.</p>
                             @endif

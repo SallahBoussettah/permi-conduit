@@ -175,90 +175,82 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalQuestions = {{ count($questions) }};
     const navButtons = document.querySelectorAll('.question-nav-btn');
     
-    // Get timer data from server
-    const endTimeTimestamp = parseInt(timerElement.getAttribute('data-end-time')) * 1000; // convert to milliseconds
-    const serverRemainingTime = parseInt(timerElement.getAttribute('data-remaining-seconds')); // seconds
-    
-    // Set up timer variables
-    let timeRemaining; 
-    
-    // Determine the starting time - prefer server-calculated time if available
-    if (!isNaN(serverRemainingTime) && serverRemainingTime > 0 && serverRemainingTime <= 360) {
-        timeRemaining = serverRemainingTime;
-        console.log("Using server time: " + timeRemaining + " seconds remaining");
-    } else {
-        // Calculate from end timestamp as fallback
-        const currentTime = new Date().getTime();
-        timeRemaining = Math.max(0, Math.floor((endTimeTimestamp - currentTime) / 1000));
-        console.log("Using client time: " + timeRemaining + " seconds remaining");
-    }
-    
-    // Safety check - if time calculation fails, default to 6 minutes
-    if (isNaN(timeRemaining) || timeRemaining <= 0 || timeRemaining > 360) {
-        timeRemaining = 360;
-        console.log("Using default time: 6 minutes (360 seconds)");
-    }
-    
-    // TIMER FUNCTION - updates the timer display and handles timeout
-    function updateTimerDisplay() {
-        // Calculate minutes and seconds
-        const minutes = Math.floor(timeRemaining / 60);
-        const seconds = timeRemaining % 60;
+    // SUPER SIMPLE TIMER IMPLEMENTATION
+    // This is a bare-bones implementation that will work in any browser
+    if (timerElement) {
+        console.log("Timer element found, starting simple timer...");
         
-        // Format with leading zeros
-        const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        // Get the end time from the element
+        const endTimeTimestamp = parseInt(timerElement.getAttribute('data-end-time')) * 1000;
         
-        // Update the DOM element with the new time
-        timerElement.innerText = formattedTime;
-        
-        // Update visual styling based on time remaining
-        if (timeRemaining <= 30) {
-            // Red pulsing for last 30 seconds
-            timerElement.className = 'text-2xl font-bold text-red-600 animate-pulse';
-        } else if (timeRemaining <= 60) {
-            // Yellow for last minute
-            timerElement.className = 'text-2xl font-bold text-yellow-600';
-        } else {
-            // Normal styling
-            timerElement.className = 'text-2xl font-bold text-gray-900';
+        // Create a very simple updating function
+        function simpleTimerUpdate() {
+            try {
+                // Get current time and calculate difference
+                const now = new Date().getTime();
+                const diff = Math.max(0, endTimeTimestamp - now);
+                
+                // Format minutes and seconds
+                const minutes = Math.floor(diff / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                
+                // Format the time string with leading zeros
+                const timeString = 
+                    (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+                    (seconds < 10 ? "0" + seconds : seconds);
+                
+                // Directly update the innerHTML
+                timerElement.innerHTML = timeString;
+                
+                // Apply different styles based on time remaining
+                if (diff <= 30000) { // Less than 30 seconds
+                    timerElement.className = 'text-2xl font-bold text-red-600 animate-pulse';
+                } else if (diff <= 60000) { // Less than 1 minute
+                    timerElement.className = 'text-2xl font-bold text-yellow-600';
+                } else {
+                    timerElement.className = 'text-2xl font-bold text-gray-900';
+                }
+                
+                // If time's up, submit the form
+                if (diff <= 0) {
+                    clearInterval(timerUpdateInterval);
+                    alert('Time is up! Your exam will be submitted automatically.');
+                    examForm.submit();
+                }
+            } catch (error) {
+                console.error("Error updating timer:", error);
+            }
         }
         
-        // Debug logging
-        console.log(`Timer updated: ${formattedTime} (${timeRemaining} seconds remaining)`);
-    }
-    
-    // Start timer function - runs every second
-    function startTimer() {
-        // Update the display immediately once
-        updateTimerDisplay();
+        // Run immediately
+        simpleTimerUpdate();
         
-        // Set up the interval to run every 1000ms (1 second)
-        const timerInterval = setInterval(function() {
-            // Decrease remaining time
-            timeRemaining--;
-            
-            // Update the display with new time
-            updateTimerDisplay();
-            
-            // Check if timer has expired
-            if (timeRemaining <= 0) {
-                // Clear the interval to stop the timer
-                clearInterval(timerInterval);
-                
-                // Show message
-                alert('Time is up! Your exam will be submitted automatically.');
-                
-                // Submit the form
-                examForm.submit();
-            }
-        }, 1000);
+        // Then set up an interval to run EXACTLY every second
+        const timerUpdateInterval = setInterval(simpleTimerUpdate, 1000);
         
-        console.log("Timer started with " + timeRemaining + " seconds remaining");
-        return timerInterval;
+        // Create debug button (in development only)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const debugBtn = document.createElement('button');
+            debugBtn.textContent = 'Debug Timer';
+            debugBtn.style.position = 'fixed';
+            debugBtn.style.bottom = '10px';
+            debugBtn.style.right = '10px';
+            debugBtn.style.zIndex = '9999';
+            debugBtn.style.padding = '5px 10px';
+            debugBtn.style.background = '#f0f0f0';
+            debugBtn.style.border = '1px solid #ccc';
+            debugBtn.style.borderRadius = '4px';
+            debugBtn.onclick = function() {
+                console.log('Timer element:', timerElement);
+                console.log('Current value:', timerElement.innerHTML);
+                timerElement.style.border = '2px solid red';
+                simpleTimerUpdate(); // Force an update
+            };
+            document.body.appendChild(debugBtn);
+        }
+    } else {
+        console.error("Timer element not found!");
     }
-    
-    // Initialize the timer
-    const timerInterval = startTimer();
     
     // Question navigation
     navButtons.forEach(function(button, index) {

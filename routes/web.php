@@ -214,4 +214,119 @@ Route::get('/debug-latest-logs', function() {
     return 'Debug logs not available in production.';
 });
 
+// Temporary debug route to check course materials
+Route::get('/debug-materials', function () {
+    $materials = \App\Models\CourseMaterial::all();
+    return $materials->map(function ($material) {
+        return [
+            'id' => $material->id,
+            'title' => $material->title,
+            'material_type' => $material->material_type,
+            'content_path_or_url' => $material->content_path_or_url,
+        ];
+    });
+});
+
+// Route to debug form submissions for course material creation
+Route::post('/debug-material-creation', function (Request $request) {
+    \Log::info('Material Creation Debug', ['request_data' => $request->all()]);
+    return response()->json([
+        'submitted_data' => $request->all(),
+        'material_type' => $request->material_type,
+        'has_video_url' => $request->has('video_url') ? 'Yes' : 'No',
+        'video_url' => $request->video_url ?? 'Not provided',
+        'has_pdf_file' => $request->hasFile('pdf_file') ? 'Yes' : 'No'
+    ]);
+})->name('debug.material.creation');
+
+// Route to fix material types
+Route::get('/fix-material-types', function () {
+    $materials = \App\Models\CourseMaterial::all();
+    $fixed = 0;
+    
+    foreach ($materials as $material) {
+        $contentPath = $material->content_path_or_url;
+        $correctType = null;
+        
+        // Check if it's likely a YouTube video ID
+        if (preg_match('/^[a-zA-Z0-9_-]{11}$/', $contentPath)) {
+            $correctType = 'video';
+        } 
+        // Check if it's a PDF file (likely has .pdf extension or is stored in the pdfs directory)
+        else if (str_contains($contentPath, '.pdf') || str_contains($contentPath, 'pdfs/')) {
+            $correctType = 'pdf';
+        }
+        
+        // Update if we determined a different type
+        if ($correctType && $material->material_type !== $correctType) {
+            $material->material_type = $correctType;
+            $material->save();
+            $fixed++;
+        }
+    }
+    
+    // Get the updated list of materials
+    $updatedMaterials = \App\Models\CourseMaterial::all()->map(function ($material) {
+        return [
+            'id' => $material->id,
+            'title' => $material->title,
+            'material_type' => $material->material_type,
+            'content_path_or_url' => $material->content_path_or_url,
+        ];
+    });
+    
+    return [
+        'message' => "Fixed $fixed material types",
+        'materials' => $updatedMaterials
+    ];
+});
+
+// Route to manually set a material type
+Route::get('/set-material-type/{id}/{type}', function ($id, $type) {
+    if (!in_array($type, ['pdf', 'video'])) {
+        return [
+            'error' => 'Invalid type. Must be "pdf" or "video".'
+        ];
+    }
+    
+    $material = \App\Models\CourseMaterial::find($id);
+    
+    if (!$material) {
+        return [
+            'error' => 'Material not found.'
+        ];
+    }
+    
+    $oldType = $material->material_type;
+    $material->material_type = $type;
+    $material->save();
+    
+    return [
+        'message' => "Updated material #{$id} from '{$oldType}' to '{$type}'",
+        'material' => [
+            'id' => $material->id,
+            'title' => $material->title,
+            'material_type' => $material->material_type,
+            'content_path_or_url' => $material->content_path_or_url,
+        ]
+    ];
+});
+
+// Debug route to check the last created material
+Route::get('/debug-last-material', function () {
+    $material = \App\Models\CourseMaterial::latest()->first();
+    
+    if (!$material) {
+        return ['error' => 'No materials found'];
+    }
+    
+    return [
+        'id' => $material->id,
+        'title' => $material->title,
+        'material_type' => $material->material_type,
+        'content_path_or_url' => $material->content_path_or_url,
+        'created_at' => $material->created_at->format('Y-m-d H:i:s'),
+    ];
+});
+
 require __DIR__.'/auth.php';

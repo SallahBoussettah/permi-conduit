@@ -6,7 +6,7 @@ This document outlines the development roadmap for a Laravel-based web applicati
 
 * **User Roles:**
     * **Candidate:** Can sign in, access their results, watch/access course materials (PDFs, Videos, Audio, Résumés) tailored to exam sections, and take QCM exams.
-    * **Inspector:** Can sign in, manage exam sessions, manage courses, and input candidate results live during the exam.
+    * **Inspector:** Can sign in, manage exam sessions, Gérer les cours, and input candidate results live during the exam.
 * **Exam Process:** Digitize the "Épreuve Hors Circulation Catégorie C" (Plateau) as detailed in official documents, including QCM, Socle 1 & 2 checks, Themed questions, Oral Interrogation, and Maneuvers.
 * **Live Marking:** Inspectors will mark results directly in the system while with the candidate, often using mobile devices.
 

@@ -8,10 +8,11 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl sm:tracking-tight">
-                        {{ __('Course Management') }}
+                        {{ __('Gestion des cours
+') }}
                     </h1>
                     <p class="mt-2 text-lg text-gray-500">
-                        {{ __('Create and manage courses for candidates') }}
+                        {{ __('Create and Gérer les cours for candidates') }}
                     </p>
                 </div>
                 <div class="mt-4 md:mt-0 flex-shrink-0">

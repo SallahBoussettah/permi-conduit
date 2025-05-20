@@ -49,13 +49,25 @@ class CourseMaterialController extends Controller
             ->orderBy('sequence_order', 'desc')
             ->first();
         
-        return view('candidate.courses.materials.show', compact(
-            'course', 
-            'material', 
-            'progress', 
-            'nextMaterial', 
-            'prevMaterial'
-        ));
+        // Choose appropriate view based on material type
+        if ($material->material_type === 'video') {
+            return view('candidate.courses.materials.show-video', compact(
+                'course', 
+                'material', 
+                'progress', 
+                'nextMaterial', 
+                'prevMaterial'
+            ));
+        } else {
+            // Default view for PDFs
+            return view('candidate.courses.materials.show', compact(
+                'course', 
+                'material', 
+                'progress', 
+                'nextMaterial', 
+                'prevMaterial'
+            ));
+        }
     }
 
     /**
@@ -94,10 +106,21 @@ class CourseMaterialController extends Controller
      */
     public function updateProgress(Request $request, Course $course, CourseMaterial $material)
     {
-        $request->validate([
-            'page' => 'required|integer|min:1',
-            'progress_percentage' => 'required|numeric|min:0|max:100',
-        ]);
+        // Different validation rules based on material type
+        if ($material->material_type === 'video') {
+            $request->validate([
+                'progress_percentage' => 'required|numeric|min:0|max:100',
+            ]);
+            
+            $lastPage = 1; // Not applicable for videos
+        } else {
+            $request->validate([
+                'page' => 'required|integer|min:1',
+                'progress_percentage' => 'required|numeric|min:0|max:100',
+            ]);
+            
+            $lastPage = $request->page;
+        }
         
         $user = Auth::user();
         
@@ -108,7 +131,7 @@ class CourseMaterialController extends Controller
                 'course_material_id' => $material->id,
             ],
             [
-                'last_page' => $request->page,
+                'last_page' => $lastPage,
                 'progress_percentage' => $request->progress_percentage,
                 'completed' => $request->progress_percentage >= 100,
             ]
@@ -130,11 +153,14 @@ class CourseMaterialController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Course  $course
      * @param  \App\Models\CourseMaterial  $material
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function markAsComplete(Request $request, Course $course, CourseMaterial $material)
     {
         $user = Auth::user();
+        
+        // Set appropriate last_page based on material type
+        $lastPage = ($material->material_type === 'pdf') ? ($material->page_count ?? 1) : 1;
         
         // Mark as complete
         $progress = UserCourseProgress::updateOrCreate(
@@ -143,20 +169,16 @@ class CourseMaterialController extends Controller
                 'course_material_id' => $material->id,
             ],
             [
-                'last_page' => $material->page_count,
+                'last_page' => $lastPage,
                 'progress_percentage' => 100,
                 'completed' => true,
             ]
         );
         
         // Update course completion record
-        $courseCompletion = $this->updateCourseCompletion($user, $course);
+        $this->updateCourseCompletion($user, $course);
         
-        return response()->json([
-            'success' => true,
-            'completed' => true,
-            'course_completed' => $courseCompletion->progress_percentage == 100,
-        ]);
+        return redirect()->back()->with('success', 'Material marked as complete!');
     }
     
     /**

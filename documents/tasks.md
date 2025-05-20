@@ -25,7 +25,8 @@ This document outlines the specific tasks needed to complete the Laravel-based d
 
 ## Phase 3: Course Module
 
-- [x] Create course management interface for inspectors/admins:
+- [x] Create Gestion des cours
+ interface for inspectors/admins:
   - [x] CRUD operations for courses
   - [x] Upload/link course materials (PDF, video, audio, text)
   - [x] Associate courses with exam sections

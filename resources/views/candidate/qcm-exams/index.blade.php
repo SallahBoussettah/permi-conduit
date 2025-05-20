@@ -43,11 +43,14 @@
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
             <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
                 <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Available Exams') }}</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('QCM exams you can take for your permit categories.') }}</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Available Exam') }}</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('A randomly selected QCM exam for your permit category.') }}</p>
                 </div>
-                <a href="{{ route('candidate.qcm-exams.available') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    {{ __('View All') }}
+                <a href="{{ route('candidate.qcm-exams.available') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="mr-2 -ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                    </svg>
+                    {{ __('Get Another Exam') }}
                 </a>
             </div>
             <div class="border-t border-gray-200">
@@ -90,7 +93,7 @@
                                                 <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
                                                 </svg>
-                                                {{ __('Time Limit:') }} {{ config('qcm.time_limit', 6) }} {{ __('minutes') }}
+                                                {{ __('Time Limit:') }} {{ $paper->duration }} {{ __('minutes') }}
                                             </p>
                                         </div>
                                         <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
@@ -98,7 +101,7 @@
                                                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                             </svg>
-                                            {{ __('Passing Score:') }} {{ config('qcm.passing_percentage', 70) }}%
+                                            {{ __('Passing Score:') }} {{ config('qcm.passing_percentage', 60) }}%
                                         </div>
                                     </div>
                                 </div>
@@ -201,6 +204,13 @@
                 @endif
             </div>
         </div>
+        
+        <!-- Pagination for Recent Exams -->
+        @if(isset($recentExams) && $recentExams->hasPages())
+            <div class="mt-4">
+                {{ $recentExams->links() }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection 
