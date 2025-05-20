@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="px-4 py-6 sm:px-0">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-900">{{ __('User Management') }}</h1>
+            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Gérer les utilisateurs') }}</h1>
         </div>
 
         @if(session('success'))
@@ -23,14 +23,14 @@
         <div class="bg-white shadow-sm rounded-lg p-4 mb-6">
             <form action="{{ route('admin.users.index') }}" method="GET" class="space-y-4 md:space-y-0 md:flex md:items-end md:space-x-4">
                 <div class="flex-1">
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Search') }}</label>
-                    <input type="text" name="search" id="search" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="{{ __('Search by name or email') }}" value="{{ $search ?? '' }}">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Rechercher') }}</label>
+                    <input type="text" name="search" id="search" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="{{ __('Rechercher par nom ou email') }}" value="{{ $search ?? '' }}">
                 </div>
                 
                 <div class="w-full md:w-1/4">
-                    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Role') }}</label>
+                    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Rôle') }}</label>
                     <select name="role" id="role" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="">{{ __('All Roles') }}</option>
+                        <option value="">{{ __('Toutes les rôles') }}</option>
                         @foreach($roles as $id => $name)
                             <option value="{{ $id }}" {{ (isset($roleFilter) && $roleFilter == $id) ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
@@ -38,10 +38,10 @@
                 </div>
                 
                 <div class="w-full md:w-1/4">
-                    <label for="permit_category" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Permit Category') }}</label>
+                    <label for="permit_category" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Catégorie de permis') }}</label>
                     <select name="permit_category" id="permit_category" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="">{{ __('All Permit Categories') }}</option>
-                        <option value="null" {{ (isset($permitCategoryFilter) && $permitCategoryFilter === 'null') ? 'selected' : '' }}>{{ __('No Permit Category') }}</option>
+                        <option value="">{{ __('Toutes les catégories de permis') }}</option>
+                        <option value="null" {{ (isset($permitCategoryFilter) && $permitCategoryFilter === 'null') ? 'selected' : '' }}>{{ __('Aucune catégorie de permis') }}</option>
                         @foreach($permitCategories as $id => $name)
                             <option value="{{ $id }}" {{ (isset($permitCategoryFilter) && $permitCategoryFilter == $id) ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
@@ -49,23 +49,23 @@
                 </div>
 
                 <div class="w-full md:w-1/4">
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Status') }}</label>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Statut') }}</label>
                     <select name="status" id="status" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="">{{ __('All Statuses') }}</option>
-                        <option value="pending" {{ (isset($statusFilter) && $statusFilter === 'pending') ? 'selected' : '' }}>{{ __('Pending Approval') }}</option>
-                        <option value="approved" {{ (isset($statusFilter) && $statusFilter === 'approved') ? 'selected' : '' }}>{{ __('Approved') }}</option>
-                        <option value="rejected" {{ (isset($statusFilter) && $statusFilter === 'rejected') ? 'selected' : '' }}>{{ __('Rejected') }}</option>
-                        <option value="active" {{ (isset($statusFilter) && $statusFilter === 'active') ? 'selected' : '' }}>{{ __('Active') }}</option>
-                        <option value="inactive" {{ (isset($statusFilter) && $statusFilter === 'inactive') ? 'selected' : '' }}>{{ __('Inactive') }}</option>
+                        <option value="">{{ __('Tous les statuts') }}</option>
+                        <option value="pending" {{ (isset($statusFilter) && $statusFilter === 'pending') ? 'selected' : '' }}>{{ __('En attente d\'approbation') }}</option>
+                        <option value="approved" {{ (isset($statusFilter) && $statusFilter === 'approved') ? 'selected' : '' }}>{{ __('Approuvé') }}</option>
+                        <option value="rejected" {{ (isset($statusFilter) && $statusFilter === 'rejected') ? 'selected' : '' }}>{{ __('Rejeté') }}</option>
+                        <option value="active" {{ (isset($statusFilter) && $statusFilter === 'active') ? 'selected' : '' }}>{{ __('Actif') }}</option>
+                        <option value="inactive" {{ (isset($statusFilter) && $statusFilter === 'inactive') ? 'selected' : '' }}>{{ __('Inactif') }}</option>
                     </select>
                 </div>
                 
                 <div class="flex space-x-2">
                     <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        {{ __('Filter') }}
+                        {{ __('Filtrer') }}
                     </button>
                     <a href="{{ route('admin.users.index') }}" class="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        {{ __('Reset') }}
+                        {{ __('Réinitialiser') }}
                     </a>
                 </div>
             </form>
@@ -77,11 +77,11 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Name') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nom') }}</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Email') }}</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Role') }}</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Permit Category') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Rôle') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Statut') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Catégorie de permis') }}</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
@@ -104,26 +104,26 @@
                                         <!-- Approval Status -->
                                         @if($user->approval_status === 'pending')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                {{ __('Pending Approval') }}
+                                                {{ __('En attente d\'approbation') }}
                                             </span>
                                         @elseif($user->approval_status === 'approved')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {{ __('Approved') }}
+                                                {{ __('Approuvé') }}
                                             </span>
                                         @elseif($user->approval_status === 'rejected')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800" title="{{ $user->rejection_reason }}">
-                                                {{ __('Rejected') }}
+                                                {{ __('Rejeté') }}
                                             </span>
                                         @endif
                                         
                                         <!-- Active Status -->
                                         @if($user->is_active)
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                                {{ __('Active') }}
+                                                {{ __('Actif') }}
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                {{ __('Inactive') }}
+                                                {{ __('Inactif') }}
                                             </span>
                                         @endif
                                         
@@ -131,11 +131,11 @@
                                         @if($user->expires_at)
                                             @if($user->hasExpired())
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800" title="{{ __('Expired on') }} {{ $user->expires_at->format('Y-m-d') }}">
-                                                    {{ __('Expired') }}
+                                                    {{ __('Expiré') }}
                                                 </span>
                                             @else
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->daysUntilExpiration() < 7 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}" title="{{ __('Expires on') }} {{ $user->expires_at->format('Y-m-d') }}">
-                                                    {{ __('Expires in') }} {{ $user->daysUntilExpiration() }} {{ __('days') }}
+                                                    {{ __('Expire dans') }} {{ $user->daysUntilExpiration() }} {{ __('jours') }}
                                                 </span>
                                             @endif
                                         @endif
@@ -158,7 +158,7 @@
                                                     </form>
                                                 </span>
                                             @empty
-                                                <span class="text-xs text-gray-500">{{ __('None') }}</span>
+                                                <span class="text-xs text-gray-500">{{ __('Aucun') }}</span>
                                             @endforelse
                                         </div>
                                         
@@ -166,7 +166,7 @@
                                             <button type="button" 
                                                     onclick="toggleCategoryDropdown(this, '{{ $user->id }}')" 
                                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-1.5 bg-white text-left">
-                                                {{ __('Manage Categories') }}
+                                                {{ __('Gérer les catégories') }}
                                                 <span class="ml-1 absolute right-3 top-2">
                                                     <svg class="h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -178,7 +178,7 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <div class="p-2 border-b border-gray-100">
-                                                        <p class="text-xs font-medium text-gray-700 mb-2">{{ __('Select Categories:') }}</p>
+                                                        <p class="text-xs font-medium text-gray-700 mb-2">{{ __('Sélectionner les catégories') }}</p>
                                                         @foreach($permitCategories as $id => $name)
                                                             <div class="flex items-center py-1">
                                                                 <input id="category-{{ $user->id }}-{{ $id }}" 
@@ -195,10 +195,10 @@
                                                     </div>
                                                     <div class="p-2 flex justify-between">
                                                         <button type="button" onclick="toggleCategoryDropdown(this, '{{ $user->id }}')" class="text-sm text-gray-500">
-                                                            {{ __('Cancel') }}
+                                                            {{ __('Annuler') }}
                                                         </button>
                                                         <button type="submit" class="inline-flex justify-center text-sm text-white px-3 py-1 bg-indigo-600 hover:bg-indigo-700 rounded">
-                                                            {{ __('Save') }}
+                                                            {{ __('Enregistrer') }}
                                                         </button>
                                                     </div>
                                                 </form>
@@ -212,7 +212,7 @@
                                             <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                             </svg>
-                                            {{ __('Edit') }}
+                                            {{ __('Modifier') }}
                                         </a>
                                         
                                         <!-- Approval Actions -->
@@ -222,13 +222,13 @@
                                                     <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
-                                                    {{ __('Approve') }}
+                                                    {{ __('Approuver') }}
                                                 </a>
                                                 <a href="{{ route('admin.users.show-reject', $user) }}" class="text-red-600 hover:text-red-900">
                                                     <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
-                                                    {{ __('Reject') }}
+                                                    {{ __('Rejeter') }}
                                                 </a>
                                             </div>
                                         @endif
@@ -241,12 +241,12 @@
                                                     <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                                     </svg>
-                                                    {{ __('Deactivate') }}
+                                                    {{ __('Désactiver') }}
                                                 @else
                                                     <svg class="h-5 w-5 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
-                                                    {{ __('Activate') }}
+                                                    {{ __('Activer') }}
                                                 @endif
                                             </button>
                                         </form>
@@ -256,7 +256,7 @@
                         @empty
                             <tr>
                                 <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-500">
-                                    {{ __('No users found.') }}
+                                    {{ __('Aucun utilisateur trouvé.') }}
                                 </td>
                             </tr>
                         @endforelse

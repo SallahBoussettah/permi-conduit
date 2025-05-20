@@ -11,9 +11,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </a>
-                <h1 class="text-3xl font-bold text-gray-900">{{ __('QCM Statistics') }}</h1>
+                <h1 class="text-3xl font-bold text-gray-900">{{ __('Statistiques QCM') }}</h1>
             </div>
-            <p class="mt-2 text-sm text-gray-700">{{ __('Detailed statistics for QCM exams.') }}</p>
+            <p class="mt-2 text-sm text-gray-700">{{ __('Statistiques détaillées pour les examens QCM.') }}</p>
         </div>
 
         <!-- Tabs -->
@@ -21,22 +21,22 @@
             <div class="sm:hidden">
                 <label for="tabs" class="sr-only">{{ __('Select a tab') }}</label>
                 <select id="tabs" name="tabs" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                    <option value="category" {{ $activeTab == 'category' ? 'selected' : '' }}>{{ __('By Permit Category') }}</option>
-                    <option value="paper" {{ $activeTab == 'paper' ? 'selected' : '' }}>{{ __('By QCM Paper') }}</option>
-                    <option value="month" {{ $activeTab == 'month' ? 'selected' : '' }}>{{ __('By Month') }}</option>
+                    <option value="category" {{ $activeTab == 'category' ? 'selected' : '' }}>{{ __('Par catégorie de permis') }}</option>
+                    <option value="paper" {{ $activeTab == 'paper' ? 'selected' : '' }}>{{ __('Par QCM') }}</option>
+                    <option value="month" {{ $activeTab == 'month' ? 'selected' : '' }}>{{ __('Par mois') }}</option>
                 </select>
             </div>
             <div class="hidden sm:block">
                 <div class="border-b border-gray-200">
                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                         <a href="{{ route('admin.qcm-reports.statistics', ['tab' => 'category']) }}" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab == 'category' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                            {{ __('By Permit Category') }}
+                            {{ __('Par catégorie de permis') }}
                         </a>
                         <a href="{{ route('admin.qcm-reports.statistics', ['tab' => 'paper']) }}" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab == 'paper' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                            {{ __('By QCM Paper') }}
+                            {{ __('Par QCM') }}
                         </a>
                         <a href="{{ route('admin.qcm-reports.statistics', ['tab' => 'month']) }}" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab == 'month' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                            {{ __('By Month') }}
+                            {{ __('Par mois') }}
                         </a>
                     </nav>
                 </div>
@@ -48,20 +48,20 @@
             <div class="px-4 py-5 sm:px-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
                     @if($activeTab == 'category')
-                        {{ __('Statistics by Permit Category') }}
+                        {{ __('Statistiques par catégorie de permis') }}
                     @elseif($activeTab == 'paper')
-                        {{ __('Statistics by QCM Paper') }}
+                        {{ __('Statistiques par QCM') }}
                     @else
-                        {{ __('Statistics by Month') }}
+                        {{ __('Statistiques par mois') }}
                     @endif
                 </h3>
                 <p class="mt-1 max-w-2xl text-sm text-gray-500">
                     @if($activeTab == 'category')
-                        {{ __('Exam statistics grouped by permit category.') }}
+                        {{ __('Statistiques regroupées par catégorie de permis.') }}
                     @elseif($activeTab == 'paper')
-                        {{ __('Exam statistics grouped by QCM paper.') }}
+                        {{ __('Statistiques regroupées par QCM.') }}
                     @else
-                        {{ __('Exam statistics grouped by month.') }}
+                        {{ __('Statistiques regroupées par mois.') }}
                     @endif
                 </p>
             </div>
@@ -73,12 +73,12 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Permit Category') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total Exams') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completed') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passed') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Average Score') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Pass Rate') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Catégorie de permis') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total des examens') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completés') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passés') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Moyenne des notes') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Taux de réussite') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -116,7 +116,7 @@
                         </div>
                     @else
                         <div class="py-12 text-center">
-                            <p class="text-sm text-gray-500">{{ __('No category statistics available.') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Aucune statistique disponible.') }}</p>
                         </div>
                     @endif
 
@@ -127,13 +127,13 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('QCM Paper') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Permit Category') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total Exams') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completed') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passed') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Average Score') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Pass Rate') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('QCM') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Catégorie de permis') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total des examens') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completés') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passés') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Moyenne des notes') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Taux de réussite') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -174,7 +174,7 @@
                         </div>
                     @else
                         <div class="py-12 text-center">
-                            <p class="text-sm text-gray-500">{{ __('No paper statistics available.') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Aucune statistique disponible.') }}</p>
                         </div>
                     @endif
 
@@ -192,12 +192,12 @@
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Month') }}</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total Exams') }}</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completed') }}</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passed') }}</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Average Score') }}</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Pass Rate') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Mois') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total des examens') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completés') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passés') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Moyenne des notes') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Taux de réussite') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
@@ -236,7 +236,7 @@
                         </div>
                     @else
                         <div class="py-12 text-center">
-                            <p class="text-sm text-gray-500">{{ __('No monthly statistics available.') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Aucune statistique disponible.') }}</p>
                         </div>
                     @endif
                 @endif
@@ -257,19 +257,19 @@
             data: {
                 labels: {!! json_encode($monthStats->pluck('month')) !!},
                 datasets: [{
-                    label: '{{ __('Total Exams') }}',
+                    label: '{{ __('Total des examens') }}',
                     data: {!! json_encode($monthStats->pluck('total_count')) !!},
                     backgroundColor: 'rgba(79, 70, 229, 0.6)',
                     borderColor: 'rgba(79, 70, 229, 1)',
                     borderWidth: 1
                 }, {
-                    label: '{{ __('Completed Exams') }}',
+                    label: '{{ __('Completés') }}',
                     data: {!! json_encode($monthStats->pluck('completed_count')) !!},
                     backgroundColor: 'rgba(59, 130, 246, 0.6)',
                     borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 1
                 }, {
-                    label: '{{ __('Passed Exams') }}',
+                    label: '{{ __('Passés') }}',
                     data: {!! json_encode($monthStats->pluck('passed_count')) !!},
                     backgroundColor: 'rgba(16, 185, 129, 0.6)',
                     borderColor: 'rgba(16, 185, 129, 1)',

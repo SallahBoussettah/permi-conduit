@@ -11,9 +11,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </a>
-                <h1 class="text-3xl font-bold text-gray-900">{{ __('Candidates Report') }}</h1>
+                <h1 class="text-3xl font-bold text-gray-900">{{ __('Rapport des candidats') }}</h1>
             </div>
-            <p class="mt-2 text-sm text-gray-700">{{ __('View exam statistics for all candidates.') }}</p>
+            <p class="mt-2 text-sm text-gray-700">{{ __('Voir les statistiques des examens pour tous les candidats.') }}</p>
         </div>
 
         <!-- Search and Filter -->
@@ -22,20 +22,20 @@
                 <form action="{{ route('admin.qcm-reports.candidates') }}" method="GET" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700">{{ __('Search') }}</label>
+                            <label for="search" class="block text-sm font-medium text-gray-700">{{ __('Rechercher') }}</label>
                             <div class="mt-1">
-                                <input type="text" name="search" id="search" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="{{ __('Name or email') }}" value="{{ request('search') }}">
+                                <input type="text" name="search" id="search" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="{{ __('Nom ou email') }}" value="{{ request('search') }}">
                             </div>
                         </div>
                         <div>
-                            <label for="sort" class="block text-sm font-medium text-gray-700">{{ __('Sort By') }}</label>
+                            <label for="sort" class="block text-sm font-medium text-gray-700">{{ __('Trier par') }}</label>
                             <div class="mt-1">
                                 <select id="sort" name="sort" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                                    <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>{{ __('Name') }}</option>
+                                    <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>{{ __('Nom') }}</option>
                                     <option value="email" {{ request('sort') == 'email' ? 'selected' : '' }}>{{ __('Email') }}</option>
-                                    <option value="exams" {{ request('sort') == 'exams' ? 'selected' : '' }}>{{ __('Exam Count') }}</option>
-                                    <option value="passed" {{ request('sort') == 'passed' ? 'selected' : '' }}>{{ __('Passed Count') }}</option>
-                                    <option value="rate" {{ request('sort') == 'rate' ? 'selected' : '' }}>{{ __('Pass Rate') }}</option>
+                                    <option value="exams" {{ request('sort') == 'exams' ? 'selected' : '' }}>{{ __('Nombre d\'examens') }}</option>
+                                    <option value="passed" {{ request('sort') == 'passed' ? 'selected' : '' }}>{{ __('Nombre d\'examens passés') }}</option>
+                                    <option value="rate" {{ request('sort') == 'rate' ? 'selected' : '' }}>{{ __('Taux de réussite') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -43,15 +43,15 @@
                             <label for="direction" class="block text-sm font-medium text-gray-700">{{ __('Direction') }}</label>
                             <div class="mt-1">
                                 <select id="direction" name="direction" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
-                                    <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>{{ __('Ascending') }}</option>
-                                    <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>{{ __('Descending') }}</option>
+                                    <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>{{ __('Ascendant') }}</option>
+                                    <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>{{ __('Descendant') }}</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="flex justify-end">
                         <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Filter') }}
+                            {{ __('Filtrer') }}
                         </button>
                     </div>
                 </form>
@@ -61,8 +61,8 @@
         <!-- Candidates List -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Candidates') }}</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Showing') }} {{ $candidates->firstItem() ?? 0 }} - {{ $candidates->lastItem() ?? 0 }} {{ __('of') }} {{ $candidates->total() }} {{ __('candidates') }}</p>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Liste des candidats') }}</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Affichage de') }} {{ $candidates->firstItem() ?? 0 }} - {{ $candidates->lastItem() ?? 0 }} {{ __('sur') }} {{ $candidates->total() }} {{ __('candidats') }}</p>
             </div>
             <div class="border-t border-gray-200">
                 @if($candidates->count() > 0)
@@ -70,11 +70,11 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Candidate') }}</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total Exams') }}</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completed') }}</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passed') }}</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Pass Rate') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Candidat') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nombre d\'examens') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Completés') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Passés') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Taux de réussite') }}</th>
                                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
@@ -116,7 +116,7 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('admin.qcm-reports.candidate-detail', $candidate) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('View Details') }}</a>
+                                            <a href="{{ route('admin.qcm-reports.candidate-detail', $candidate) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Voir les détails') }}</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -131,8 +131,8 @@
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('No candidates found') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500">{{ __('No candidates match your search criteria.') }}</p>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('Aucun candidat trouvé') }}</h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ __('Aucun candidat ne correspond à vos critères de recherche.') }}</p>
                     </div>
                 @endif
             </div>

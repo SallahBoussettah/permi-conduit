@@ -4,12 +4,12 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="px-4 py-6 sm:px-0">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Create Permit Category') }}</h1>
+            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Créer une catégorie de permis') }}</h1>
             <a href="{{ route('admin.permit-categories.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                {{ __('Back to Permit Categories') }}
+                {{ __('Retour aux catégories de permis') }}
             </a>
         </div>
 
@@ -30,16 +30,16 @@
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Name -->
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('Name') }} <span class="text-red-500">*</span></label>
+                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('Nom') }} <span class="text-red-500">*</span></label>
                             <input type="text" name="name" id="name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('name') }}" required>
-                            <p class="mt-1 text-sm text-gray-500">{{ __('The full name of the permit category (e.g. "Driver License C").') }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Le nom complet de la catégorie de permis (e.g. "Permis de conduire C").') }}</p>
                         </div>
 
                         <!-- Code -->
                         <div>
                             <label for="code" class="block text-sm font-medium text-gray-700">{{ __('Code') }} <span class="text-red-500">*</span></label>
                             <input type="text" name="code" id="code" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('code') }}" required>
-                            <p class="mt-1 text-sm text-gray-500">{{ __('The short code for the permit category (e.g. "C", "CE", "D").') }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Le code court de la catégorie de permis (e.g. "C", "CE", "D").') }}</p>
                         </div>
 
                         <!-- Description -->
@@ -55,16 +55,16 @@
                                     <input id="status" name="status" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" value="1" {{ old('status', '1') == '1' ? 'checked' : '' }}>
                                 </div>
                                 <div class="ml-3 text-sm">
-                                    <label for="status" class="font-medium text-gray-700">{{ __('Active') }}</label>
-                                    <p class="text-gray-500">{{ __('Whether this permit category is active and available.') }}</p>
+                                    <label for="status" class="font-medium text-gray-700">{{ __('Actif') }}</label>
+                                    <p class="text-gray-500">{{ __('Si cette catégorie de permis est active et disponible.') }}</p>
                                     <div class="mt-2 p-2 border-l-4 border-yellow-400 bg-yellow-50">
                                         <p class="text-yellow-700">
-                                            <strong>{{ __('Important:') }}</strong> {{ __('When a permit category is set to inactive:') }}
+                                            <strong>{{ __('Important:') }}</strong> {{ __('Lorsque une catégorie de permis est désactivée:') }}
                                         </p>
                                         <ul class="list-disc ml-5 mt-1 text-yellow-700">
-                                            <li>{{ __('Candidates with this permit category will only see general courses.') }}</li>
-                                            <li>{{ __('Courses associated with this permit category will not be accessible.') }}</li>
-                                            <li>{{ __('Candidates will see a message informing them the category is unavailable.') }}</li>
+                                            <li>{{ __('Les candidats avec cette catégorie de permis ne verront que les cours généraux.') }}</li>
+                                            <li>{{ __('Les cours associés à cette catégorie de permis ne seront plus accessibles.') }}</li>
+                                            <li>{{ __('Les candidats verront un message informant qu\'elle n\'est plus disponible.') }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -74,7 +74,7 @@
                 </div>
                 <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                     <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        {{ __('Create Permit Category') }}
+                        {{ __('Créer la catégorie de permis') }}
                     </button>
                 </div>
             </form>

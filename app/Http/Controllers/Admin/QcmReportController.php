@@ -64,41 +64,97 @@ class QcmReportController extends Controller
             ->limit(10)
             ->get();
             
-        // Get exams by month
-        $examsByMonth = QcmExam::when($schoolId, function($query) use ($schoolId) {
-                $query->where('school_id', $schoolId);
-            })
-            ->select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('COUNT(*) as total'),
-                DB::raw('SUM(CASE WHEN is_eliminatory = 0 THEN 1 ELSE 0 END) as passed')
-            )
-            ->whereIn('status', ['completed', 'timed_out'])
-            ->groupBy('year', 'month')
-            ->orderBy('year', 'desc')
-            ->orderBy('month', 'desc')
-            ->limit(12)
-            ->get();
-            
-        // Format the data for the chart
-        $chartLabels = [];
-        $chartData = [
-            'total' => [],
-            'passed' => []
-        ];
-        
-        foreach ($examsByMonth as $data) {
-            $date = Carbon::createFromDate($data->year, $data->month, 1);
-            $chartLabels[] = $date->format('M Y');
-            $chartData['total'][] = $data->total;
-            $chartData['passed'][] = $data->passed;
+        // Add passed_count to each paper
+        foreach ($examsByPaper as $paper) {
+            $paper->passed_count = QcmExam::where('qcm_paper_id', $paper->id)
+                ->when($schoolId, function($q) use ($schoolId) {
+                    $q->where('school_id', $schoolId);
+                })
+                ->where('is_eliminatory', false)
+                ->whereIn('status', ['completed', 'timed_out'])
+                ->count();
         }
         
-        // Reverse the arrays to show oldest to newest
-        $chartLabels = array_reverse($chartLabels);
-        $chartData['total'] = array_reverse($chartData['total']);
-        $chartData['passed'] = array_reverse($chartData['passed']);
+        // Try to get exams by month
+        try {
+            $examsByMonth = QcmExam::when($schoolId, function($query) use ($schoolId) {
+                    $query->where('school_id', $schoolId);
+                })
+                ->select(
+                    DB::raw('YEAR(created_at) as year'),
+                    DB::raw('MONTH(created_at) as month'),
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw('SUM(CASE WHEN is_eliminatory = 0 THEN 1 ELSE 0 END) as passed')
+                )
+                ->whereIn('status', ['completed', 'timed_out'])
+                ->groupBy('year', 'month')
+                ->orderBy('year', 'desc')
+                ->orderBy('month', 'desc')
+                ->limit(12)
+                ->get();
+                
+            // Format the data for the chart
+            $chartLabels = [];
+            $chartData = [
+                'total' => [],
+                'passed' => []
+            ];
+            
+            foreach ($examsByMonth as $data) {
+                $date = Carbon::createFromDate($data->year, $data->month, 1);
+                $chartLabels[] = $date->format('M Y');
+                $chartData['total'][] = $data->total;
+                $chartData['passed'][] = $data->passed;
+                
+                // Add exam_count for compatibility with the view
+                $data->exam_count = $data->total;
+                $data->passed_count = $data->passed;
+                // Add month name for the chart
+                $data->month = $date->format('M Y');
+            }
+            
+            // Reverse the arrays to show oldest to newest
+            $chartLabels = array_reverse($chartLabels);
+            $chartData['total'] = array_reverse($chartData['total']);
+            $chartData['passed'] = array_reverse($chartData['passed']);
+        } catch (\Exception $e) {
+            // If there's an error, create empty arrays
+            $examsByMonth = collect([]);
+            $chartLabels = [];
+            $chartData = [
+                'total' => [],
+                'passed' => []
+            ];
+        }
+        
+        // Get top candidates
+        $topCandidates = [];
+        try {
+            $topCandidates = DB::table('users')
+                ->join('qcm_exams', 'users.id', '=', 'qcm_exams.user_id')
+                ->when($schoolId, function($query) use ($schoolId) {
+                    $query->where('users.school_id', $schoolId);
+                })
+                ->select(
+                    'users.id',
+                    DB::raw('users.id as user_id'),
+                    DB::raw('users.name as name'),
+                    DB::raw('users.email as email'),
+                    DB::raw('COUNT(qcm_exams.id) as exam_count'),
+                    DB::raw('SUM(CASE WHEN qcm_exams.is_eliminatory = 0 AND qcm_exams.status IN ("completed", "timed_out") THEN 1 ELSE 0 END) as passed_count')
+                )
+                ->groupBy('users.id', 'users.name', 'users.email')
+                ->orderBy('exam_count', 'desc')
+                ->limit(5)
+                ->get();
+            
+            // Add user objects to the candidates
+            foreach($topCandidates as $candidate) {
+                $candidate->user = User::find($candidate->user_id);
+            }
+        } catch (\Exception $e) {
+            $topCandidates = collect([]);
+        }
         
         return view('admin.qcm-reports.index', compact(
             'totalExams', 
@@ -107,8 +163,10 @@ class QcmReportController extends Controller
             'passRate', 
             'recentExams', 
             'examsByPaper',
+            'examsByMonth',
             'chartLabels',
-            'chartData'
+            'chartData',
+            'topCandidates'
         ));
     }
     
@@ -301,16 +359,16 @@ class QcmReportController extends Controller
                 'ID',
                 'Candidate',
                 'Email',
-                'Paper',
-                'Permit Category',
-                'Started At',
-                'Completed At',
-                'Duration (seconds)',
-                'Correct Answers',
-                'Total Questions',
+                'Papier',
+                'Category permis',
+                'Début',
+                'Fin',
+                'Durée (secondes)',
+                'Réponses correctes',
+                'Total questions',
                 'Points',
-                'Status',
-                'Passed'
+                'Statut',
+                'Passé'
             ]);
             
             // Add data
@@ -328,7 +386,7 @@ class QcmReportController extends Controller
                     $exam->total_questions,
                     $exam->points_earned,
                     $exam->status,
-                    $exam->is_eliminatory ? 'No' : 'Yes'
+                    $exam->is_eliminatory ? 'Non' : 'Oui'
                 ]);
             }
             

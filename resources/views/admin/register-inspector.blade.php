@@ -8,10 +8,10 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl sm:tracking-tight">
-                        {{ __('Register New Inspector') }}
+                        {{ __('Enregistrer un nouvel inspecteur') }}
                     </h1>
                     <p class="mt-2 text-lg text-gray-500">
-                        {{ __('Create a new inspector account') }}
+                        {{ __('Créer un nouveau compte d\'inspecteur') }}
                     </p>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                     <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                         <!-- Name Field -->
                         <div class="sm:col-span-3">
-                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('Name') }}</label>
+                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('Nom') }}</label>
                             <div class="mt-1">
                                 <input type="text" name="name" id="name" value="{{ old('name') }}" required autofocus 
                                     class="shadow-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full sm:text-sm border-gray-300 rounded-md @error('name') border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 @enderror">
@@ -66,7 +66,7 @@
 
                         <!-- Password Field -->
                         <div class="sm:col-span-3">
-                            <label for="password" class="block text-sm font-medium text-gray-700">{{ __('Password') }}</label>
+                            <label for="password" class="block text-sm font-medium text-gray-700">{{ __('Mot de passe') }}</label>
                             <div class="mt-1">
                                 <input type="password" name="password" id="password" required 
                                     class="shadow-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full sm:text-sm border-gray-300 rounded-md @error('password') border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 @enderror">
@@ -78,7 +78,7 @@
 
                         <!-- Confirm Password Field -->
                         <div class="sm:col-span-3">
-                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700">{{ __('Confirm Password') }}</label>
+                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700">{{ __('Confirmer le mot de passe') }}</label>
                             <div class="mt-1">
                                 <input type="password" name="password_confirmation" id="password_confirmation" required 
                                     class="shadow-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full sm:text-sm border-gray-300 rounded-md">
@@ -88,10 +88,10 @@
 
                     <div class="mt-8 flex justify-end">
                         <a href="{{ route('admin.inspectors') }}" class="mr-4 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                            {{ __('Cancel') }}
+                            {{ __('Annuler') }}
                         </a>
                         <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                            {{ __('Register Inspector') }}
+                            {{ __('Enregistrer l\'inspecteur') }}
                         </button>
                     </div>
                 </form>
@@ -104,7 +104,7 @@
                 <svg class="mr-1 h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                {{ __('Back to Inspectors') }}
+                {{ __('Retour aux inspecteurs') }}
             </a>
         </div>
     </div>

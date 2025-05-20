@@ -92,7 +92,7 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         // QCM Reports
         Route::get('/qcm-reports', [\App\Http\Controllers\Admin\QcmReportController::class, 'index'])->name('qcm-reports.index');
         Route::get('/qcm-reports/candidates', [\App\Http\Controllers\Admin\QcmReportController::class, 'candidates'])->name('qcm-reports.candidates');
-        Route::get('/qcm-reports/candidates/{user}', [\App\Http\Controllers\Admin\QcmReportController::class, 'candidateDetail'])->name('qcm-reports.candidates.detail');
+        Route::get('/qcm-reports/candidate/{user}', [\App\Http\Controllers\Admin\QcmReportController::class, 'candidateDetail'])->name('qcm-reports.candidate-detail');
         Route::get('/qcm-reports/statistics', [\App\Http\Controllers\Admin\QcmReportController::class, 'statistics'])->name('qcm-reports.statistics');
         Route::get('/qcm-reports/export', [\App\Http\Controllers\Admin\QcmReportController::class, 'export'])->name('qcm-reports.export');
     });
@@ -327,6 +327,14 @@ Route::get('/debug-last-material', function () {
         'content_path_or_url' => $material->content_path_or_url,
         'created_at' => $material->created_at->format('Y-m-d H:i:s'),
     ];
+});
+
+/**
+ * Admin QCM Reports Routes
+ */
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    // Add the missing route for candidate detail
+    Route::get('qcm-reports/candidate/{user}', [App\Http\Controllers\Admin\QcmReportController::class, 'candidateDetail'])->name('qcm-reports.candidate-detail');
 });
 
 require __DIR__.'/auth.php';

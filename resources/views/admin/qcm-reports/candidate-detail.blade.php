@@ -83,8 +83,8 @@
                                     @foreach($exams as $exam)
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">{{ $exam->qcmPaper->title }}</div>
-                                                <div class="text-sm text-gray-500">{{ $exam->qcmPaper->permitCategory->name }}</div>
+                                                <div class="text-sm font-medium text-gray-900">{{ $exam->paper->title }}</div>
+                                                <div class="text-sm text-gray-500">{{ $exam->paper->permitCategory->name }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-900">{{ $exam->created_at->format('d/m/Y') }}</div>
@@ -93,7 +93,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($exam->completed_at)
                                                     <div class="text-sm text-gray-900">{{ $exam->score }} / {{ $exam->total_points }}</div>
-                                                    <div class="text-sm text-gray-500">{{ round(($exam->score / $exam->total_points) * 100) }}%</div>
+                                                    <div class="text-sm text-gray-500">{{ $exam->total_points > 0 ? round(($exam->score / $exam->total_points) * 100) : 0 }}%</div>
                                                 @else
                                                     <span class="text-sm text-yellow-500">{{ __('In Progress') }}</span>
                                                 @endif

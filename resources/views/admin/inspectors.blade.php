@@ -8,10 +8,10 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl sm:tracking-tight">
-                        {{ __('Manage Inspectors') }}
+                        {{ __('Gérer les inspecteurs') }}
                     </h1>
                     <p class="mt-2 text-lg text-gray-500">
-                        {{ __('Create and manage inspector accounts') }}
+                        {{ __('Créer et gérer les comptes des inspecteurs') }}
                     </p>
                 </div>
                 <div class="mt-4 md:mt-0 flex-shrink-0">
@@ -19,7 +19,7 @@
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        {{ __('Register New Inspector') }}
+                        {{ __('Enregistrer un nouvel inspecteur') }}
                     </a>
                 </div>
             </div>
@@ -48,14 +48,14 @@
                     <svg class="mx-auto h-16 w-16 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <h3 class="mt-4 text-lg font-medium text-gray-900">{{ __('No inspectors found') }}</h3>
-                    <p class="mt-2 text-sm text-gray-500">{{ __('No inspectors found in the system.') }}</p>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">{{ __('Aucun inspecteur trouvé') }}</h3>
+                    <p class="mt-2 text-sm text-gray-500">{{ __('Aucun inspecteur trouvé dans le système.') }}</p>
                     <div class="mt-6">
                         <a href="{{ route('admin.register.inspector') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
-                            {{ __('Register First Inspector') }}
+                            {{ __('Enregistrer le premier inspecteur') }}
                         </a>
                     </div>
                 </div>
@@ -67,16 +67,16 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Name') }}
+                                    {{ __('Nom') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     {{ __('Email') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Created Date') }}
+                                    {{ __('Date de création') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Status') }}
+                                    {{ __('Statut') }}
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     {{ __('Actions') }}
@@ -107,22 +107,22 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($inspector->email_verified_at)
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                {{ __('Active') }}
+                                                {{ __('Actif') }}
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                {{ __('Pending Verification') }}
+                                                {{ __('En attente de vérification') }}
                                             </span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex justify-end space-x-3">
-                                            <a href="#" class="text-indigo-600 hover:text-indigo-900" title="{{ __('Edit') }}">
+                                            <a href="#" class="text-indigo-600 hover:text-indigo-900" title="{{ __('Modifier') }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                             </a>
-                                            <a href="#" class="text-red-600 hover:text-red-900" title="{{ __('Deactivate') }}">
+                                            <a href="#" class="text-red-600 hover:text-red-900" title="{{ __('Désactiver') }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                                 </svg>
@@ -148,7 +148,7 @@
                 <svg class="mr-1 h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                {{ __('Back to Dashboard') }}
+                {{ __('Retour au tableau de bord') }}
             </a>
         </div>
     </div>

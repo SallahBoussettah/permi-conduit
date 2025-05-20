@@ -6,15 +6,15 @@
         <!-- Header -->
         <div class="mb-8 flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">{{ __('QCM Reports') }}</h1>
-                <p class="mt-2 text-sm text-gray-700">{{ __('View statistics and reports for QCM exams.') }}</p>
+                <h1 class="text-3xl font-bold text-gray-900">{{ __('Rapports QCM') }}</h1>
+                <p class="mt-2 text-sm text-gray-700">{{ __('Afficher les statistiques et les rapports pour les examens QCM.') }}</p>
             </div>
             <div>
                 <a href="{{ route('admin.qcm-reports.export') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                    {{ __('Export Data') }}
+                    {{ __('Exporter les données') }}
                 </a>
             </div>
         </div>
@@ -32,7 +32,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Total Exams') }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Total des examens') }}</dt>
                                 <dd class="text-3xl font-semibold text-gray-900">{{ $totalExams }}</dd>
                             </dl>
                         </div>
@@ -51,7 +51,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Completed Exams') }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Exams terminés') }}</dt>
                                 <dd class="text-3xl font-semibold text-gray-900">{{ $completedExams }}</dd>
                             </dl>
                         </div>
@@ -70,7 +70,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Passed Exams') }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Exams réussis') }}</dt>
                                 <dd class="text-3xl font-semibold text-gray-900">{{ $passedExams }}</dd>
                             </dl>
                         </div>
@@ -90,7 +90,7 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Pass Rate') }}</dt>
+                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('Taux de réussite') }}</dt>
                                 <dd class="text-3xl font-semibold text-gray-900">{{ $passRate }}%</dd>
                             </dl>
                         </div>
@@ -104,8 +104,8 @@
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Recent Exams') }}</h3>
-                        <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Latest QCM exams taken by candidates.') }}</p>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Exams récents') }}</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Derniers examens QCM passés par les candidats.') }}</p>
                     </div>
                 </div>
                 <div class="border-t border-gray-200">
@@ -114,10 +114,10 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Candidate') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Exam') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Score') }}</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Candidat') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Examen') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Note') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Statut') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Date') }}</th>
                                     </tr>
                                 </thead>
@@ -133,31 +133,31 @@
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">{{ $exam->qcmPaper->title }}</div>
-                                                <div class="text-sm text-gray-500">{{ $exam->qcmPaper->permitCategory->name }}</div>
+                                                <div class="text-sm text-gray-900">{{ $exam->paper->title }}</div>
+                                                <div class="text-sm text-gray-500">{{ $exam->paper->permitCategory->name }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($exam->completed_at)
                                                     <div class="text-sm text-gray-900">{{ $exam->score }} / {{ $exam->total_points }}</div>
-                                                    <div class="text-sm text-gray-500">{{ round(($exam->score / $exam->total_points) * 100) }}%</div>
+                                                    <div class="text-sm text-gray-500">{{ $exam->total_points > 0 ? round(($exam->score / $exam->total_points) * 100) : 0 }}%</div>
                                                 @else
-                                                    <span class="text-sm text-yellow-500">{{ __('In Progress') }}</span>
+                                                    <span class="text-sm text-yellow-500">{{ __('En cours') }}</span>
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($exam->completed_at)
                                                     @if($exam->passed)
                                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                            {{ __('Passed') }}
+                                                            {{ __('Réussi') }}
                                                         </span>
                                                     @else
                                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                            {{ __('Failed') }}
+                                                            {{ __('Échoué') }}
                                                         </span>
                                                     @endif
                                                 @else
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                        {{ __('Incomplete') }}
+                                                        {{ __('Incomplet') }}
                                                     </span>
                                                 @endif
                                             </td>
@@ -171,7 +171,7 @@
                         </div>
                     @else
                         <div class="py-12 text-center">
-                            <p class="text-sm text-gray-500">{{ __('No exams taken yet.') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Aucun examen passé pour le moment.') }}</p>
                         </div>
                     @endif
                 </div>
@@ -180,8 +180,8 @@
             <!-- Exams by Paper -->
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Exams by Paper') }}</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Number of exams taken for each QCM paper.') }}</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Exams par QCM') }}</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Nombre d\'examens passés pour chaque QCM.') }}</p>
                 </div>
                 <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
                     <div class="h-80">
@@ -195,8 +195,8 @@
             <!-- Monthly Exams -->
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Monthly Exam Statistics') }}</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Number of exams taken each month.') }}</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Statistiques mensuelles') }}</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Nombre d\'examens passés chaque mois.') }}</p>
                 </div>
                 <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
                     <div class="h-80">
@@ -209,11 +209,11 @@
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Top Candidates') }}</h3>
-                        <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Candidates with the most exams taken.') }}</p>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Top candidats') }}</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Candidats avec le plus d\'examens passés.') }}</p>
                     </div>
                     <a href="{{ route('admin.qcm-reports.candidates') }}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
-                        {{ __('View All') }}
+                        {{ __('Voir tous') }}
                     </a>
                 </div>
                 <div class="border-t border-gray-200">
@@ -237,10 +237,10 @@
                                                 </div>
                                                 <div>
                                                     <div class="flex items-center">
-                                                        <div class="text-sm text-gray-900 mr-2">{{ $candidate->exam_count }} {{ __('exams') }}</div>
+                                                        <div class="text-sm text-gray-900 mr-2">{{ $candidate->exam_count }} {{ __('examens') }}</div>
                                                         <div class="text-sm text-gray-900">
                                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                                {{ $candidate->passed_count }} {{ __('passed') }}
+                                                                {{ $candidate->passed_count }} {{ __('réussis') }}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -253,7 +253,7 @@
                         </ul>
                     @else
                         <div class="py-12 text-center">
-                            <p class="text-sm text-gray-500">{{ __('No candidates have taken exams yet.') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Aucun candidat n\'a passé d\'examens pour le moment.') }}</p>
                         </div>
                     @endif
                 </div>
@@ -271,16 +271,16 @@
         const examsByPaperChart = new Chart(examsByPaperCtx, {
             type: 'bar',
             data: {
-                labels: {!! json_encode($examsByPaper->pluck('title')) !!},
+                labels: {!! isset($examsByPaper) && $examsByPaper->count() > 0 ? json_encode($examsByPaper->pluck('title')) : '[]' !!},
                 datasets: [{
-                    label: '{{ __('Total Exams') }}',
-                    data: {!! json_encode($examsByPaper->pluck('exam_count')) !!},
+                    label: '{{ __('Total des examens') }}',
+                    data: {!! isset($examsByPaper) && $examsByPaper->count() > 0 ? json_encode($examsByPaper->pluck('exam_count')) : '[]' !!},
                     backgroundColor: 'rgba(79, 70, 229, 0.6)',
                     borderColor: 'rgba(79, 70, 229, 1)',
                     borderWidth: 1
                 }, {
-                    label: '{{ __('Passed Exams') }}',
-                    data: {!! json_encode($examsByPaper->pluck('passed_count')) !!},
+                    label: '{{ __('Exams réussis') }}',
+                    data: {!! isset($examsByPaper) && $examsByPaper->count() > 0 ? json_encode($examsByPaper->pluck('passed_count')) : '[]' !!},
                     backgroundColor: 'rgba(16, 185, 129, 0.6)',
                     borderColor: 'rgba(16, 185, 129, 1)',
                     borderWidth: 1
@@ -305,10 +305,10 @@
         const monthlyExamsChart = new Chart(monthlyExamsCtx, {
             type: 'line',
             data: {
-                labels: {!! json_encode($examsByMonth->pluck('month')) !!},
+                labels: {!! isset($examsByMonth) && !empty($examsByMonth) ? json_encode($examsByMonth->pluck('month')) : '[]' !!},
                 datasets: [{
                     label: '{{ __('Total Exams') }}',
-                    data: {!! json_encode($examsByMonth->pluck('exam_count')) !!},
+                    data: {!! isset($examsByMonth) && !empty($examsByMonth) ? json_encode($examsByMonth->pluck('exam_count')) : '[]' !!},
                     backgroundColor: 'rgba(79, 70, 229, 0.2)',
                     borderColor: 'rgba(79, 70, 229, 1)',
                     borderWidth: 2,
@@ -316,7 +316,7 @@
                     tension: 0.4
                 }, {
                     label: '{{ __('Passed Exams') }}',
-                    data: {!! json_encode($examsByMonth->pluck('passed_count')) !!},
+                    data: {!! isset($examsByMonth) && !empty($examsByMonth) ? json_encode($examsByMonth->pluck('passed_count')) : '[]' !!},
                     backgroundColor: 'rgba(16, 185, 129, 0.2)',
                     borderColor: 'rgba(16, 185, 129, 1)',
                     borderWidth: 2,

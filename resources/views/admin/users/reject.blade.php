@@ -4,12 +4,12 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="px-4 py-6 sm:px-0">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Reject User Registration') }}</h1>
+            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Rejeter l\'inscription de l\'utilisateur') }}</h1>
             <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
                 </svg>
-                {{ __('Back to Users') }}
+                {{ __('Retour aux utilisateurs') }}
             </a>
         </div>
 
@@ -48,7 +48,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-yellow-700">
-                                {{ __('You are about to reject this user\'s registration. Please provide a clear reason for the rejection.') }}
+                                {{ __('Vous êtes sur le point de rejeter l\'inscription de cet utilisateur. Veuillez fournir une raison claire pour le rejet.') }}
                             </p>
                         </div>
                     </div>
@@ -60,16 +60,16 @@
                         <label for="rejection_reason" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Rejection Reason') }} <span class="text-red-500">*</span></label>
                         <textarea id="rejection_reason" name="rejection_reason" rows="4" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="{{ __('Please provide a clear explanation for rejecting this user...') }}">{{ old('rejection_reason', $user->rejection_reason) }}</textarea>
                         <p class="mt-2 text-sm text-gray-500">
-                            {{ __('This reason will be shown to the user when they attempt to log in.') }}
+                            {{ __('Cette raison sera affichée à l\'utilisateur lorsqu\'ils essaieront de se connecter.') }}
                         </p>
                     </div>
 
                     <div class="flex justify-end space-x-4">
                         <a href="{{ route('admin.users.index') }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Cancel') }}
+                            {{ __('Annuler') }}
                         </a>
                         <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            {{ __('Reject User') }}
+                            {{ __('Rejeter l\'utilisateur') }}
                         </button>
                     </div>
                 </form>

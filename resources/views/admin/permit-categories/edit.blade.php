@@ -4,12 +4,12 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="px-4 py-6 sm:px-0">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Edit Permit Category') }}: {{ $permitCategory->name }}</h1>
+            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Modifier la catégorie de permis') }}: {{ $permitCategory->name }}</h1>
             <a href="{{ route('admin.permit-categories.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                {{ __('Back to Permit Categories') }}
+                {{ __('Retour aux catégories de permis') }}
             </a>
         </div>
 
@@ -31,16 +31,16 @@
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Name -->
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('Name') }} <span class="text-red-500">*</span></label>
+                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('Nom') }} <span class="text-red-500">*</span></label>
                             <input type="text" name="name" id="name" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('name', $permitCategory->name) }}" required>
-                            <p class="mt-1 text-sm text-gray-500">{{ __('The full name of the permit category (e.g. "Driver License C").') }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Le nom complet de la catégorie de permis (e.g. "Permis de conduire C").') }}</p>
                         </div>
 
                         <!-- Code -->
                         <div>
                             <label for="code" class="block text-sm font-medium text-gray-700">{{ __('Code') }} <span class="text-red-500">*</span></label>
                             <input type="text" name="code" id="code" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('code', $permitCategory->code) }}" required>
-                            <p class="mt-1 text-sm text-gray-500">{{ __('The short code for the permit category (e.g. "C", "CE", "D").') }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Le code court de la catégorie de permis (e.g. "C", "CE", "D").') }}</p>
                         </div>
 
                         <!-- Description -->
@@ -57,15 +57,15 @@
                                 </div>
                                 <div class="ml-3 text-sm">
                                     <label for="status" class="font-medium text-gray-700">{{ __('Active') }}</label>
-                                    <p class="text-gray-500">{{ __('Whether this permit category is active and available.') }}</p>
+                                    <p class="text-gray-500">{{ __('Si cette catégorie de permis est active et disponible.') }}</p>
                                     <div class="mt-2 p-2 border-l-4 border-yellow-400 bg-yellow-50">
                                         <p class="text-yellow-700">
-                                            <strong>{{ __('Important:') }}</strong> {{ __('When a permit category is set to inactive:') }}
+                                            <strong>{{ __('Important:') }}</strong> {{ __('Lorsque la catégorie de permis est désactivée:') }}
                                         </p>
                                         <ul class="list-disc ml-5 mt-1 text-yellow-700">
-                                            <li>{{ __('Candidates with this permit category will only see general courses.') }}</li>
-                                            <li>{{ __('Courses associated with this permit category will not be accessible.') }}</li>
-                                            <li>{{ __('Candidates will see a message informing them the category is unavailable.') }}</li>
+                                            <li>{{ __('Les candidats associés à cette catégorie de permis ne verront que les cours généraux.') }}</li>
+                                            <li>{{ __('Les cours associés à cette catégorie de permis ne seront plus accessibles.') }}</li>
+                                            <li>{{ __('Les candidats verront un message informant qu\'elle n\'est plus disponible.') }}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -73,14 +73,14 @@
                         </div>
 
                         <div>
-                            <h3 class="text-sm font-medium text-gray-700">{{ __('Usage statistics') }}</h3>
+                            <h3 class="text-sm font-medium text-gray-700">{{ __('Statistiques d\'utilisation') }}</h3>
                             <div class="mt-2 grid grid-cols-2 gap-4">
                                 <div class="bg-gray-50 rounded-md p-3">
-                                    <p class="text-sm text-gray-500">{{ __('Courses assigned') }}:</p>
+                                    <p class="text-sm text-gray-500">{{ __('Cours associés') }}:</p>
                                     <p class="text-xl font-semibold">{{ $permitCategory->courses()->count() }}</p>
                                 </div>
                                 <div class="bg-gray-50 rounded-md p-3">
-                                    <p class="text-sm text-gray-500">{{ __('Users assigned') }}:</p>
+                                    <p class="text-sm text-gray-500">{{ __('Utilisateurs associés') }}:</p>
                                     <p class="text-xl font-semibold">{{ $permitCategory->users()->count() }}</p>
                                 </div>
                             </div>
@@ -89,7 +89,7 @@
                 </div>
                 <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                     <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        {{ __('Update Permit Category') }}
+                        {{ __('Mettre à jour la catégorie de permis') }}
                     </button>
                 </div>
             </form>
@@ -97,14 +97,14 @@
 
         <!-- Delete Form -->
         <div class="mt-6">
-            <form action="{{ route('admin.permit-categories.destroy', $permitCategory) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this permit category?') }}');">
+            <form action="{{ route('admin.permit-categories.destroy', $permitCategory) }}" method="POST" onsubmit="return confirm('{{ __('Êtes-vous sûr de vouloir supprimer cette catégorie de permis?') }}');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                     <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m6-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    {{ __('Delete Permit Category') }}
+                    {{ __('Supprimer la catégorie de permis') }}
                 </button>
             </form>
         </div>

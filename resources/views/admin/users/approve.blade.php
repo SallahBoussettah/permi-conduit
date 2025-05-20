@@ -9,7 +9,7 @@
                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
                 </svg>
-                {{ __('Back to Users') }}
+                {{ __('Retour aux utilisateurs') }}
             </a>
         </div>
 
@@ -48,7 +48,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-green-700">
-                                {{ __('You are about to approve this user\'s registration. You can optionally set an expiration date for their account.') }}
+                                {{ __('Vous êtes sur le point d\'approuver l\'inscription de cet utilisateur. Vous pouvez également définir une date d\'expiration pour leur compte.') }}
                             </p>
                         </div>
                     </div>
@@ -57,14 +57,14 @@
                 <form action="{{ route('admin.users.approve', $user) }}" method="POST">
                     @csrf
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Account Expiration Options') }}</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Options d\'expiration du compte') }}</label>
                         
                         <div class="space-y-4">
                             <div>
                                 <div class="flex items-center">
                                     <input type="radio" id="no_expiration" name="expiration_type" value="none" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
                                     <label for="no_expiration" class="ml-3 block text-sm font-medium text-gray-700">
-                                        {{ __('No expiration (permanent access)') }}
+                                        {{ __('Aucune expiration (accès permanent)') }}
                                     </label>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                                 <div class="flex items-center">
                                     <input type="radio" id="days_expiration" name="expiration_type" value="days" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
                                     <label for="days_expiration" class="ml-3 block text-sm font-medium text-gray-700">
-                                        {{ __('Set expiration by days') }}
+                                        {{ __('Définir l\'expiration par jours') }}
                                     </label>
                                 </div>
                                 <div class="ml-7 mt-2">
@@ -87,7 +87,7 @@
                                 <div class="flex items-center">
                                     <input type="radio" id="date_expiration" name="expiration_type" value="date" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
                                     <label for="date_expiration" class="ml-3 block text-sm font-medium text-gray-700">
-                                        {{ __('Set specific expiration date') }}
+                                        {{ __('Définir une date d\'expiration spécifique') }}
                                     </label>
                                 </div>
                                 <div class="ml-7 mt-2">
@@ -99,16 +99,16 @@
                         </div>
                         
                         <p class="mt-2 text-sm text-gray-500">
-                            {{ __('Choose how long the account should remain active after approval.') }}
+                            {{ __('Choisissez combien de temps le compte doit rester actif après l\'approbation.') }}
                         </p>
                     </div>
 
                     <div class="flex justify-end space-x-4">
                         <a href="{{ route('admin.users.index') }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Cancel') }}
+                            {{ __('Annuler') }}
                         </a>
                         <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            {{ __('Approve User') }}
+                            {{ __('Approuver l\'utilisateur') }}
                         </button>
                     </div>
                 </form>
