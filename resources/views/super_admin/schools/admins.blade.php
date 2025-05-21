@@ -99,7 +99,10 @@
                     </div>
                     <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                         <dt class="text-sm font-medium text-gray-500">{{ __('Current Candidates') }}</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $school->candidates_count ?? 0 }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <div>{{ $school->current_active_candidate_count }} {{ __('active') }} / {{ $school->candidates_count ?? 0 }} {{ __('total') }}</div>
+                            <div class="text-xs text-gray-500">{{ __('Limit') }}: {{ $school->candidate_limit }} ({{ max(0, $school->candidate_limit - $school->current_active_candidate_count) }} {{ __('slots remaining') }})</div>
+                        </dd>
                     </div>
                 </dl>
             </div>

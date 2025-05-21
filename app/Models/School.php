@@ -47,7 +47,7 @@ class School extends Model
      */
     protected static function booted()
     {
-        // Auto-generate slug from name when creating a new school
+        // Auto-generate slug when creating a new school
         static::creating(function ($school) {
             if (empty($school->slug)) {
                 $school->slug = Str::slug($school->name);
@@ -95,6 +95,8 @@ class School extends Model
 
     /**
      * Get the active candidates count.
+     * This method explicitly counts only users with the 'candidate' role
+     * to ensure admins and inspectors don't count toward the limit.
      */
     public function activeCandidatesCount(): int
     {
@@ -102,11 +104,53 @@ class School extends Model
     }
 
     /**
+     * Update the current_active_candidate_count based on actual active candidates.
+     * 
+     * @return int The updated count
+     */
+    public function updateActiveCandidateCount(): int
+    {
+        $activeCount = $this->activeCandidatesCount();
+        $this->current_active_candidate_count = $activeCount;
+        $this->save();
+        
+        return $activeCount;
+    }
+
+    /**
      * Check if the school has capacity for more candidates.
+     * This method uses the live count of active candidates (not admins or inspectors)
+     * to ensure accurate enforcement of limits.
+     * 
+     * An extra slot (+1) is automatically added to the limit to provide buffer capacity.
+     * 
+     * @return bool
      */
     public function hasCapacity(): bool
     {
-        return $this->current_active_candidate_count < $this->candidate_limit;
+        $activeCount = $this->activeCandidatesCount();
+        
+        // Update the stored count if it doesn't match the actual count
+        if ($activeCount !== $this->current_active_candidate_count) {
+            $this->current_active_candidate_count = $activeCount;
+            $this->save();
+        }
+        
+        // Add 1 to the limit to provide an extra buffer slot
+        return $activeCount < ($this->candidate_limit + 1);
+    }
+
+    /**
+     * Get the remaining capacity for candidates.
+     * 
+     * An extra slot (+1) is automatically added to the limit to provide buffer capacity.
+     * 
+     * @return int
+     */
+    public function getRemainingCapacity(): int
+    {
+        $activeCount = $this->activeCandidatesCount();
+        return max(0, ($this->candidate_limit + 1) - $activeCount);
     }
 
     /**

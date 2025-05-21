@@ -188,6 +188,20 @@ class UserController extends Controller
         
         // Update approval status and active status if provided
         if (isset($validated['approval_status'])) {
+            // If changing to approved and user is a candidate, check school capacity
+            if ($validated['approval_status'] === 'approved' && 
+                $user->approval_status !== 'approved' && 
+                $user->isCandidate() && 
+                $user->school_id) {
+                
+                $school = \App\Models\School::find($user->school_id);
+                if ($school && !$school->hasCapacity()) {
+                    return redirect()->route('admin.users.edit', $user)
+                        ->with('error', 'Cannot approve candidate. School has reached its candidate limit. Please contact a super admin to increase the limit.')
+                        ->withInput();
+                }
+            }
+            
             $user->approval_status = $validated['approval_status'];
             
             // If status is changing to approved, set approved_at and approved_by
@@ -204,6 +218,16 @@ class UserController extends Controller
         
         // Update active status if provided
         if (isset($validated['is_active'])) {
+            // If activating a candidate, check school capacity
+            if ($validated['is_active'] && !$user->is_active && $user->isCandidate() && $user->school_id) {
+                $school = \App\Models\School::find($user->school_id);
+                if ($school && !$school->hasCapacity()) {
+                    return redirect()->route('admin.users.edit', $user)
+                        ->with('error', 'Cannot activate candidate. School has reached its candidate limit. Please contact a super admin to increase the limit.')
+                        ->withInput();
+                }
+            }
+            
             $user->is_active = $validated['is_active'];
         }
         
@@ -212,13 +236,19 @@ class UserController extends Controller
             $user->expires_at = $validated['expires_at'];
         }
         
+        // Update permissions if provided
+        if (isset($validated['permit_category_ids'])) {
+            $user->permitCategories()->sync($validated['permit_category_ids'] ?? []);
+        }
+        
         $user->save();
         
-        // Sync permit categories
-        if (isset($validated['permit_category_ids'])) {
-            $user->permitCategories()->sync($validated['permit_category_ids']);
-        } else {
-            $user->permitCategories()->detach();
+        // Update the school's active candidate count if this is a candidate
+        if ($user->isCandidate() && $user->school_id) {
+            $school = \App\Models\School::find($user->school_id);
+            if ($school) {
+                $school->updateActiveCandidateCount();
+            }
         }
         
         return redirect()->route('admin.users.index')
@@ -340,6 +370,16 @@ class UserController extends Controller
                 ->with('error', 'You do not have permission to approve users from other schools.');
         }
         
+        // Check if the user is a candidate and their school has capacity
+        if ($user->isCandidate() && $user->school_id) {
+            $school = \App\Models\School::find($user->school_id);
+            
+            if ($school && !$school->hasCapacity()) {
+                return redirect()->route('admin.users.index')
+                    ->with('error', 'Cannot approve candidate. School has reached its candidate limit. Please contact a super admin to increase the limit.');
+            }
+        }
+        
         $validated = $request->validate([
             'expiration_type' => ['required', 'in:none,days,date'],
             'expires_after' => ['nullable', 'integer', 'min:1', 'required_if:expiration_type,days'],
@@ -364,11 +404,18 @@ class UserController extends Controller
         
         $user->save();
         
+        // If this is a candidate and they were approved, update the school's active candidate count
+        if ($user->isCandidate() && $user->school_id) {
+            $school = \App\Models\School::find($user->school_id);
+            if ($school) {
+                $school->updateActiveCandidateCount();
+            }
+        }
+        
         // Here you can add code to send an approval notification email
         
         return redirect()->route('admin.users.index')
-            ->with('success', 'User has been approved successfully.' . 
-                ($user->expires_at ? ' Account will expire on ' . $user->expires_at->format('Y-m-d') : ''));
+            ->with('success', 'User approved successfully.');
     }
 
     /**

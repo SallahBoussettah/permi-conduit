@@ -21,6 +21,9 @@ class Kernel extends ConsoleKernel
         
         // Check for expired accounts daily at midnight
         $schedule->command('accounts:deactivate-expired')->daily();
+        
+        // Sync school active candidate counts daily at 1 AM
+        $schedule->command('schools:sync-candidate-counts')->dailyAt('01:00');
     }
 
     /**

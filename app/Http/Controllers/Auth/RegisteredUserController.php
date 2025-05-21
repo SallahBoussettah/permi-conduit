@@ -67,11 +67,17 @@ class RegisteredUserController extends Controller
         if ($request->role === 'candidate' && $request->filled('school_id')) {
             $school = \App\Models\School::find($request->school_id);
             
-            // Verify the school is active and has capacity
-            if ($school && $school->is_active && $school->hasCapacity()) {
+            // Only verify that the school is active (capacity will be checked during approval)
+            if ($school && $school->is_active) {
                 $userData['school_id'] = $school->id;
             } else {
-                $errorMessage = 'The selected school is unavailable or at capacity. Please choose another school.';
+                // Determine the specific error message
+                if ($school && !$school->is_active) {
+                    $errorMessage = 'The selected school is not currently accepting new registrations.';
+                } else {
+                    $errorMessage = 'The selected school is unavailable. Please choose another school.';
+                }
+                
                 return redirect()->back()->withErrors(['school_id' => $errorMessage])->withInput();
             }
         }

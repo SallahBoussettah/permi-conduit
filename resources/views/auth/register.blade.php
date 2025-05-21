@@ -69,6 +69,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Note: Your registration will be pending approval. Final approval depends on school capacity and administrator review.') }}</p>
                             @error('school_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror

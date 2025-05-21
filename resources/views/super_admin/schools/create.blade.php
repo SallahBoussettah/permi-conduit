@@ -138,7 +138,8 @@
                                 <input type="number" name="candidate_limit" id="candidate_limit" min="1" value="{{ old('candidate_limit', 50) }}" required 
                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             </div>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('Maximum number of candidates allowed for this school') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('Maximum number of candidates allowed for this school (admins and inspectors do not count toward this limit)') }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Note: The system automatically adds 1 extra slot to this limit as a buffer.') }}</p>
                         </div>
 
                         <div class="sm:col-span-3">

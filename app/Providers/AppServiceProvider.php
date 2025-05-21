@@ -34,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
         // Register the middleware
         $this->app['router']->aliasMiddleware('role', \App\Http\Middleware\CheckRole::class);
         $this->app['router']->aliasMiddleware('super_admin', \App\Http\Middleware\CheckSuperAdmin::class);
+        
+        // Register User model observers for tracking school candidate counts
+        \App\Models\User::observe(new \App\Observers\UserObserver());
     }
     
     /**

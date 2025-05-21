@@ -155,7 +155,7 @@
                                 <input type="number" name="candidate_limit" id="candidate_limit" min="1" value="{{ old('candidate_limit', $school->candidate_limit) }}" required 
                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             </div>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('Maximum number of candidates allowed for this school') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('Maximum number of candidates allowed for this school (admins and inspectors do not count toward this limit)') }}</p>
                             @if($school->candidates_count > 0)
                                 <div class="mt-1 text-sm text-gray-500">
                                     {{ __('Current candidates') }}: {{ $school->candidates_count }}

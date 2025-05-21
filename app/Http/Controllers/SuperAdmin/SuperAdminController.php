@@ -197,6 +197,10 @@ class SuperAdminController extends Controller
      */
     public function schoolAdmins(School $school)
     {
+        // Load the school with candidate counts
+        $school->loadCount(['candidates']);
+        $school->current_active_candidate_count = $school->activeCandidatesCount();
+        
         $admins = $school->admins()->paginate(10);
         return view('super_admin.schools.admins', compact('school', 'admins'));
     }
@@ -213,7 +217,7 @@ class SuperAdminController extends Controller
     }
     
     /**
-     * Store a newly created admin for a school.
+     * Store a newly created admin for the specified school.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\School  $school
@@ -227,8 +231,13 @@ class SuperAdminController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
         
-        // Get admin role ID
-        $adminRoleId = Role::where('name', 'admin')->first()->id;
+        // Get or create admin role
+        $adminRole = Role::where('name', 'admin')->first();
+        if (!$adminRole) {
+            // Create the admin role if it doesn't exist
+            $adminRole = Role::create(['name' => 'admin']);
+        }
+        $adminRoleId = $adminRole->id;
         
         // Create admin user
         $admin = User::create([
