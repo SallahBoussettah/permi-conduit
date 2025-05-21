@@ -12,10 +12,10 @@
                         {{ __('Super Administrator') }}
                     </div>
                     <h1 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-                        {{ __('Welcome back') }}, {{ Auth::user()->name }}!
+                        {{ __('Bonjour') }}, {{ Auth::user()->name }}!
                     </h1>
                     <p class="mt-3 max-w-md text-gray-300">
-                        {{ __('Manage your schools, admins, and system-wide settings from this central dashboard.') }}
+                        {{ __('Gérez vos écoles, administrateurs et paramètres système depuis ce tableau de bord central.') }}
                     </p>
                 </div>
                 <div class="md:w-1/3 flex justify-center p-8">
