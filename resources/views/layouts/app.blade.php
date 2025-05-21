@@ -13,23 +13,42 @@
 
         <!-- Load assets from manifest -->
         @php
+        // Check both possible manifest locations
         $manifestPath = public_path('build/manifest.json');
+        $viteManifestPath = public_path('build/.vite/manifest.json');
+        $manifest = null;
+        
         if (file_exists($manifestPath)) {
             $manifest = json_decode(file_get_contents($manifestPath), true);
-            $cssFile = isset($manifest['resources/css/app.css']['file']) ? 
-                '/build/assets/' . basename($manifest['resources/css/app.css']['file']) : 
-                null;
-            $jsFile = isset($manifest['resources/js/app.js']['file']) ? 
-                '/build/assets/' . basename($manifest['resources/js/app.js']['file']) : 
-                null;
+        } elseif (file_exists($viteManifestPath)) {
+            $manifest = json_decode(file_get_contents($viteManifestPath), true);
+        }
+        
+        $cssFile = null;
+        $jsFile = null;
+        
+        if ($manifest) {
+            // Check both possible CSS entry formats
+            if (isset($manifest['resources/css/app.css']['file'])) {
+                $cssFile = '/build/' . $manifest['resources/css/app.css']['file'];
+            } elseif (isset($manifest['resources/css/app.css'])) {
+                $cssFile = '/build/' . $manifest['resources/css/app.css'];
+            }
+            
+            // Check both possible JS entry formats
+            if (isset($manifest['resources/js/app.js']['file'])) {
+                $jsFile = '/build/' . $manifest['resources/js/app.js']['file'];
+            } elseif (isset($manifest['resources/js/app.js'])) {
+                $jsFile = '/build/' . $manifest['resources/js/app.js'];
+            }
         }
         @endphp
         
-        @if(isset($cssFile))
+        @if($cssFile)
         <link rel="stylesheet" href="{{ $cssFile }}">
         @endif
         
-        @if(isset($jsFile))
+        @if($jsFile)
         <script src="{{ $jsFile }}" defer></script>
         @endif
     </head>

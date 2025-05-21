@@ -6,6 +6,11 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
+            // Explicitly set the build path
+            publicDirectory: 'public',
+            buildDirectory: 'build',
+            // Force manifest to be in the build directory
+            manifest: true
         }),
     ],
     // Set the base URL for production assets
@@ -18,10 +23,21 @@ export default defineConfig({
         },
     },
     build: {
-        // Generate a manifest.json file for the build
+        // Ensure manifest is generated
         manifest: true,
-        // Output assets to the public/build directory
+        // Force the output directory
         outDir: 'public/build',
-        // Remove cssCodeSplit as it conflicts with having CSS in input files
+        // Make sure assets are in the correct path
+        assetsDir: 'assets',
+        // Clean the output directory before building
+        emptyOutDir: true,
+        rollupOptions: {
+            output: {
+                // Ensure proper asset naming
+                assetFileNames: 'assets/[name]-[hash][extname]',
+                chunkFileNames: 'assets/[name]-[hash].js',
+                entryFileNames: 'assets/[name]-[hash].js',
+            },
+        },
     },
 });
