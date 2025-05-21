@@ -11,23 +11,26 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
-        <!-- Fallback CSS in case Vite fails -->
+        <!-- Load assets from manifest -->
         @php
         $manifestPath = public_path('build/manifest.json');
-        $cssPath = '';
-        
         if (file_exists($manifestPath)) {
             $manifest = json_decode(file_get_contents($manifestPath), true);
-            if (isset($manifest['resources/css/app.css']['file'])) {
-                $cssPath = '/build/assets/' . basename($manifest['resources/css/app.css']['file']);
-            }
+            $cssFile = isset($manifest['resources/css/app.css']['file']) ? 
+                '/build/assets/' . basename($manifest['resources/css/app.css']['file']) : 
+                null;
+            $jsFile = isset($manifest['resources/js/app.js']['file']) ? 
+                '/build/assets/' . basename($manifest['resources/js/app.js']['file']) : 
+                null;
         }
         @endphp
-        @if($cssPath)
-        <link rel="stylesheet" href="{{ $cssPath }}">
+        
+        @if(isset($cssFile))
+        <link rel="stylesheet" href="{{ $cssFile }}">
+        @endif
+        
+        @if(isset($jsFile))
+        <script src="{{ $jsFile }}" defer></script>
         @endif
     </head>
     <body class="font-sans antialiased">

@@ -1,0 +1,57 @@
+<?php
+// Get the manifest file
+$manifestPath = __DIR__ . '/build/manifest.json';
+$cssFile = '';
+
+if (file_exists($manifestPath)) {
+    $manifest = json_decode(file_get_contents($manifestPath), true);
+    
+    // Get CSS file path
+    if (isset($manifest['resources/css/app.css']['file'])) {
+        $cssFile = '/build/assets/' . basename($manifest['resources/css/app.css']['file']);
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Test Page</title>
+    <?php if ($cssFile): ?>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($cssFile); ?>">
+    <?php else: ?>
+    <p style="color: red; font-weight: bold;">CSS FILE NOT FOUND IN MANIFEST!</p>
+    <?php endif; ?>
+</head>
+<body>
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-blue-600 mb-4">CSS Test Page</h1>
+        <p class="mb-4">If you can see this text styled with a blue heading and proper spacing, the CSS is working!</p>
+        
+        <div class="bg-gray-100 p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-2">Tailwind Classes Test</h2>
+            <p>This box should have a gray background, rounded corners, and a shadow.</p>
+        </div>
+        
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-red-100 p-4 rounded">Red Box</div>
+            <div class="bg-green-100 p-4 rounded">Green Box</div>
+            <div class="bg-blue-100 p-4 rounded">Blue Box</div>
+        </div>
+        
+        <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Test Button
+        </button>
+        
+        <div class="mt-8 p-4 border border-gray-300 rounded">
+            <h2 class="text-xl font-semibold mb-2">Debug Information</h2>
+            <p><strong>CSS File:</strong> <?php echo htmlspecialchars($cssFile ?: 'Not found'); ?></p>
+            <p><strong>Manifest Path:</strong> <?php echo htmlspecialchars($manifestPath); ?></p>
+            <p><strong>Manifest File Exists:</strong> <?php echo file_exists($manifestPath) ? 'Yes' : 'No'; ?></p>
+            <?php if (file_exists($manifestPath)): ?>
+            <p><strong>Manifest Contents:</strong></p>
+            <pre style="background-color: #f5f5f5; padding: 10px; overflow-x: auto;"><?php echo htmlspecialchars(file_get_contents($manifestPath)); ?></pre>
+            <?php endif; ?>
+        </div>
+    </div>
+</body>
+</html> 
