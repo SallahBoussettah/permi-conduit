@@ -17,6 +17,22 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Fallback CSS in case Vite fails -->
+    @php
+    $manifestPath = public_path('build/manifest.json');
+    $cssPath = '';
+    
+    if (file_exists($manifestPath)) {
+        $manifest = json_decode(file_get_contents($manifestPath), true);
+        if (isset($manifest['resources/css/app.css']['file'])) {
+            $cssPath = '/build/assets/' . basename($manifest['resources/css/app.css']['file']);
+        }
+    }
+    @endphp
+    @if($cssPath)
+    <link rel="stylesheet" href="{{ $cssPath }}">
+    @endif
 </head>
 <body class="font-sans antialiased bg-gray-50 text-gray-900">
     <header class="bg-gray-900 text-white fixed top-0 left-0 right-0 z-50">
@@ -27,30 +43,60 @@
                         <img src="{{ asset('images/logo.png') }}" alt="ECF Logo" class="h-10 w-auto">
                     </a>
                     <nav class="hidden md:ml-10 md:flex md:space-x-8">
-                        <a href="{{ route('home') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('home') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
-                            {{ __('app.home') }}
-                        </a>
-                        <a href="{{ route('contact') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('contact') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
-                            {{ __('app.contact') }}
-                        </a>
-                        @auth
-                            @if(Auth::user()->hasRole('candidate'))
-                                <a href="{{ route('candidate.courses.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('candidate.courses.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
-                                    {{ __('Courses') }}
+                        @if(!request()->routeIs('dashboard') && !Str::startsWith(request()->route()->getName(), 'admin.') && !Str::startsWith(request()->route()->getName(), 'inspector.') && !Str::startsWith(request()->route()->getName(), 'candidate.') && !Str::startsWith(request()->route()->getName(), 'super_admin.'))
+                            <a href="{{ route('home') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('home') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                {{ __('app.home') }}
+                            </a>
+                            <a href="{{ route('contact') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('contact') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                {{ __('app.contact') }}
+                            </a>
+                            @auth
+                                <a href="{{ route('dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('dashboard') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                    {{ __('app.dashboard') }}
                                 </a>
-                            @elseif(Auth::user()->hasRole('inspector'))
-                                <a href="{{ route('inspector.courses.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('inspector.courses.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
-                                    {{ __('Gérer les cours') }}
-                                </a>
-                            @elseif(Auth::user()->hasRole('admin'))
-                                <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.users.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
-                                    {{ __('User Management') }}
-                                </a>
-                                <a href="{{ route('admin.permit-categories.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.permit-categories.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
-                                    {{ __('Permit Categories') }}
-                                </a>
-                            @endif
-                        @endauth
+                            @endauth
+                        @else
+                            @auth
+                                @if(Auth::user()->hasRole('candidate'))
+                                    <a href="{{ route('candidate.courses.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('candidate.courses.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Courses') }}
+                                    </a>
+                                    <a href="{{ route('candidate.qcm-exams.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('candidate.qcm-exams.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('QCM Exams') }}
+                                    </a>
+                                @elseif(Auth::user()->hasRole('inspector'))
+                                    <a href="{{ route('inspector.courses.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('inspector.courses.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Gérer les cours') }}
+                                    </a>
+                                    <a href="{{ route('inspector.qcm-papers.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('inspector.qcm-papers.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Gérer QCM') }}
+                                    </a>
+                                    <a href="{{ route('inspector.permit-categories.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('inspector.permit-categories.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Permit Categories') }}
+                                    </a>
+                                @elseif(Auth::user()->hasRole('admin'))
+                                    <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.users.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('User Management') }}
+                                    </a>
+                                    <a href="{{ route('admin.inspectors') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.inspectors') || request()->routeIs('admin.register.inspector') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Inspectors') }}
+                                    </a>
+                                    <a href="{{ route('admin.qcm-reports.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.qcm-reports.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('QCM Reports') }}
+                                    </a>
+                                    <a href="{{ route('admin.permit-categories.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.permit-categories.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Permit Categories') }}
+                                    </a>
+                                @elseif(Auth::user()->hasRole('super_admin'))
+                                    <a href="{{ route('super_admin.dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('super_admin.dashboard') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Dashboard') }}
+                                    </a>
+                                    <a href="{{ route('super_admin.schools') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('super_admin.schools*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Schools') }}
+                                    </a>
+                                @endif
+                            @endauth
+                        @endif
                     </nav>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -87,23 +133,47 @@
                                     </svg>
                                 </button>
                                 <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        {{ __('app.dashboard') }}
-                                    </a>
+                                    @if(!request()->routeIs('dashboard') && !Str::startsWith(request()->route()->getName(), 'admin.') && !Str::startsWith(request()->route()->getName(), 'inspector.') && !Str::startsWith(request()->route()->getName(), 'candidate.') && !Str::startsWith(request()->route()->getName(), 'super_admin.'))
+                                        <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('app.dashboard') }}
+                                        </a>
+                                    @endif
                                     @if(Auth::user()->hasRole('candidate'))
                                         <a href="{{ route('candidate.courses.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('My Courses') }}
+                                        </a>
+                                        <a href="{{ route('candidate.qcm-exams.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('QCM Exams') }}
                                         </a>
                                     @elseif(Auth::user()->hasRole('inspector'))
                                         <a href="{{ route('inspector.courses.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('Gérer les cours') }}
                                         </a>
+                                        <a href="{{ route('inspector.qcm-papers.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Gérer QCM') }}
+                                        </a>
+                                        <a href="{{ route('inspector.permit-categories.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Permit Categories') }}
+                                        </a>
                                     @elseif(Auth::user()->hasRole('admin'))
                                         <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('User Management') }}
                                         </a>
+                                        <a href="{{ route('admin.inspectors') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Inspectors') }}
+                                        </a>
+                                        <a href="{{ route('admin.qcm-reports.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('QCM Reports') }}
+                                        </a>
                                         <a href="{{ route('admin.permit-categories.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('Permit Categories') }}
+                                        </a>
+                                    @elseif(Auth::user()->hasRole('super_admin'))
+                                        <a href="{{ route('super_admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Dashboard') }}
+                                        </a>
+                                        <a href="{{ route('super_admin.schools') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Schools') }}
                                         </a>
                                     @endif
                                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -129,39 +199,63 @@
         <!-- Mobile menu, show/hide based on menu state -->
         <div id="mobile-menu" class="hidden md:hidden absolute w-full bg-gray-900 shadow-lg">
             <div class="pt-2 pb-3 space-y-1">
-                <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                    {{ __('app.home') }}
-                </a>
-                <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                    {{ __('app.contact') }}
-                </a>
-                @auth
-                    @if(Auth::user()->hasRole('candidate'))
-                        <a href="{{ route('candidate.courses.index') }}" class="{{ request()->routeIs('candidate.courses.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            {{ __('Courses') }}
-                        </a>
-                    @elseif(Auth::user()->hasRole('inspector'))
-                        <a href="{{ route('inspector.courses.index') }}" class="{{ request()->routeIs('inspector.courses.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            {{ __('Gérer les cours') }}
-                        </a>
-                        <a href="{{ route('inspector.permit-categories.index') }}" class="{{ request()->routeIs('inspector.permit-categories.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            {{ __('Permit Categories') }}
-                        </a>
-                    @elseif(Auth::user()->hasRole('admin'))
-                        <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            {{ __('User Management') }}
-                        </a>
-                        <a href="{{ route('admin.permit-categories.index') }}" class="{{ request()->routeIs('admin.permit-categories.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            {{ __('Permit Categories') }}
-                        </a>
-                    @endif
-                    <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                        {{ __('app.dashboard') }}
+                @if(!request()->routeIs('dashboard') && !Str::startsWith(request()->route()->getName(), 'admin.') && !Str::startsWith(request()->route()->getName(), 'inspector.') && !Str::startsWith(request()->route()->getName(), 'candidate.') && !Str::startsWith(request()->route()->getName(), 'super_admin.'))
+                    <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        {{ __('app.home') }}
                     </a>
-                    <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                        {{ __('app.profile') }}
+                    <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                        {{ __('app.contact') }}
                     </a>
-                @endauth
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                            {{ __('app.dashboard') }}
+                        </a>
+                    @endauth
+                @else
+                    @auth
+                        @if(Auth::user()->hasRole('candidate'))
+                            <a href="{{ route('candidate.courses.index') }}" class="{{ request()->routeIs('candidate.courses.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Courses') }}
+                            </a>
+                            <a href="{{ route('candidate.qcm-exams.index') }}" class="{{ request()->routeIs('candidate.qcm-exams.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('QCM Exams') }}
+                            </a>
+                        @elseif(Auth::user()->hasRole('inspector'))
+                            <a href="{{ route('inspector.courses.index') }}" class="{{ request()->routeIs('inspector.courses.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Gérer les cours') }}
+                            </a>
+                            <a href="{{ route('inspector.qcm-papers.index') }}" class="{{ request()->routeIs('inspector.qcm-papers.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Gérer QCM') }}
+                            </a>
+                            <a href="{{ route('inspector.permit-categories.index') }}" class="{{ request()->routeIs('inspector.permit-categories.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Permit Categories') }}
+                            </a>
+                        @elseif(Auth::user()->hasRole('admin'))
+                            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('User Management') }}
+                            </a>
+                            <a href="{{ route('admin.inspectors') }}" class="{{ request()->routeIs('admin.inspectors') || request()->routeIs('admin.register.inspector') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Inspectors') }}
+                            </a>
+                            <a href="{{ route('admin.qcm-reports.index') }}" class="{{ request()->routeIs('admin.qcm-reports.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('QCM Reports') }}
+                            </a>
+                            <a href="{{ route('admin.permit-categories.index') }}" class="{{ request()->routeIs('admin.permit-categories.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Permit Categories') }}
+                            </a>
+                        @elseif(Auth::user()->hasRole('super_admin'))
+                            <a href="{{ route('super_admin.dashboard') }}" class="{{ request()->routeIs('super_admin.dashboard') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Dashboard') }}
+                            </a>
+                            <a href="{{ route('super_admin.schools') }}" class="{{ request()->routeIs('super_admin.schools*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Schools') }}
+                            </a>
+                        @endif
+                        <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                            {{ __('app.profile') }}
+                        </a>
+                    @endauth
+                @endif
             </div>
             <div class="pt-2 pb-3 border-t border-gray-700">
                 <!-- Language options in mobile menu -->

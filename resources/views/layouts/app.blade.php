@@ -13,6 +13,22 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Fallback CSS in case Vite fails -->
+        @php
+        $manifestPath = public_path('build/manifest.json');
+        $cssPath = '';
+        
+        if (file_exists($manifestPath)) {
+            $manifest = json_decode(file_get_contents($manifestPath), true);
+            if (isset($manifest['resources/css/app.css']['file'])) {
+                $cssPath = '/build/assets/' . basename($manifest['resources/css/app.css']['file']);
+            }
+        }
+        @endphp
+        @if($cssPath)
+        <link rel="stylesheet" href="{{ $cssPath }}">
+        @endif
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
