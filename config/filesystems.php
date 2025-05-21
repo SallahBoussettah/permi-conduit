@@ -32,10 +32,8 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app/private'),
-            'serve' => true,
+            'root' => storage_path('app'),
             'throw' => false,
-            'report' => false,
         ],
 
         'public' => [
@@ -44,7 +42,6 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
-            'report' => false,
         ],
 
         's3' => [
@@ -57,7 +54,6 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
-            'report' => false,
         ],
 
     ],
@@ -68,13 +64,27 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may configure the symbolic links that will be created when the
-    | `storage:link` Artisan command is executed. The array keys should be
-    | the locations of the links and the values should be their targets.
+    | `storage:link` command is executed. The array keys should be the locations
+    | of the links and the values should be their targets.
     |
     */
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Max Upload File Size
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the maximum file size that can be uploaded through
+    | the application. This is separate from the PHP settings and provides
+    | an additional layer of validation.
+    |
+    */
+    
+    'max_upload_size' => env('UPLOAD_MAX_FILESIZE', '40M'),
+    'max_post_size' => env('POST_MAX_SIZE', '40M'),
 
 ];

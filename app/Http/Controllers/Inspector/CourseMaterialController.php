@@ -38,17 +38,69 @@ class CourseMaterialController extends Controller
      */
     public function store(Request $request, Course $course)
     {
+        // Debug upload information 
+        Log::info('Audio upload attempt - UPDATED METHOD', [
+            'POST size' => $request->header('Content-Length'),
+            'Max allowed' => $this->returnBytes(ini_get('post_max_size')),
+            'Upload max filesize' => ini_get('upload_max_filesize'),
+            'Laravel config filesize' => config('filesystems.max_upload_size', '40M'),
+            'Request has audio_file' => $request->hasFile('audio_file'),
+            'Request all files' => $request->allFiles(),
+            'Request method' => $request->method()
+        ]);
+
+        // Enhanced error checking for audio files
+        if ($request->material_type === 'audio') {
+            if (!$request->hasFile('audio_file')) {
+                Log::error('Audio file missing from request', [
+                    'request_files' => $request->files->all(),
+                    'post_data_keys' => array_keys($request->post()),
+                    'content_length' => $request->header('Content-Length')
+                ]);
+                
+                return redirect()->back()
+                    ->withErrors(['audio_file' => 'No audio file was found in the request. This could be due to file size exceeding server limits.'])
+                    ->withInput();
+            }
+            
+            $audioFile = $request->file('audio_file');
+            
+            if (!$audioFile->isValid()) {
+                $errorMessage = $this->getUploadErrorMessage($audioFile->getError());
+                Log::error('Invalid audio file upload', [
+                    'error_code' => $audioFile->getError(),
+                    'error_message' => $errorMessage
+                ]);
+                
+                return redirect()->back()
+                    ->withErrors(['audio_file' => 'Audio file upload failed: ' . $errorMessage])
+                    ->withInput();
+            }
+            
+            // Enhanced logging for file details
+            Log::info('Audio file details before validation', [
+                'original_name' => $audioFile->getClientOriginalName(),
+                'size' => $audioFile->getSize(),
+                'size_in_mb' => round($audioFile->getSize() / (1024 * 1024), 2) . 'MB',
+                'mime_type' => $audioFile->getMimeType()
+            ]);
+        }
+
         // Define validation rules based on material type
         $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'material_type' => 'required|in:pdf,video',
+            'material_type' => 'required|in:pdf,video,audio',
         ];
 
         // Add specific rules based on material type
         if ($request->material_type === 'pdf') {
             $rules['pdf_file'] = 'required|file|mimes:pdf|max:10240'; // 10MB max
             $rules['thumbnail'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048'; // 2MB max
+        } else if ($request->material_type === 'audio') {
+            // Using broader validation to accept more audio types
+            $rules['audio_file'] = 'required|file|max:41000'; // 40MB max
+            $rules['audio_thumbnail'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048'; // 2MB max
         } else { // video
             $rules['video_url'] = 'required|url';
             $rules['video_thumbnail'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048'; // 2MB max
@@ -65,6 +117,21 @@ class CourseMaterialController extends Controller
                 }
             }
         });
+
+        // Get the current PHP upload limit in bytes
+        $maxUploadSize = $this->getMaxUploadSize();
+        
+        // Directly check the size of the audio file if it exists
+        if ($request->material_type === 'audio' && $request->hasFile('audio_file')) {
+            $audioFile = $request->file('audio_file');
+            
+            if ($audioFile->getSize() > $maxUploadSize) {
+                $maxUploadSizeMB = round($maxUploadSize / (1024 * 1024), 1);
+                return redirect()->back()
+                    ->withErrors(['audio_file' => "The audio file exceeds the maximum upload size of {$maxUploadSizeMB}MB. Please choose a smaller file."])
+                    ->withInput();
+            }
+        }
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -114,6 +181,103 @@ class CourseMaterialController extends Controller
             } else {
                 return redirect()->back()
                     ->withErrors(['pdf_file' => 'Failed to upload PDF file.'])
+                    ->withInput();
+            }
+        } else if ($request->material_type === 'audio') {
+            // Handle audio file upload
+            if ($request->hasFile('audio_file')) {
+                try {
+                    $audio = $request->file('audio_file');
+                    
+                    // Detailed debug info
+                    Log::info('Audio file details', [
+                        'original_name' => $audio->getClientOriginalName(),
+                        'mime_type' => $audio->getMimeType(),
+                        'size' => $audio->getSize(),
+                        'size_in_mb' => round($audio->getSize() / (1024 * 1024), 2) . 'MB',
+                        'is_valid' => $audio->isValid(),
+                        'error' => $audio->getError(),
+                        'error_message' => $this->getUploadErrorMessage($audio->getError())
+                    ]);
+
+                    // Check the file error code
+                    if ($audio->getError() !== UPLOAD_ERR_OK) {
+                        throw new \Exception('File upload error: ' . $this->getUploadErrorMessage($audio->getError()));
+                    }
+                    
+                    // Make sure the file is valid
+                    if (!$audio->isValid()) {
+                        throw new \Exception('Invalid audio file upload: Error code ' . $audio->getError());
+                    }
+                    
+                    $audioName = time() . '_' . Str::slug($request->title) . '.' . $audio->getClientOriginalExtension();
+                    
+                    // Make sure the audio directory exists
+                    $audioDir = storage_path('app/public/audio');
+                    if (!file_exists($audioDir)) {
+                        mkdir($audioDir, 0755, true);
+                        Log::info('Created audio directory: ' . $audioDir);
+                    }
+                    
+                    // Check directory permissions
+                    Log::info('Directory permissions check', [
+                        'audio_dir' => $audioDir,
+                        'exists' => file_exists($audioDir),
+                        'is_writable' => is_writable($audioDir)
+                    ]);
+                    
+                    // Store the file
+                    Log::info('Attempting to store audio file', [
+                        'path' => 'public/audio/' . $audioName,
+                        'disk' => config('filesystems.default')
+                    ]);
+                    
+                    $path = $audio->storeAs('public/audio', $audioName);
+                    if (!$path) {
+                        throw new \Exception('Failed to store audio file. Check storage permissions.');
+                    }
+                    
+                    Log::info('Audio file stored successfully at: ' . $path);
+                    
+                    // Get audio duration if possible (this would require a library like getID3)
+                    $durationSeconds = null;
+                    
+                    // Generate thumbnail or use custom thumbnail
+                    $thumbnailPath = null;
+                    if ($request->hasFile('audio_thumbnail')) {
+                        $thumbnail = $request->file('audio_thumbnail');
+                        $thumbnailName = time() . '_' . Str::slug($request->title) . '.' . $thumbnail->getClientOriginalExtension();
+                        $thumbnail->storeAs('public/thumbnails', $thumbnailName);
+                        $thumbnailPath = 'thumbnails/' . $thumbnailName;
+                    } else {
+                        // Use a default audio thumbnail
+                        $thumbnailPath = 'thumbnails/default_audio.jpg';
+                        
+                        // Make sure the default thumbnail exists
+                        $defaultThumbPath = storage_path('app/public/' . $thumbnailPath);
+                        if (!file_exists($defaultThumbPath)) {
+                            // Create a simple audio icon
+                            $this->createDefaultAudioThumbnail($defaultThumbPath);
+                        }
+                    }
+    
+                    // Set audio-specific data
+                    $materialData['material_type'] = 'audio';
+                    $materialData['content_path_or_url'] = $audioName;
+                    $materialData['thumbnail_path'] = $thumbnailPath;
+                    $materialData['duration_seconds'] = $durationSeconds;
+                } catch (\Exception $e) {
+                    Log::error('Audio file upload failed: ' . $e->getMessage(), [
+                        'exception' => $e,
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    return redirect()->back()
+                        ->withErrors(['audio_file' => 'Failed to upload audio file: ' . $e->getMessage()])
+                        ->withInput();
+                }
+            } else {
+                return redirect()->back()
+                    ->withErrors(['audio_file' => 'No audio file was selected for upload.'])
                     ->withInput();
             }
         } else { // video
@@ -320,13 +484,16 @@ class CourseMaterialController extends Controller
         $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'material_type' => 'required|in:pdf,video',
+            'material_type' => 'required|in:pdf,video,audio',
             'custom_thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // 2MB max
         ];
 
         // Add specific validation rules based on material type
         if ($request->material_type === 'pdf') {
             $rules['pdf_file'] = 'nullable|file|mimes:pdf|max:10240'; // 10MB max
+        } else if ($request->material_type === 'audio') {
+            // Using broader validation for audio files
+            $rules['audio_file'] = 'nullable|file|max:40960'; // 40MB max
         } else { // video
             $rules['video_url'] = 'required|url';
         }
@@ -342,6 +509,21 @@ class CourseMaterialController extends Controller
                 }
             }
         });
+        
+        // Get the current PHP upload limit in bytes
+        $maxUploadSize = $this->getMaxUploadSize();
+        
+        // Directly check the size of the audio file if it exists
+        if ($request->material_type === 'audio' && $request->hasFile('audio_file')) {
+            $audioFile = $request->file('audio_file');
+            
+            if ($audioFile->getSize() > $maxUploadSize) {
+                $maxUploadSizeMB = round($maxUploadSize / (1024 * 1024), 1);
+                return redirect()->back()
+                    ->withErrors(['audio_file' => "The audio file exceeds the maximum upload size of {$maxUploadSizeMB}MB. Please choose a smaller file."])
+                    ->withInput();
+            }
+        }
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -381,6 +563,53 @@ class CourseMaterialController extends Controller
                     
                     // Generate new thumbnail
                     $material->thumbnail_path = $this->generatePdfThumbnail($pdf->path(), $request->title);
+                }
+            }
+        } else if ($request->material_type === 'audio') {
+            // Replace audio file if provided
+            if ($request->hasFile('audio_file')) {
+                // Delete old audio file
+                if ($material->content_path_or_url) {
+                    Storage::delete('public/audio/' . $material->content_path_or_url);
+                }
+                
+                // Upload new audio file
+                $audio = $request->file('audio_file');
+                $audioName = time() . '_' . Str::slug($request->title) . '.' . $audio->getClientOriginalExtension();
+                
+                // Make sure the audio directory exists
+                $audioDir = storage_path('app/public/audio');
+                if (!file_exists($audioDir)) {
+                    mkdir($audioDir, 0755, true);
+                }
+                
+                $audio->storeAs('public/audio', $audioName);
+                
+                // Update audio-related fields
+                $material->content_path_or_url = $audioName;
+                
+                // Get audio duration if possible (this would require a library like getID3)
+                $durationSeconds = null;
+                $material->duration_seconds = $durationSeconds;
+                
+                // Update thumbnail only if not provided by user
+                if (!$request->hasFile('custom_thumbnail')) {
+                    // Delete old thumbnail
+                    if ($material->thumbnail_path) {
+                        Storage::delete('public/' . $material->thumbnail_path);
+                    }
+                    
+                    // Use a default audio thumbnail
+                    $thumbnailPath = 'thumbnails/default_audio.jpg';
+                    
+                    // Make sure the default thumbnail exists
+                    $defaultThumbPath = storage_path('app/public/' . $thumbnailPath);
+                    if (!file_exists($defaultThumbPath)) {
+                        // Create a simple audio icon
+                        $this->createDefaultAudioThumbnail($defaultThumbPath);
+                    }
+                    
+                    $material->thumbnail_path = $thumbnailPath;
                 }
             }
         } else { // video
@@ -453,14 +682,17 @@ class CourseMaterialController extends Controller
      */
     public function destroy(Course $course, CourseMaterial $material)
     {
-        // Delete PDF file
-        if ($material->content_path_or_url) {
-            Storage::delete('public/pdfs/' . basename($material->content_path_or_url));
+        // Delete the relevant file based on material type
+        if ($material->material_type === 'pdf' && $material->content_path_or_url) {
+            Storage::delete('public/pdfs/' . $material->content_path_or_url);
+        } else if ($material->material_type === 'audio' && $material->content_path_or_url) {
+            Storage::delete('public/audio/' . $material->content_path_or_url);
         }
+        // For video type, there's no file to delete as we only store the YouTube ID
         
         // Delete thumbnail
         if ($material->thumbnail_path) {
-            Storage::delete('public/thumbnails/' . basename($material->thumbnail_path));
+            Storage::delete('public/' . $material->thumbnail_path);
         }
         
         // Delete the material
@@ -522,5 +754,153 @@ class CourseMaterialController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $material->title . '.pdf"',
         ]);
+    }
+
+    /**
+     * Serve audio file.
+     *
+     * @param  \App\Models\Course  $course
+     * @param  \App\Models\CourseMaterial  $material
+     * @return \Illuminate\Http\Response
+     */
+    public function serveAudio(Course $course, CourseMaterial $material)
+    {
+        // Check if file exists
+        $filePath = 'public/audio/' . $material->content_path_or_url;
+        
+        if (!Storage::exists($filePath)) {
+            abort(404, 'Audio file not found');
+        }
+        
+        // Get the file
+        $file = Storage::path($filePath);
+        $type = mime_content_type($file);
+        
+        // Return as a streaming download
+        return response()->file($file, [
+            'Content-Type' => $type,
+            'Content-Disposition' => 'inline; filename="' . $material->title . '"',
+        ]);
+    }
+
+    /**
+     * Create a default audio thumbnail image.
+     */
+    private function createDefaultAudioThumbnail($path)
+    {
+        try {
+            // Create a simple audio icon image
+            $width = 300;
+            $height = 300;
+            $image = imagecreatetruecolor($width, $height);
+            
+            // Set background color (light gray)
+            $bgColor = imagecolorallocate($image, 240, 240, 240);
+            imagefill($image, 0, 0, $bgColor);
+            
+            // Set colors for audio icon
+            $iconColor = imagecolorallocate($image, 235, 180, 50); // Yellow/Gold
+            $textColor = imagecolorallocate($image, 70, 70, 70); // Dark gray
+            
+            // Draw a circle for audio icon
+            $centerX = $width / 2;
+            $centerY = $height / 2;
+            $radius = min($width, $height) * 0.3;
+            imagefilledellipse($image, $centerX, $centerY, $radius * 2, $radius * 2, $iconColor);
+            
+            // Draw inner circle (to make it look like a speaker or note)
+            imagefilledellipse($image, $centerX, $centerY, $radius, $radius, $bgColor);
+            
+            // Draw audio wave lines
+            $lineColor = imagecolorallocate($image, 70, 70, 70);
+            $waveWidth = $radius * 1.2;
+            $waveHeight = $radius * 0.8;
+            
+            // Draw three wave lines
+            for ($i = 0; $i < 3; $i++) {
+                $xOffset = $centerX + ($i - 1) * ($waveWidth / 4);
+                imagesetthickness($image, 3);
+                imageline($image, $xOffset, $centerY - $waveHeight/2, $xOffset, $centerY + $waveHeight/2, $lineColor);
+            }
+            
+            // Add "AUDIO" text
+            imagestring($image, 5, $width/2 - 25, $height/2 + $radius + 20, "AUDIO", $textColor);
+            
+            // Create directory if needed
+            if (!file_exists(dirname($path))) {
+                mkdir(dirname($path), 0755, true);
+            }
+            
+            // Save the image as JPEG (better for thumbnails)
+            imagejpeg($image, $path, 90);
+            imagedestroy($image);
+            
+            Log::info('Default audio thumbnail created at ' . $path);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Default audio thumbnail creation failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get the maximum upload size allowed by PHP configuration
+     * @return int Maximum upload size in bytes
+     */
+    private function getMaxUploadSize()
+    {
+        // Get PHP's upload_max_filesize and post_max_size in bytes
+        $uploadMaxFilesize = $this->returnBytes(ini_get('upload_max_filesize'));
+        $postMaxSize = $this->returnBytes(ini_get('post_max_size'));
+        
+        // The smaller of the two values
+        return min($uploadMaxFilesize, $postMaxSize);
+    }
+    
+    /**
+     * Convert a PHP ini value to bytes
+     * @param string $val Value from ini_get (e.g. "2M", "8M")
+     * @return int Value in bytes
+     */
+    private function returnBytes($val)
+    {
+        $val = trim($val);
+        $last = strtolower($val[strlen($val)-1]);
+        $val = (int)$val;
+        
+        switch($last) {
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+        
+        return $val;
+    }
+
+    /**
+     * Get a human-readable error message for upload error codes
+     */
+    private function getUploadErrorMessage($errorCode) {
+        switch ($errorCode) {
+            case UPLOAD_ERR_INI_SIZE:
+                return 'The uploaded file exceeds the upload_max_filesize directive in php.ini';
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form';
+            case UPLOAD_ERR_PARTIAL:
+                return 'The uploaded file was only partially uploaded';
+            case UPLOAD_ERR_NO_FILE:
+                return 'No file was uploaded';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Missing a temporary folder';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Failed to write file to disk';
+            case UPLOAD_ERR_EXTENSION:
+                return 'A PHP extension stopped the file upload';
+            default:
+                return 'Unknown upload error';
+        }
     }
 }

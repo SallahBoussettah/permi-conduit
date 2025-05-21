@@ -52,6 +52,14 @@
                                         {{ __('YouTube Video') }}
                                     </span>
                                     <p class="mt-1 text-xs text-gray-500">{{ __('Material type cannot be changed after creation.') }}</p>
+                                @elseif($material->material_type === 'audio')
+                                    <span class="inline-flex items-center">
+                                        <svg class="mr-1 h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        {{ __('Audio File') }}
+                                    </span>
+                                    <p class="mt-1 text-xs text-gray-500">{{ __('Material type cannot be changed after creation.') }}</p>
                                 @else
                                     <span class="inline-flex items-center">
                                         <svg class="mr-1 h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
@@ -83,6 +91,34 @@
                                 <input type="file" name="pdf_file" id="pdf_file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" accept="application/pdf">
                             </div>
                             <p class="mt-1 text-sm text-gray-500">{{ __('Leave empty to keep current file. Maximum size: 10MB') }}</p>
+                        </div>
+                        @elseif($material->material_type === 'audio')
+                        <!-- Current Audio File -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">{{ __('Current Audio File') }}</label>
+                            <div class="mt-1 text-sm text-gray-700">
+                                {{ $material->content_path_or_url }}
+                            </div>
+                        </div>
+
+                        <!-- Audio Preview -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Current Audio Preview') }}</label>
+                            <div class="bg-gray-100 rounded-lg p-4">
+                                <audio controls class="w-full">
+                                    <source src="{{ route('inspector.courses.materials.audio', ['course' => $course, 'material' => $material]) }}" type="audio/mpeg">
+                                    {{ __('Your browser does not support the audio element.') }}
+                                </audio>
+                            </div>
+                        </div>
+
+                        <!-- Upload New Audio -->
+                        <div>
+                            <label for="audio_file" class="block text-sm font-medium text-gray-700">{{ __('Replace Audio File (Optional)') }}</label>
+                            <div class="mt-1 flex items-center">
+                                <input type="file" name="audio_file" id="audio_file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" accept="audio/mp3,audio/wav,audio/ogg,audio/mpeg">
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Leave empty to keep current file. Maximum size: 20MB') }}</p>
                         </div>
                         @else
                         <!-- YouTube Video URL -->

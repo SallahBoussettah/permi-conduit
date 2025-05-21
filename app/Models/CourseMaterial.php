@@ -26,6 +26,7 @@ class CourseMaterial extends Model
         'thumbnail_path',
         'page_count',
         'sequence_order',
+        'duration_seconds',
     ];
 
     /**

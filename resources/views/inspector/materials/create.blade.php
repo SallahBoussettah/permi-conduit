@@ -23,9 +23,26 @@
                 </div>
                 @endif
 
-                <form action="{{ route('inspector.courses.materials.store', $course) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('inspector.courses.materials.store', $course) }}" method="POST" enctype="multipart/form-data" id="materialForm">
                     @csrf
                     
+                    <!-- Hidden field for maximum file size -->
+                    <input type="hidden" name="MAX_FILE_SIZE" value="41943040">
+                    
+                    @if ($errors->any())
+                    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        <ul class="list-disc pl-5">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+                    
+                    <div id="uploadError" class="hidden mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                        <p id="errorMessage"></p>
+                    </div>
+
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Title -->
                         <div>
@@ -50,6 +67,10 @@
                                 <div class="flex items-center">
                                     <input type="radio" name="material_type" id="type_video" value="video" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
                                     <label for="type_video" class="ml-2 block text-sm text-gray-700">{{ __('YouTube Video') }}</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="material_type" id="type_audio" value="audio" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                    <label for="type_audio" class="ml-2 block text-sm text-gray-700">{{ __('Audio File') }}</label>
                                 </div>
                             </div>
                         </div>
@@ -92,6 +113,34 @@
                             </div>
                         </div>
 
+                        <!-- Audio File (shown when Audio type is selected) -->
+                        <div id="audio_section" class="hidden">
+                            <div>
+                                <label for="audio_file" class="block text-sm font-medium text-gray-700">{{ __('Audio File') }} <span class="text-green-600 font-bold">(Max: 40MB)</span></label>
+                                <div class="mt-1 flex items-center">
+                                    <input type="file" name="audio_file" id="audio_file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" accept="audio/*">
+                                </div>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Acceptable formats: MP3, WAV, OGG, etc. Maximum file size is 40MB.') }}</p>
+                                @error('audio_file')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Upload size warning -->
+                            <div id="uploadError" class="mt-4 p-3 bg-red-100 text-red-700 border border-red-400 rounded-md hidden">
+                                <p id="errorMessage" class="text-sm font-medium"></p>
+                            </div>
+
+                            <!-- Thumbnail Image for Audio -->
+                            <div class="mt-4">
+                                <label for="audio_thumbnail" class="block text-sm font-medium text-gray-700">{{ __('Thumbnail Image (Optional)') }}</label>
+                                <div class="mt-1 flex items-center">
+                                    <input type="file" name="audio_thumbnail" id="audio_thumbnail" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" accept="image/*">
+                                </div>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('If not provided, a default audio thumbnail will be used.') }}</p>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end pt-6">
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
                                 {{ __('Upload Material') }}
@@ -104,28 +153,64 @@
     </div>
 
     <script>
-        // Toggle visibility of PDF and Video sections based on material type selection
+        // Toggle visibility of PDF, Video, and Audio sections based on material type selection
         document.addEventListener('DOMContentLoaded', function() {
             const pdfRadio = document.getElementById('type_pdf');
             const videoRadio = document.getElementById('type_video');
+            const audioRadio = document.getElementById('type_audio');
             const pdfSection = document.getElementById('pdf_section');
             const videoSection = document.getElementById('video_section');
+            const audioSection = document.getElementById('audio_section');
             const pdfFileInput = document.getElementById('pdf_file');
             const videoUrlInput = document.getElementById('video_url');
+            const audioFileInput = document.getElementById('audio_file');
+            const form = document.getElementById('materialForm');
+            const uploadError = document.getElementById('uploadError');
+            const errorMessage = document.getElementById('errorMessage');
 
             function toggleSections() {
                 if (pdfRadio.checked) {
                     pdfSection.classList.remove('hidden');
                     videoSection.classList.add('hidden');
+                    audioSection.classList.add('hidden');
                     pdfFileInput.setAttribute('required', 'required');
                     videoUrlInput.removeAttribute('required');
-                } else {
+                    audioFileInput.removeAttribute('required');
+                } else if (videoRadio.checked) {
                     pdfSection.classList.add('hidden');
                     videoSection.classList.remove('hidden');
+                    audioSection.classList.add('hidden');
                     pdfFileInput.removeAttribute('required');
                     videoUrlInput.setAttribute('required', 'required');
+                    audioFileInput.removeAttribute('required');
+                } else if (audioRadio.checked) {
+                    pdfSection.classList.add('hidden');
+                    videoSection.classList.add('hidden');
+                    audioSection.classList.remove('hidden');
+                    pdfFileInput.removeAttribute('required');
+                    videoUrlInput.removeAttribute('required');
+                    audioFileInput.setAttribute('required', 'required');
                 }
             }
+
+            // Check file size before submission
+            form.addEventListener('submit', function(e) {
+                if (audioRadio.checked && audioFileInput.files.length > 0) {
+                    const file = audioFileInput.files[0];
+                    console.log('Audio file selected:', file.name, 'Size:', file.size);
+                    
+                    // Convert to MB for easier comparison (1MB = 1,048,576 bytes)
+                    const fileSizeMB = file.size / 1048576;
+                    
+                    // Check against PHP's upload_max_filesize (40MB from our setting)
+                    if (fileSizeMB > 40) {
+                        e.preventDefault();
+                        uploadError.classList.remove('hidden');
+                        errorMessage.textContent = `File is too large (${fileSizeMB.toFixed(2)}MB). Maximum allowed size is 40MB. Please choose a smaller file.`;
+                        return false;
+                    }
+                }
+            });
 
             // Initial toggle
             toggleSections();
@@ -133,29 +218,28 @@
             // Add event listeners
             pdfRadio.addEventListener('change', toggleSections);
             videoRadio.addEventListener('change', toggleSections);
+            audioRadio.addEventListener('change', toggleSections);
             
-            // Debug form submission
-            const debugButton = document.getElementById('debug-form-button');
-            debugButton.addEventListener('click', function() {
-                const form = document.querySelector('form');
-                const formData = new FormData(form);
-                
-                fetch('/debug-material-creation', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            // Add file size validation for the audio input
+            if (audioFileInput) {
+                audioFileInput.addEventListener('change', function() {
+                    if (this.files.length > 0) {
+                        const file = this.files[0];
+                        console.log('File selected:', file.name, 'Size:', file.size);
+                        
+                        // Convert to MB
+                        const fileSizeMB = file.size / 1048576;
+                        
+                        // Show warning if file is too large
+                        if (fileSizeMB > 40) {
+                            uploadError.classList.remove('hidden');
+                            errorMessage.textContent = `Warning: File is ${fileSizeMB.toFixed(2)}MB. PHP's upload_max_filesize is 40MB. This upload will likely fail.`;
+                        } else {
+                            uploadError.classList.add('hidden');
+                        }
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Debug data:', data);
-                    alert('Debug information logged. Check console for details.');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
                 });
-            });
+            }
         });
     </script>
 @endsection 

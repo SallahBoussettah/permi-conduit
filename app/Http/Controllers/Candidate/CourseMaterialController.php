@@ -58,6 +58,14 @@ class CourseMaterialController extends Controller
                 'nextMaterial', 
                 'prevMaterial'
             ));
+        } else if ($material->material_type === 'audio') {
+            return view('candidate.courses.materials.show-audio', compact(
+                'course', 
+                'material', 
+                'progress', 
+                'nextMaterial', 
+                'prevMaterial'
+            ));
         } else {
             // Default view for PDFs
             return view('candidate.courses.materials.show', compact(
@@ -97,6 +105,33 @@ class CourseMaterialController extends Controller
     }
 
     /**
+     * Serve the audio file.
+     *
+     * @param  \App\Models\Course  $course
+     * @param  \App\Models\CourseMaterial  $material
+     * @return \Illuminate\Http\Response
+     */
+    public function serveAudio(Course $course, CourseMaterial $material)
+    {
+        // Check if file exists
+        $filePath = 'public/audio/' . $material->content_path_or_url;
+        
+        if (!Storage::exists($filePath)) {
+            abort(404, 'Audio file not found');
+        }
+        
+        // Get the file
+        $file = Storage::path($filePath);
+        $type = mime_content_type($file);
+        
+        // Return as a streaming download
+        return response()->file($file, [
+            'Content-Type' => $type,
+            'Content-Disposition' => 'inline; filename="' . $material->title . '"',
+        ]);
+    }
+
+    /**
      * Update progress for a material.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -107,12 +142,12 @@ class CourseMaterialController extends Controller
     public function updateProgress(Request $request, Course $course, CourseMaterial $material)
     {
         // Different validation rules based on material type
-        if ($material->material_type === 'video') {
+        if ($material->material_type === 'video' || $material->material_type === 'audio') {
             $request->validate([
                 'progress_percentage' => 'required|numeric|min:0|max:100',
             ]);
             
-            $lastPage = 1; // Not applicable for videos
+            $lastPage = 1; // Not applicable for videos/audio
         } else {
             $request->validate([
                 'page' => 'required|integer|min:1',

@@ -122,6 +122,7 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::delete('/courses/{course}/materials/{material}', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'destroy'])->name('courses.materials.destroy');
         Route::post('/courses/{course}/materials/update-order', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'updateOrder'])->name('courses.materials.update-order');
         Route::get('/courses/{course}/materials/{material}/pdf', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'servePdf'])->name('courses.materials.pdf');
+        Route::get('/courses/{course}/materials/{material}/audio', [\App\Http\Controllers\Inspector\CourseMaterialController::class, 'serveAudio'])->name('courses.materials.audio');
         
         // QCM Papers
         Route::resource('qcm-papers', \App\Http\Controllers\Inspector\QcmPaperController::class, [
@@ -162,6 +163,7 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         // Course Materials
         Route::get('/courses/{course}/materials/{material}', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'show'])->name('courses.materials.show');
         Route::get('/courses/{course}/materials/{material}/pdf', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'servePdf'])->name('courses.materials.pdf');
+        Route::get('/courses/{course}/materials/{material}/audio', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'serveAudio'])->name('courses.materials.audio');
         Route::post('/courses/{course}/materials/{material}/progress', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'updateProgress'])->name('courses.materials.progress');
         Route::post('/courses/{course}/materials/{material}/complete', [\App\Http\Controllers\Candidate\CourseMaterialController::class, 'markAsComplete'])->name('courses.materials.complete');
         
@@ -335,6 +337,119 @@ Route::get('/debug-last-material', function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     // Add the missing route for candidate detail
     Route::get('qcm-reports/candidate/{user}', [App\Http\Controllers\Admin\QcmReportController::class, 'candidateDetail'])->name('qcm-reports.candidate-detail');
+});
+
+// Temporary route to check PHP upload settings
+Route::get('/check-upload-settings', function () {
+    return response()->json([
+        'upload_max_filesize' => ini_get('upload_max_filesize'),
+        'post_max_size' => ini_get('post_max_size'),
+        'max_file_uploads' => ini_get('max_file_uploads'),
+        'memory_limit' => ini_get('memory_limit'),
+        'error_reporting' => ini_get('error_reporting'),
+        'display_errors' => ini_get('display_errors'),
+        'file_uploads' => ini_get('file_uploads'),
+        'max_input_time' => ini_get('max_input_time'),
+        'max_execution_time' => ini_get('max_execution_time'),
+        'audio_directory_exists' => is_dir(storage_path('app/public/audio')),
+        'audio_directory_writable' => is_writable(storage_path('app/public/audio')),
+        'public_dir_writable' => is_writable(public_path()),
+        'storage_path' => storage_path('app/public/audio'),
+        'public_path' => public_path(),
+    ]);
+});
+
+// Add this before the final require
+Route::post('/laravel-upload-test', function (\Illuminate\Http\Request $request) {
+    // Check if we have a file
+    if (!$request->hasFile('test_file')) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No file uploaded',
+            'request_data' => $request->all(),
+            'files_data' => $request->allFiles()
+        ]);
+    }
+
+    $file = $request->file('test_file');
+    $validFile = $file->isValid();
+    $error = $file->getError();
+
+    // Map error codes to messages
+    $errorMessages = [
+        UPLOAD_ERR_OK => 'There is no error, the file uploaded with success',
+        UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+        UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive specified in the HTML form',
+        UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded',
+        UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+        UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
+        UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+        UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
+    ];
+
+    $errorMessage = isset($errorMessages[$error]) ? $errorMessages[$error] : 'Unknown upload error';
+
+    // Build a more detailed response with debug info
+    $response = [
+        'success' => $validFile,
+        'message' => $validFile ? 'File uploaded successfully' : 'Upload failed: ' . $errorMessage,
+        'error_code' => $error,
+        'error_message' => $errorMessage,
+        'file_data' => [
+            'name' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'size_mb' => round($file->getSize() / (1024 * 1024), 2) . 'MB',
+            'mime_type' => $file->getMimeType(),
+            'extension' => $file->getClientOriginalExtension(),
+        ],
+        'php_settings' => [
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'post_max_size' => ini_get('post_max_size'),
+            'max_file_uploads' => ini_get('max_file_uploads'),
+        ],
+        'system_info' => [
+            'temp_dir' => sys_get_temp_dir(),
+            'temp_dir_writable' => is_writable(sys_get_temp_dir()) ? 'Yes' : 'No'
+        ]
+    ];
+
+    if ($validFile) {
+        try {
+            // Store the file
+            $path = $file->store('test-uploads', 'public');
+            $response['stored_path'] = $path;
+            
+            // Try to get actual file info
+            $storedFilePath = storage_path('app/public/' . $path);
+            if (file_exists($storedFilePath)) {
+                $response['stored_file_info'] = [
+                    'exists' => true,
+                    'size' => filesize($storedFilePath),
+                    'size_mb' => round(filesize($storedFilePath) / (1024 * 1024), 2) . 'MB',
+                ];
+            } else {
+                $response['stored_file_info'] = [
+                    'exists' => false
+                ];
+            }
+        } catch (\Exception $e) {
+            $response['success'] = false;
+            $response['message'] = 'Exception during file storage: ' . $e->getMessage();
+            $response['exception'] = [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ];
+        }
+    }
+    
+    return response()->json($response);
+});
+
+// Create a form for the above route
+Route::get('/laravel-upload-test', function () {
+    return view('laravel-upload-test');
 });
 
 require __DIR__.'/auth.php';
