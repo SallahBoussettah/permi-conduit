@@ -25,8 +25,7 @@ This document outlines the specific tasks needed to complete the Laravel-based d
 
 ## Phase 3: Course Module
 
-- [x] Create Gestion des cours
- interface for inspectors/admins:
+- [x] Create Gestion des cours interface for inspectors/admins:
   - [x] CRUD operations for courses
   - [x] Upload/link course materials (PDF, video, audio, text)
   - [x] Associate courses with exam sections
@@ -38,20 +37,21 @@ This document outlines the specific tasks needed to complete the Laravel-based d
 
 ## Phase 4: QCM (Multiple Choice Questions) Module
 
-- [ ] Create QCM management interface:
-  - [ ] CRUD for QCM papers (20 papers total)
-  - [ ] Each paper contains 10 questions
-  - [ ] Question and answer management
-- [ ] Implement QCM exam interface for candidates:
-  - [ ] Random paper selection from 20 available papers
-  - [ ] 6-minute timer functionality
-  - [ ] Question display and answer selection
-  - [ ] Auto-submission on timer expiry
-- [ ] Implement QCM grading system:
-  - [ ] Auto-grading logic (9-10 correct: 3 pts, 7-8: 2 pts, 6: 1 pt, 5: 0 pts, <5: Eliminatory)
-  - [ ] Store results in database
-  - [ ] Display results to candidates
-  - [ ] Flag eliminatory results
+- [x] Create QCM management interface:
+  - [x] CRUD for QCM papers (20 papers total)
+  - [x] Each paper contains 10 questions
+  - [x] Question and answer management
+- [x] Implement QCM exam interface for candidates:
+  - [x] Random paper selection from 20 available papers
+  - [x] 6-minute timer functionality
+  - [x] Question display and answer selection
+  - [x] Auto-submission on timer expiry
+- [x] Implement QCM grading system:
+  - [x] Auto-grading logic (9-10 correct: 3 pts, 7-8: 2 pts, 6: 1 pt, 5: 0 pts, <5: Eliminatory)
+  - [x] Store results in database
+  - [x] Display results to candidates
+  - [x] Flag eliminatory results
+- [x] QCM reporting and statistics for administrators
 
 ## Phase 5: Practical Exam Structure
 
@@ -67,6 +67,7 @@ This document outlines the specific tasks needed to complete the Laravel-based d
   - [ ] Exam creation and candidate assignment
   - [ ] Date/time/location management
   - [ ] Block practical exam scheduling for eliminatory QCM results
+- [ ] Link practical exams to QCM results
 
 ## Phase 6: Live Marking Interface
 
@@ -85,17 +86,19 @@ This document outlines the specific tasks needed to complete the Laravel-based d
 
 ## Phase 7: Results & Reporting
 
-- [ ] Create candidate results view:
-  - [ ] QCM results display
+- [x] Create candidate results view for QCM:
+  - [x] QCM results display
+  - [x] QCM pass/fail status with explanation
+- [ ] Implement practical exam results:
   - [ ] Practical exam breakdown
-  - [ ] Pass/fail status with explanation
+  - [ ] Overall pass/fail status
   - [ ] Inspector observations display
 - [ ] Implement inspector exam history:
   - [ ] List of conducted exams
   - [ ] Detailed result access
   - [ ] Filtering and search functionality
-- [ ] Create admin reporting dashboard:
-  - [ ] Pass/fail statistics
+- [ ] Enhance admin reporting dashboard:
+  - [ ] Combined QCM/practical exam stats
   - [ ] Performance by section/item
   - [ ] Inspector activity reports
 
@@ -129,6 +132,14 @@ This document outlines the specific tasks needed to complete the Laravel-based d
 - [ ] Implement analytics and reporting enhancements
 - [ ] Add notification system for exam scheduling and results
 - [ ] Create API for potential mobile app integration
+
+## Current Priority: Practical Exam Implementation
+
+Before starting the practical exam implementation, the following changes are needed:
+- Refine the link between QCM results and practical exam eligibility
+- Design the mobile-optimized marking interface
+- Create database seeds for exam sections based on the official Fiche de Recueil
+- Implement real-time saving for marking interface
 
 ---
 

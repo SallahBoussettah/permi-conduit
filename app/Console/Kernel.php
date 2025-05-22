@@ -24,6 +24,9 @@ class Kernel extends ConsoleKernel
         
         // Sync school active candidate counts daily at 1 AM
         $schedule->command('schools:sync-candidate-counts')->dailyAt('01:00');
+        
+        // Run daily at 8:00 AM
+        $schedule->command('notifications:generate')->dailyAt('08:00');
     }
 
     /**

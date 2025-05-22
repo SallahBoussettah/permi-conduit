@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\ExamSection;
 use App\Models\CourseCategory;
 use App\Models\PermitCategory;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,24 @@ use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
+    /**
+     * The notification service instance.
+     *
+     * @var \App\Services\NotificationService
+     */
+    protected $notificationService;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param  \App\Services\NotificationService  $notificationService
+     * @return void
+     */
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * Display a listing of the courses.
      *
@@ -69,6 +88,10 @@ class CourseController extends Controller
         $validated['status'] = true;
 
         $course = Course::create($validated);
+
+        // Always send notifications for new courses, even if they don't have a permit category
+        // The NotificationService will handle the logic for determining who gets notified
+        $this->notificationService->notifyNewCourse($course);
 
         return redirect()->route('inspector.courses.show', $course)
             ->with('success', 'Course created successfully.');

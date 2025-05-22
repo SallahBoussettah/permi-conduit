@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -55,8 +55,11 @@
     @if($jsFile)
     <script src="{{ $jsFile }}" defer></script>
     @endif
+
+    <!-- Alpine.js CDN - add if not already included in your build -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="font-sans antialiased bg-gray-50 text-gray-900">
+<body class="font-sans antialiased bg-gray-50 text-gray-900 flex flex-col min-h-screen">
     <header class="bg-gray-900 text-white fixed top-0 left-0 right-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -124,14 +127,14 @@
                 <div class="flex items-center space-x-4">
                     <!-- Mobile menu button -->
                     <div class="md:hidden">
-                        <button type="button" aria-controls="mobile-menu" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-500">
+                        <button id="mobile-menu-button" type="button" aria-controls="mobile-menu" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-500">
                             <span class="sr-only">Open main menu</span>
                             <!-- Icon when menu is closed -->
-                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <svg id="mobile-menu-open-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                             <!-- Icon when menu is open -->
-                            <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <svg id="mobile-menu-close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
@@ -147,6 +150,106 @@
                                 {{ __('app.inspector_space') }}
                             </a>
                         @else
+                            <!-- Notifications dropdown -->
+                            @auth
+                            <div class="relative" 
+                                x-data="{ 
+                                    notificationsOpen: false,
+                                    notifications: [], 
+                                    unreadCount: 0,
+                                    init() {
+                                        this.fetchNotifications();
+                                        // Refresh notifications every minute
+                                        setInterval(() => this.fetchNotifications(), 60000);
+                                    },
+                                    fetchNotifications() {
+                                        fetch('{{ route('notifications.unread') }}')
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                this.notifications = data.notifications;
+                                                this.unreadCount = data.count;
+                                            });
+                                    },
+                                    markAsRead(id) {
+                                        fetch(`/notifications/${id}/read`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            this.unreadCount = data.count;
+                                            this.fetchNotifications();
+                                        })
+                                        .catch(error => {
+                                            console.error('Error marking notification as read:', error);
+                                        });
+                                    },
+                                    markAllAsRead() {
+                                        fetch('/notifications/read-all', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            this.unreadCount = 0;
+                                            this.fetchNotifications();
+                                        })
+                                        .catch(error => {
+                                            console.error('Error marking all notifications as read:', error);
+                                        });
+                                    }
+                                }">
+                                <button @click="notificationsOpen = !notificationsOpen" class="flex mx-3 items-center text-sm font-medium text-gray-300 hover:text-white focus:outline-none transition duration-150 ease-in-out relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg>
+                                    <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"></span>
+                                </button>
+                                <div x-show="notificationsOpen" @click.away="notificationsOpen = false" class="absolute right-0 mt-2 w-[400px] bg-white rounded-md shadow-lg overflow-hidden z-50" style="display: none;">
+                                    <div class="py-2">
+                                        <div class="px-4 py-2 border-b border-gray-200">
+                                            <div class="flex justify-between items-center gap-6">
+                                                <h3 class="text-sm font-semibold text-gray-700">{{ __('Notifications') }}</h3>
+                                                <div class="flex space-x-2">
+                                                    <button x-show="unreadCount > 0" @click="markAllAsRead()" class="text-xs text-blue-600 hover:text-blue-800">{{ __('Marquer tout comme lu') }}</button>
+                                                    <a href="{{ route('notifications.index') }}" class="text-xs text-blue-600 hover:text-blue-800">{{ __('Voir tout') }}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <template x-if="notifications.length > 0">
+                                            <div class="max-h-64 overflow-y-auto">
+                                                <template x-for="notification in notifications" :key="notification.id">
+                                                    <div class="px-5 py-4 border-b border-gray-200 hover:bg-gray-50">
+                                                        <div class="flex justify-between">
+                                                            <div class="flex-1">
+                                                                <p class="text-sm font-medium text-gray-900" x-text="notification.message"></p>
+                                                                <p class="text-xs text-gray-500 mt-2" x-text="new Date(notification.created_at).toLocaleString()"></p>
+                                                            </div>
+                                                            <div class="flex space-x-3 ml-4 flex-shrink-0 items-start">
+                                                                <button @click="markAsRead(notification.id)" class="text-xs text-blue-600 hover:text-blue-800 font-medium">{{ __('Marquer comme lu') }}</button>
+                                                                <a x-show="notification.link" :href="notification.link" class="text-xs text-blue-600 hover:text-blue-800 font-medium">{{ __('Voir') }}</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                        <template x-if="notifications.length === 0">
+                                            <div class="px-4 py-8 text-center">
+                                                <p class="text-sm text-gray-500">{{ __('Aucune notification non lue') }}</p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                            @endauth
+                            
                             <div class="relative">
                                 <button id="user-menu-button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-300 hover:text-white focus:outline-none transition ease-in-out duration-150">
                                     {{ Auth::user()->name }}
@@ -273,6 +376,11 @@
                                 {{ __('Ecoles') }}
                             </a>
                         @endif
+                        <!-- Notifications Link for Mobile -->
+                        <a href="{{ route('notifications.index') }}" class="{{ request()->routeIs('notifications.index') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-3 border-l-4 text-base font-medium flex justify-between items-center">
+                            <span>{{ __('Notifications') }}</span>
+                            <span id="mobile-notification-count" class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full"></span>
+                        </a>
                         <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                             {{ __('app.profile') }}
                         </a>
@@ -312,11 +420,11 @@
     </header>
 
     <!-- Add padding to main content to prevent it from being hidden under the fixed header -->
-    <main class="pt-16">
+    <main class="pt-16 flex-grow">
         @yield('content')
     </main>
 
-    <footer class="bg-gray-900 text-white">
+    <footer class="bg-gray-900 text-white mt-auto">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
@@ -371,65 +479,69 @@
 
     <script>
         // User menu toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const userMenuButton = document.getElementById('user-menu-button');
-            const userMenu = document.getElementById('user-menu');
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+                userMenu.classList.toggle('hidden');
+            });
             
-            if (userMenuButton && userMenu) {
-                userMenuButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    userMenu.classList.toggle('hidden');
-                });
-                
-                // Close the menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
-                        userMenu.classList.add('hidden');
+            // Close the menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuOpenIcon = document.getElementById('mobile-menu-open-icon');
+        const mobileMenuCloseIcon = document.getElementById('mobile-menu-close-icon');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                // Toggle icons
+                if (mobileMenuOpenIcon && mobileMenuCloseIcon) {
+                    mobileMenuOpenIcon.classList.toggle('hidden');
+                    mobileMenuCloseIcon.classList.toggle('hidden');
+                }
+            });
+        }
+        
+        // Function to update mobile notification count
+        function updateMobileNotificationCount() {
+            const mobileNotificationCount = document.getElementById('mobile-notification-count');
+            if (mobileNotificationCount) {
+                fetch('{{ route('notifications.unread') }}', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+                        'Accept': 'application/json'
                     }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count > 0) {
+                        mobileNotificationCount.textContent = data.count;
+                        mobileNotificationCount.style.display = 'inline-flex';
+                    } else {
+                        mobileNotificationCount.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching notification count:', error);
                 });
             }
-            
-            // Mobile menu toggle
-            const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', function(event) {
-                    event.stopPropagation(); // Prevent document click from immediately closing the menu
-                    mobileMenu.classList.toggle('hidden');
-                    
-                    // Toggle menu icons
-                    const openIcon = mobileMenuButton.querySelector('svg:first-of-type');
-                    const closeIcon = mobileMenuButton.querySelector('svg:last-of-type');
-                    
-                    if (openIcon && closeIcon) {
-                        openIcon.classList.toggle('block');
-                        openIcon.classList.toggle('hidden');
-                        closeIcon.classList.toggle('block');
-                        closeIcon.classList.toggle('hidden');
-                    }
-                });
-
-                // Close mobile menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    // Only close if the menu is open and the click is outside the menu and menu button
-                    if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target) && !mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                        
-                        // Reset icons
-                        const openIcon = mobileMenuButton.querySelector('svg:first-of-type');
-                        const closeIcon = mobileMenuButton.querySelector('svg:last-of-type');
-                        
-                        if (openIcon && closeIcon) {
-                            openIcon.classList.add('block');
-                            openIcon.classList.remove('hidden');
-                            closeIcon.classList.add('hidden');
-                            closeIcon.classList.remove('block');
-                        }
-                    }
-                });
-            }
-        });
+        }
+        
+        // Update notification count when page loads and every minute
+        updateMobileNotificationCount();
+        setInterval(updateMobileNotificationCount, 60000); // Every minute
     </script>
 </body>
 </html> 
