@@ -8,10 +8,10 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                        {{ __('Edit School') }}
+                        {{ __('Modifier l\'ecole') }}
                     </h2>
                     <p class="mt-1 text-sm text-gray-500">
-                        {{ __('Update information for') }} {{ $school->name }}
+                        {{ __('Mettre a jour les informations de') }} {{ $school->name }}
                     </p>
                 </div>
                 <div class="flex mt-4 md:mt-0 md:ml-4">
@@ -19,7 +19,7 @@
                         <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        {{ __('Back to Schools') }}
+                        {{ __('Retour aux écoles') }}
                     </a>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                     </div>
                     <div class="ml-3">
                         <h3 class="text-sm font-medium text-red-800">
-                            {{ __('There were errors with your submission') }}
+                            {{ __('Il y avait des erreurs dans votre soumission') }}
                         </h3>
                         <div class="mt-2 text-sm text-red-700">
                             <ul class="list-disc pl-5 space-y-1">
@@ -78,16 +78,16 @@
                 <div class="px-4 py-5 sm:p-6">
                     <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                         <div class="sm:col-span-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('School Name') }} <span class="text-red-500">*</span></label>
+                            <label for="name" class="block text-sm font-medium text-gray-700">{{ __('Nom de l\'ecole') }} <span class="text-red-500">*</span></label>
                             <div class="mt-1">
-                                <input type="text" name="name" id="name" value="{{ old('name', $school->name) }}" required 
+                                <input type="text" name="name" id="name" value="{{ old('nom', $school->name) }}" required 
                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                        placeholder="{{ __('e.g. Premier Driving Academy') }}">
                             </div>
                         </div>
 
                         <div class="sm:col-span-6">
-                            <label for="address" class="block text-sm font-medium text-gray-700">{{ __('Address') }}</label>
+                            <label for="address" class="block text-sm font-medium text-gray-700">{{ __('Adresse') }}</label>
                             <div class="mt-1">
                                 <input type="text" name="address" id="address" value="{{ old('address', $school->address) }}" 
                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -96,25 +96,25 @@
                         </div>
 
                         <div class="sm:col-span-3">
-                            <label for="phone" class="block text-sm font-medium text-gray-700">{{ __('Phone Number') }}</label>
+                            <label for="phone" class="block text-sm font-medium text-gray-700">{{ __('Numéro de téléphone') }}</label>
                             <div class="mt-1">
                                 <input type="tel" name="phone" id="phone" value="{{ old('phone', $school->phone) }}" 
                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                       placeholder="{{ __('e.g. +44 1234 567890') }}">
+                                       placeholder="{{ __('e.g. +33 1234 567890') }}">
                             </div>
                         </div>
 
                         <div class="sm:col-span-3">
-                            <label for="email" class="block text-sm font-medium text-gray-700">{{ __('Email Address') }}</label>
+                            <label for="email" class="block text-sm font-medium text-gray-700">{{ __('Adresse email') }}</label>
                             <div class="mt-1">
                                 <input type="email" name="email" id="email" value="{{ old('email', $school->email) }}" 
                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                       placeholder="{{ __('e.g. contact@school.com') }}">
+                                       placeholder="{{ __('e.g. contact@ecole.com') }}">
                             </div>
                         </div>
 
                         <div class="sm:col-span-6">
-                            <label for="logo" class="block text-sm font-medium text-gray-700">{{ __('School Logo') }}</label>
+                            <label for="logo" class="block text-sm font-medium text-gray-700">{{ __('Logo de l\'ecole') }}</label>
                             <div class="mt-1 flex items-center">
                                 @if($school->logo_path)
                                     <span class="h-12 w-12 rounded-full overflow-hidden bg-gray-100">
@@ -126,7 +126,7 @@
                                         <div class="ml-4">
                                             <label for="remove_logo" class="flex items-center text-sm font-medium text-gray-700">
                                                 <input type="checkbox" name="remove_logo" id="remove_logo" value="1" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded mr-2">
-                                                {{ __('Remove current logo') }}
+                                                {{ __('Supprimer le logo actuel') }}
                                             </label>
                                         </div>
                                     </div>
@@ -140,25 +140,25 @@
                                            class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 @endif
                             </div>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('PNG, JPG, GIF up to 2MB') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('PNG, JPG, GIF jusqu\'a 2MB') }}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- School Settings -->
                 <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('School Settings') }}</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Paramètres de l\'ecole') }}</h3>
                     <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                         <div class="sm:col-span-3">
-                            <label for="candidate_limit" class="block text-sm font-medium text-gray-700">{{ __('Candidate Limit') }} <span class="text-red-500">*</span></label>
+                            <label for="candidate_limit" class="block text-sm font-medium text-gray-700">{{ __('Limite de candidats') }} <span class="text-red-500">*</span></label>
                             <div class="mt-1">
                                 <input type="number" name="candidate_limit" id="candidate_limit" min="1" value="{{ old('candidate_limit', $school->candidate_limit) }}" required 
                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             </div>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('Maximum number of candidates allowed for this school (admins and inspectors do not count toward this limit)') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('Nombre maximum de candidats autorisés pour cette école (les administrateurs et les inspecteurs ne comptent pas dans cette limite)') }}</p>
                             @if($school->candidates_count > 0)
                                 <div class="mt-1 text-sm text-gray-500">
-                                    {{ __('Current candidates') }}: {{ $school->candidates_count }}
+                                    {{ __('Candidats actifs') }}: {{ $school->candidates_count }}
                                 </div>
                             @endif
                         </div>
@@ -172,8 +172,8 @@
                                                    class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
                                         </div>
                                         <div class="ml-3 text-sm">
-                                            <label for="is_active" class="font-medium text-gray-700">{{ __('Active') }}</label>
-                                            <p class="text-gray-500">{{ __('If unchecked, the school will be inactive and users cannot register') }}</p>
+                                            <label for="is_active" class="font-medium text-gray-700">{{ __('Actif') }}</label>
+                                            <p class="text-gray-500">{{ __('Si décoché, l\'ecole sera inactive et les utilisateurs ne pourront pas s\'inscrire') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -185,9 +185,9 @@
                             <div class="mt-1">
                                 <textarea id="description" name="description" rows="3" 
                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                          placeholder="{{ __('Brief description of the school...') }}">{{ old('description', $school->description) }}</textarea>
+                                          placeholder="{{ __('Description rapide de l\'ecole...') }}">{{ old('description', $school->description) }}</textarea>
                             </div>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('Brief description of the school that will be displayed to users') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('Description rapide de l\'ecole qui sera affichée aux utilisateurs') }}</p>
                         </div>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
                 <!-- Form Actions -->
                 <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                     <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        {{ __('Update School') }}
+                        {{ __('Mettre a jour l\'ecole') }}
                     </button>
                 </div>
             </form>

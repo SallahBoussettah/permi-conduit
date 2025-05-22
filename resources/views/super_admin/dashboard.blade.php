@@ -30,7 +30,7 @@
         
         <!-- Overview Cards -->
         <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('System Overview') }}</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Aperçu du système') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <!-- Schools Card -->
                 <div class="bg-white overflow-hidden shadow rounded-lg">
@@ -44,7 +44,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 truncate">
-                                        {{ __('Total Schools') }}
+                                        {{ __('Total Écoles') }}
                                     </dt>
                                     <dd>
                                         <div class="text-lg font-bold text-gray-900">{{ $schoolsCount }}</div>
@@ -56,7 +56,7 @@
                     <div class="bg-gray-50 px-5 py-3">
                         <div class="text-sm">
                             <a href="{{ route('super_admin.schools') }}" class="font-medium text-indigo-700 hover:text-indigo-900">
-                                {{ __('View all schools') }} &rarr;
+                                {{ __('Voir toutes les écoles') }} &rarr;
                             </a>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 truncate">
-                                        {{ __('School Administrators') }}
+                                        {{ __('Administrateurs des écoles') }}
                                     </dt>
                                     <dd>
                                         <div class="text-lg font-bold text-gray-900">{{ $adminsCount }}</div>
@@ -86,7 +86,7 @@
                     <div class="bg-gray-50 px-5 py-3">
                         <div class="text-sm">
                             <span class="font-medium text-gray-500">
-                                {{ __('Managing all schools') }}
+                                {{ __('Gestion de toutes les écoles') }}
                             </span>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 truncate">
-                                        {{ __('Total Inspectors') }}
+                                        {{ __('Total Inspecteurs') }}
                                     </dt>
                                     <dd>
                                         <div class="text-lg font-bold text-gray-900">{{ $inspectorsCount }}</div>
@@ -116,7 +116,7 @@
                     <div class="bg-gray-50 px-5 py-3">
                         <div class="text-sm">
                             <span class="font-medium text-gray-500">
-                                {{ __('Course creators & examiners') }}
+                                {{ __('Créateurs de cours et examinateurs') }}
                             </span>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 truncate">
-                                        {{ __('Active Candidates') }}
+                                        {{ __('Candidats actifs') }}
                                     </dt>
                                     <dd>
                                         <div class="text-lg font-bold text-gray-900">{{ $candidatesCount }}</div>
@@ -146,7 +146,7 @@
                     <div class="bg-gray-50 px-5 py-3">
                         <div class="text-sm">
                             <span class="font-medium text-gray-500">
-                                {{ __('Across all schools') }}
+                                {{ __('Dans toutes les écoles') }}
                             </span>
                         </div>
                     </div>
@@ -156,7 +156,7 @@
         
         <!-- Main Actions -->
         <div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Super Admin Actions') }}</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Actions du super administrateur') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- School Management Card -->
                 <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
@@ -168,13 +168,13 @@
                                 </svg>
                             </div>
                             <div class="ml-5">
-                                <h3 class="text-lg font-medium text-gray-900">{{ __('School Management') }}</h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ __('Create, edit, and manage driving schools.') }}</p>
+                                <h3 class="text-lg font-medium text-gray-900">{{ __('Gestion des écoles') }}</h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Créer, modifier et gérer les écoles de conduite.') }}</p>
                             </div>
                         </div>
                         <div class="mt-6">
                             <a href="{{ route('super_admin.schools') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                {{ __('Manage Schools') }}
+                                {{ __('Gérer les écoles') }}
                             </a>
                         </div>
                     </div>
@@ -190,13 +190,13 @@
                                 </svg>
                             </div>
                             <div class="ml-5">
-                                <h3 class="text-lg font-medium text-gray-900">{{ __('Create New School') }}</h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ __('Add a new driving school to the system.') }}</p>
+                                <h3 class="text-lg font-medium text-gray-900">{{ __('Créer une nouvelle école') }}</h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Ajouter une nouvelle école de conduite au système.') }}</p>
                             </div>
                         </div>
                         <div class="mt-6">
                             <a href="{{ route('super_admin.schools.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                {{ __('Create School') }}
+                                {{ __('Créer une école') }}
                             </a>
                         </div>
                     </div>
@@ -212,13 +212,13 @@
                                 </svg>
                             </div>
                             <div class="ml-5">
-                                <h3 class="text-lg font-medium text-gray-900">{{ __('My Profile') }}</h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ __('Update your account information.') }}</p>
+                                <h3 class="text-lg font-medium text-gray-900">{{ __('Mon profil') }}</h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Mettre à jour vos informations de compte.') }}</p>
                             </div>
                         </div>
                         <div class="mt-6">
                             <a href="{{ route('profile.edit') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                {{ __('Edit Profile') }}
+                                {{ __('Modifier le profil') }}
                             </a>
                         </div>
                     </div>

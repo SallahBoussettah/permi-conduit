@@ -8,10 +8,10 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex-1 min-w-0">
                     <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                        {{ __('Schools Management') }}
+                        {{ __('Gestion des écoles') }}
                     </h2>
                     <p class="mt-1 text-sm text-gray-500">
-                        {{ __('Manage all driving schools in the system') }}
+                        {{ __('Gérer toutes les écoles de conduite dans le système') }}
                     </p>
                 </div>
                 <div class="flex mt-4 md:mt-0 md:ml-4">
@@ -19,13 +19,13 @@
                         <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        {{ __('Back to Dashboard') }}
+                        {{ __('Retour au tableau de bord') }}
                     </a>
                     <a href="{{ route('super_admin.schools.create') }}" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <svg class="-ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        {{ __('Add New School') }}
+                        {{ __('Ajouter une nouvelle école') }}
                     </a>
                 </div>
             </div>
@@ -73,14 +73,14 @@
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('No schools found') }}</h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ __('Get started by creating a new school.') }}</p>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('Aucune école trouvée') }}</h3>
+                    <p class="mt-1 text-sm text-gray-500">{{ __('Commencez par créer une nouvelle école.') }}</p>
                     <div class="mt-6">
                         <a href="{{ route('super_admin.schools.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
-                            {{ __('Create New School') }}
+                            {{ __('Créer une nouvelle école') }}
                         </a>
                     </div>
                 </div>
@@ -89,16 +89,16 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('School') }}
+                                {{ __('École') }}
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('Status') }}
+                                {{ __('Statut') }}
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('Candidates') }}
+                                {{ __('Candidats') }}
                             </th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {{ __('Staff') }}
+                                {{ __('Personnel') }}
                             </th>
                             <th scope="col" class="relative px-6 py-3">
                                 <span class="sr-only">{{ __('Actions') }}</span>
@@ -131,30 +131,30 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $school->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $school->is_active ? __('Active') : __('Inactive') }}
+                                        {{ $school->is_active ? __('Actif') : __('Inactif') }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">{{ $school->candidates_count }} / {{ $school->candidate_limit }}</div>
-                                    <div class="text-xs text-gray-500">{{ $school->current_active_candidate_count }} {{ __('active') }}</div>
+                                    <div class="text-xs text-gray-500">{{ $school->current_active_candidate_count }} {{ __('actif') }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $school->admins_count }} {{ __('Admins') }}</div>
-                                    <div class="text-xs text-gray-500">{{ $school->inspectors_count }} {{ __('Inspectors') }}</div>
+                                    <div class="text-sm text-gray-900">{{ $school->admins_count }} {{ __('Administrateurs') }}</div>
+                                    <div class="text-xs text-gray-500">{{ $school->inspectors_count }} {{ __('Inspecteurs') }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-3">
                                         <a href="{{ route('super_admin.school.admins', $school) }}" class="text-indigo-600 hover:text-indigo-900">
-                                            {{ __('Admins') }}
+                                            {{ __('Administrateurs') }}
                                         </a>
                                         <a href="{{ route('super_admin.schools.edit', $school) }}" class="text-indigo-600 hover:text-indigo-900">
-                                            {{ __('Edit') }}
+                                            {{ __('Modifier') }}
                                         </a>
                                         <form action="{{ route('super_admin.schools.destroy', $school) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('Are you sure you want to delete this school?') }}');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-900">
-                                                {{ __('Delete') }}
+                                                {{ __('Supprimer') }}
                                             </button>
                                         </form>
                                     </div>
