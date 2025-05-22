@@ -71,6 +71,10 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::get('/inspectors', [AdminController::class, 'listInspectors'])->name('inspectors');
         Route::get('/inspectors/register', [AdminController::class, 'showRegisterInspector'])->name('register.inspector');
         Route::post('/inspectors/register', [AdminController::class, 'registerInspector'])->name('register.inspector.submit');
+        Route::get('/inspectors/{id}/edit', [AdminController::class, 'editInspector'])->name('inspectors.edit');
+        Route::put('/inspectors/{id}', [AdminController::class, 'updateInspector'])->name('inspectors.update');
+        Route::post('/inspectors/{id}/toggle-active', [AdminController::class, 'toggleInspectorActive'])->name('inspectors.toggle-active');
+        Route::delete('/inspectors/{id}', [AdminController::class, 'deleteInspector'])->name('inspectors.delete');
         
         // User management
         Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');

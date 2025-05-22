@@ -134,13 +134,13 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Inscription de l\'inspecteur') }}</h3>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Gestion des inspecteurs') }}</h3>
                                             <p class="mt-1 text-sm text-gray-500">{{ __('Créer et gérer les comptes d\'inspecteurs.') }}</p>
                                         </div>
                                     </div>
                                     <div class="mt-6">
-                                        <a href="{{ route('admin.register.inspector') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                                            {{ __('Inscription de l\'inspecteur') }}
+                                        <a href="{{ route('admin.inspectors') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                                            {{ __('Gérer les inspecteurs') }}
                                         </a>
                                     </div>
                                 </div>
@@ -233,8 +233,7 @@
                                             </svg>
                                         </div>
                                         <div class="ml-5">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Gestion des cours
-') }}</h3>
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Gestion des cours') }}</h3>
                                             <p class="mt-1 text-sm text-gray-500">{{ __('Créer et gérer des supports de cours.') }}</p>
                                         </div>
                                     </div>

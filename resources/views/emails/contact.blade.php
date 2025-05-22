@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>New Contact Form Submission</title>
+    <title>Nouveau message de contact</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,70 +11,82 @@
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         .header {
-            background-color: #1f2937;
-            color: #fff;
+            background-color: #f8b800;
+            color: #1f2937;
             padding: 15px;
             text-align: center;
-            border-radius: 5px 5px 0 0;
+            font-weight: bold;
         }
         .content {
             padding: 20px;
-            border: 1px solid #ddd;
-            border-top: none;
-            border-radius: 0 0 5px 5px;
         }
         .field {
             margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .field:last-child {
+            border-bottom: none;
         }
         .label {
             font-weight: bold;
-            display: block;
+            color: #666;
             margin-bottom: 5px;
         }
         .value {
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 3px;
+            padding: 5px 0;
         }
         .footer {
             margin-top: 20px;
+            padding: 10px;
             font-size: 12px;
             color: #666;
             text-align: center;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>New Contact Form Submission</h1>
-    </div>
-    
-    <div class="content">
-        <div class="field">
-            <div class="label">Name:</div>
-            <div class="value">{{ $data['name'] }}</div>
+    <div class="container">
+        <div class="header">
+            <h2>Nouveau message de contact</h2>
         </div>
         
-        <div class="field">
-            <div class="label">Email:</div>
-            <div class="value">{{ $data['email'] }}</div>
+        <div class="content">
+            <div class="field">
+                <div class="label">Nom:</div>
+                <div class="value">{{ $data['name'] }}</div>
+            </div>
+            
+            <div class="field">
+                <div class="label">Email:</div>
+                <div class="value">{{ $data['email'] }}</div>
+            </div>
+            
+            <div class="field">
+                <div class="label">Sujet:</div>
+                <div class="value">{{ $data['subject'] }}</div>
+            </div>
+            
+            <div class="field">
+                <div class="label">Message:</div>
+                <div class="value">{{ $data['message'] }}</div>
+            </div>
         </div>
         
-        <div class="field">
-            <div class="label">Subject:</div>
-            <div class="value">{{ $data['subject'] }}</div>
+        <div class="footer">
+            <p>Ce message a été envoyé via le formulaire de contact du site Permi-Conduit.</p>
         </div>
-        
-        <div class="field">
-            <div class="label">Message:</div>
-            <div class="value">{{ $data['message'] }}</div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        <p>This email was sent from the contact form on the ECF website.</p>
     </div>
 </body>
 </html> 

@@ -111,4 +111,127 @@ class AdminController extends Controller
         
         return view('admin.inspectors.index', compact('inspectors'));
     }
+
+    /**
+     * Show form to edit an inspector.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
+     */
+    public function editInspector($id)
+    {
+        $inspector = User::findOrFail($id);
+        
+        // Make sure the user is an inspector
+        if (!$inspector->hasRole('inspector')) {
+            return redirect()->route('admin.inspectors')
+                ->with('error', __('Cet utilisateur n\'est pas un inspecteur.'));
+        }
+        
+        return view('admin.inspectors.edit', compact('inspector'));
+    }
+
+    /**
+     * Update the specified inspector.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateInspector(Request $request, $id)
+    {
+        $inspector = User::findOrFail($id);
+        
+        // Make sure the user is an inspector
+        if (!$inspector->hasRole('inspector')) {
+            return redirect()->route('admin.inspectors')
+                ->with('error', __('Cet utilisateur n\'est pas un inspecteur.'));
+        }
+        
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($inspector->id)],
+        ];
+        
+        // Only validate password if it's being updated
+        if ($request->filled('password')) {
+            $rules['password'] = ['required', 'confirmed', Rules\Password::defaults()];
+        }
+        
+        $request->validate($rules);
+        
+        // Update basic info
+        $inspector->name = $request->name;
+        $inspector->email = $request->email;
+        
+        // Update password if provided
+        if ($request->filled('password')) {
+            $inspector->password = Hash::make($request->password);
+        }
+        
+        $inspector->save();
+        
+        return redirect()->route('admin.inspectors')
+            ->with('success', __('Inspecteur mis à jour avec succès.'));
+    }
+
+    /**
+     * Toggle the active status of an inspector.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function toggleInspectorActive($id)
+    {
+        $inspector = User::findOrFail($id);
+        
+        // Make sure the user is an inspector
+        if (!$inspector->hasRole('inspector')) {
+            return redirect()->route('admin.inspectors')
+                ->with('error', __('Cet utilisateur n\'est pas un inspecteur.'));
+        }
+        
+        $inspector->is_active = !$inspector->is_active;
+        $inspector->save();
+        
+        $message = $inspector->is_active 
+            ? __('Inspecteur activé avec succès.')
+            : __('Inspecteur désactivé avec succès.');
+            
+        return redirect()->route('admin.inspectors')
+            ->with('success', $message);
+    }
+
+    /**
+     * Delete an inspector.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function deleteInspector($id)
+    {
+        $inspector = User::findOrFail($id);
+        
+        // Make sure the user is an inspector
+        if (!$inspector->hasRole('inspector')) {
+            return redirect()->route('admin.inspectors')
+                ->with('error', __('Cet utilisateur n\'est pas un inspecteur.'));
+        }
+        
+        // Check if the inspector has any related records before deleting
+        $canDelete = true;
+        $reason = '';
+        
+        // Delete the inspector if safe to do so
+        if ($canDelete) {
+            $name = $inspector->name;
+            $inspector->delete();
+            
+            return redirect()->route('admin.inspectors')
+                ->with('success', __('Inspecteur ":name" supprimé avec succès.', ['name' => $name]));
+        } else {
+            return redirect()->route('admin.inspectors')
+                ->with('error', __('Impossible de supprimer l\'inspecteur: :reason', ['reason' => $reason]));
+        }
+    }
 } 
