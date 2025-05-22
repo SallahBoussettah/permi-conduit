@@ -9,10 +9,10 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">{{ $exam->paper->title }}</h1>
-                        <p class="mt-1 text-sm text-gray-500">{{ __('Permit Category') }}: {{ $exam->paper->permitCategory->name }}</p>
+                        <p class="mt-1 text-sm text-gray-500">{{ __('Catégorie de permis') }}: {{ $exam->paper->permitCategory->name }}</p>
                     </div>
                     <div class="flex flex-col items-end">
-                        <div class="text-sm text-gray-500">{{ __('Time Remaining') }}</div>
+                        <div class="text-sm text-gray-500">{{ __('Temps restant') }}</div>
                         <div id="timer-display" class="text-2xl font-bold">--:--</div>
                     </div>
                 </div>
@@ -20,7 +20,7 @@
                 <!-- Progress bar -->
                 <div class="mt-4">
                     <div class="flex items-center justify-between text-sm text-gray-500 mb-1">
-                        <div>{{ __('Progress') }}</div>
+                        <div>{{ __('Progression') }}</div>
                         <div><span id="answered-count">0</span>/{{ count($exam->questions) }}</div>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -87,16 +87,16 @@
                     
                     <div class="px-4 py-3 bg-gray-50 text-right sm:px-6 flex justify-between">
                         <button type="button" class="prev-question inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Previous') }}
+                            {{ __('Précédent') }}
                         </button>
                         
                         @if($index == count($exam->questions) - 1)
                             <button type="submit" id="submit-exam" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                {{ __('Submit Exam') }}
+                                {{ __('Soumettre l\'examen') }}
                             </button>
                         @else
                             <button type="button" class="next-question inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                {{ __('Next') }}
+                                {{ __('Suivant') }}
                             </button>
                         @endif
                     </div>
@@ -106,7 +106,7 @@
             <!-- Submit button (fixed at bottom for mobile) -->
             <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden">
                 <button type="submit" id="submit-exam-mobile" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    {{ __('Submit Exam') }}
+                    {{ __('Soumettre l\'examen') }}
                 </button>
             </div>
         </form>

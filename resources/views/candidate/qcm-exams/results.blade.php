@@ -6,9 +6,9 @@
         <!-- Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
-                <h1 class="text-3xl font-bold text-gray-900">{{ __('QCM Exam Results') }}</h1>
+                <h1 class="text-3xl font-bold text-gray-900">{{ __('Résultats de l\'examen QCM') }}</h1>
                 <a href="{{ route('candidate.qcm-exams.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    {{ __('Back to Exams') }}
+                    {{ __('Retour aux examens') }}
                 </a>
             </div>
             <p class="mt-2 text-sm text-gray-700">{{ $qcmExam->paper->title }} - {{ $qcmExam->paper->permitCategory->name }}</p>
@@ -18,34 +18,34 @@
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
             <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
                 <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Exam Summary') }}</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Résumé de l\'examen') }}</h3>
                     <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ $qcmExam->completed_at->format('d/m/Y H:i') }}</p>
                 </div>
                 @if($qcmExam->is_eliminatory)
                     <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                        {{ __('Eliminatory') }}
+                        {{ __('Eliminatoire') }}
                     </span>
                 @elseif($qcmExam->points_earned >= 1)
                     <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                        {{ __('Passed') }}
+                        {{ __('Passé') }}
                     </span>
                 @else
                     <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                        {{ __('Not Eliminatory') }}
+                        {{ __('Non eliminatoire') }}
                     </span>
                 @endif
             </div>
             <div class="border-t border-gray-200">
                 <dl>
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">{{ __('Score') }}</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('Note') }}</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                             <span class="font-bold text-lg">{{ $qcmExam->correct_answers_count }}</span> / {{ $qcmExam->total_questions }} 
-                            {{ __('correct answers') }} ({{ number_format($percentage, 1) }}%)
+                            {{ __('réponses correctes') }} ({{ number_format($percentage, 1) }}%)
                         </dd>
                     </div>
                     <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">{{ __('Points Earned') }}</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('Points obtenus') }}</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                             <span class="font-bold text-lg">{{ $qcmExam->points_earned }}</span> / 3
                             <span class="text-sm text-gray-500 ml-2">
@@ -63,7 +63,7 @@
                         </dd>
                     </div>
                     <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">{{ __('Duration') }}</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('Durée') }}</dt>
                         <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                             @php
                                 // Ensure duration is a positive value
@@ -76,15 +76,15 @@
                         </dd>
                     </div>
                     <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">{{ __('Status') }}</dt>
+                        <dt class="text-sm font-medium text-gray-500">{{ __('Statut') }}</dt>
                         <dd class="mt-1 text-sm sm:mt-0 sm:col-span-2">
                             @if($qcmExam->status === 'completed')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    {{ __('Completed') }}
+                                    {{ __('Terminé') }}
                                 </span>
                             @elseif($qcmExam->status === 'timed_out')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    {{ __('Timed Out') }}
+                                    {{ __('Temps écoulé') }}
                                 </span>
                             @endif
 
@@ -99,7 +99,7 @@
                                             </div>
                                             <div class="ml-3">
                                                 <p class="text-sm text-red-700">
-                                                    {{ __('This result is eliminatory. You need at least 6 correct answers to pass.') }}
+                                                    {{ __('Ce résultat est eliminatoire. Vous devez avoir au moins 6 réponses correctes pour passer.') }}
                                                 </p>
                                             </div>
                                         </div>
@@ -114,7 +114,7 @@
                                             </div>
                                             <div class="ml-3">
                                                 <p class="text-sm text-green-700">
-                                                    {{ __('You have passed this QCM exam with') }} {{ $qcmExam->points_earned }} {{ __('points.') }}
+                                                    {{ __('Vous avez passé cet examen QCM avec') }} {{ $qcmExam->points_earned }} {{ __('points.') }}
                                                 </p>
                                             </div>
                                         </div>
@@ -130,8 +130,8 @@
         <!-- Question Review -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Question Review') }}</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Review your answers and see the correct solutions.') }}</p>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Examen des questions') }}</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ __('Examinez vos réponses et voyez les solutions correctes.') }}</p>
             </div>
             <div class="border-t border-gray-200">
                 <div class="divide-y divide-gray-200">
@@ -177,12 +177,12 @@
                                             </div>
                                             <div>
                                                 @if($option->is_correct)
-                                                    <span class="text-xs font-medium text-green-800 bg-green-100 px-2 py-1 rounded-full">{{ __('Correct Answer') }}</span>
+                                                    <span class="text-xs font-medium text-green-800 bg-green-100 px-2 py-1 rounded-full">{{ __('Réponse correcte') }}</span>
                                                 @endif
                                                 @if($option->id === $answer->qcm_answer_id && !$option->is_correct)
-                                                    <span class="text-xs font-medium text-red-800 bg-red-100 px-2 py-1 rounded-full">{{ __('Your Answer') }}</span>
+                                                    <span class="text-xs font-medium text-red-800 bg-red-100 px-2 py-1 rounded-full">{{ __('Votre réponse') }}</span>
                                                 @elseif($option->id === $answer->qcm_answer_id && $option->is_correct)
-                                                    <span class="text-xs font-medium text-green-800 bg-green-100 px-2 py-1 rounded-full">{{ __('Your Answer (Correct)') }}</span>
+                                                    <span class="text-xs font-medium text-green-800 bg-green-100 px-2 py-1 rounded-full">{{ __('Votre réponse (correcte)') }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -192,7 +192,7 @@
                             
                             @if($answer->question->explanation)
                                 <div class="mt-4 p-3 bg-indigo-50 rounded-lg">
-                                    <h5 class="text-sm font-medium text-indigo-800 mb-1">{{ __('Explanation:') }}</h5>
+                                    <h5 class="text-sm font-medium text-indigo-800 mb-1">{{ __('Explication:') }}</h5>
                                     <p class="text-sm text-indigo-700">{{ $answer->question->explanation }}</p>
                                 </div>
                             @endif
@@ -205,10 +205,10 @@
         <!-- Action Buttons -->
         <div class="mt-8 flex justify-between">
             <a href="{{ route('candidate.qcm-exams.available') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Take Another Exam') }}
+                {{ __('Passer un autre examen') }}
             </a>
             <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Return to Dashboard') }}
+                {{ __('Retour au tableau de bord') }}
             </a>
         </div>
     </div>

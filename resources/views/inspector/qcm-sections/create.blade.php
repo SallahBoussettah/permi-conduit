@@ -11,9 +11,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </a>
-                <h1 class="text-3xl font-bold text-gray-900">{{ __('Create Section') }}</h1>
+                <h1 class="text-3xl font-bold text-gray-900">{{ __('Créer une section') }}</h1>
             </div>
-            <p class="mt-2 text-sm text-gray-700">{{ __('Add a new section to the QCM paper:') }} {{ $qcmPaper->title }}</p>
+            <p class="mt-2 text-sm text-gray-700">{{ __('Ajouter une nouvelle section au QCM:') }} {{ $qcmPaper->title }}</p>
         </div>
 
         <!-- Form -->
@@ -31,7 +31,7 @@
                                     </svg>
                                 </div>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">{{ __('There were errors with your submission') }}</h3>
+                                    <h3 class="text-sm font-medium text-red-800">{{ __('Des erreurs ont été rencontrées avec votre soumission') }}</h3>
                                     <div class="mt-2 text-sm text-red-700">
                                         <ul class="list-disc pl-5 space-y-1">
                                             @foreach ($errors->all() as $error)
@@ -47,7 +47,7 @@
                     <div class="space-y-6">
                         <!-- Section Title -->
                         <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700">{{ __('Section Title') }} <span class="text-red-500">*</span></label>
+                            <label for="title" class="block text-sm font-medium text-gray-700">{{ __('Titre de la section') }} <span class="text-red-500">*</span></label>
                             <div class="mt-1">
                                 <input type="text" name="title" id="title" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('title') border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 @enderror" value="{{ old('title') }}" required>
                             </div>
@@ -58,11 +58,11 @@
 
                         <!-- Section Description -->
                         <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700">{{ __('Section Description') }}</label>
+                            <label for="description" class="block text-sm font-medium text-gray-700">{{ __('Description de la section') }}</label>
                             <div class="mt-1">
                                 <textarea name="description" id="description" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md @error('description') border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 @enderror">{{ old('description') }}</textarea>
                             </div>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('Optional. Describe the purpose or content of this section.') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('Optionnel. Décrivez le but ou le contenu de cette section.') }}</p>
                             @error('description')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -71,10 +71,10 @@
 
                     <div class="mt-6 flex justify-end">
                         <a href="{{ route('inspector.qcm-papers.show', $qcmPaper) }}" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Cancel') }}
+                            {{ __('Annuler') }}
                         </a>
                         <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Create') }}
+                            {{ __('Créer') }}
                         </button>
                     </div>
                 </form>

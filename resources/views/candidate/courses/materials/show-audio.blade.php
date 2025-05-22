@@ -70,10 +70,10 @@
                 <h2 class="text-2xl font-semibold text-gray-800">{{ $material->title }}</h2>
                 <div class="flex space-x-2">
                     <a href="{{ route('candidate.courses.show', $course) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                        {{ __('Back to Course') }}
+                        {{ __('Retour au cours') }}
                     </a>
                     <button id="mark-complete-btn" class="inline-flex items-center px-4 py-2 bg-yellow-500 text-gray-900 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-yellow-400 active:bg-yellow-600 focus:outline-none focus:border-yellow-700 focus:ring ring-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed transition ease-in-out duration-150 {{ $progress->completed ? 'bg-yellow-400' : '' }}">
-                        {{ $progress->completed ? __('Completed') : __('Mark as Complete') }}
+                        {{ $progress->completed ? __('Terminé') : __('Marquer comme terminé') }}
                     </button>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                         <!-- Native audio element (hidden) -->
                         <audio id="audio-element" class="hidden" preload="metadata">
                             <source src="{{ route('candidate.courses.materials.audio', ['course' => $course, 'material' => $material]) }}" type="audio/mpeg">
-                            {{ __('Your browser does not support the audio element.') }}
+                            {{ __('Votre navigateur ne supporte pas l\'élément audio.') }}
                         </audio>
                         
                         <!-- Custom audio player UI -->
@@ -138,14 +138,14 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                         </svg>
-                        {{ __('Previous Material') }}
+                        {{ __('Matériel précédent') }}
                     </a>
                     @endif
                 </div>
                 <div>
                     @if ($nextMaterial)
                     <a href="{{ route('candidate.courses.materials.show', ['course' => $course, 'material' => $nextMaterial]) }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-300 active:bg-gray-400 focus:outline-none focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                        {{ __('Next Material') }}
+                        {{ __('Matériel suivant') }}
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>

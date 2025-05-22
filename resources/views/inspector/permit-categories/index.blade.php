@@ -4,9 +4,9 @@
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="px-4 py-6 sm:px-0">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Permit Categories') }}</h1>
+            <h1 class="text-2xl font-semibold text-gray-900">{{ __('Catégories de permis') }}</h1>
             <div class="text-sm text-gray-600 italic">
-                {{ __('Permit categories are managed by administrators') }}
+                {{ __('Les catégories de permis sont gérées par les administrateurs') }}
             </div>
         </div>
 
@@ -31,8 +31,8 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="font-bold">{{ __('Status Information') }}</p>
-                    <p class="text-sm">{{ __('Inactive permit categories will not be visible to candidates, and their associated courses will not be accessible. Only general courses (not associated with any permit category) will be shown to candidates with inactive permit categories.') }}</p>
+                    <p class="font-bold">{{ __('Informations sur le statut') }}</p>
+                    <p class="text-sm">{{ __('Les catégories de permis inactives ne seront pas visibles pour les candidats, et leurs cours associés ne seront pas accessibles. Seuls les cours généraux (non associés à une catégorie de permis) seront affichés aux candidats avec des catégories de permis inactives.') }}</p>
                 </div>
             </div>
         </div>
@@ -43,10 +43,10 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Name') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nom') }}</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Code') }}</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Courses') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Statut') }}</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Cours') }}</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Description') }}</th>
                         </tr>
                     </thead>
@@ -68,13 +68,13 @@
                                     {{ $category->courses()->count() }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">
-                                    {{ $category->description ?: 'No description available' }}
+                                    {{ $category->description ?: 'Aucune description disponible' }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-500">
-                                    {{ __('No permit categories found.') }}
+                                    {{ __('Aucune catégorie de permis trouvée.') }}
                                 </td>
                             </tr>
                         @endforelse

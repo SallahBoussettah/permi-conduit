@@ -5,9 +5,9 @@
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-semibold text-gray-800">{{ __('Edit Course') }}</h2>
+                    <h2 class="text-2xl font-semibold text-gray-800">{{ __('Modifier le cours') }}</h2>
                     <a href="{{ route('inspector.courses.show', $course) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                        {{ __('Back to Course') }}
+                        {{ __('Retour au cours') }}
                     </a>
                 </div>
 
@@ -30,7 +30,7 @@
                         <div class="space-y-6">
                             <!-- Title -->
                             <div>
-                                <label for="title" class="block text-sm font-medium text-gray-700">{{ __('Title') }} <span class="text-red-500">*</span></label>
+                                <label for="title" class="block text-sm font-medium text-gray-700">{{ __('Titre') }} <span class="text-red-500">*</span></label>
                                 <input type="text" name="title" id="title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" value="{{ old('title', $course->title) }}" required>
                             </div>
 
@@ -42,26 +42,26 @@
 
                             <!-- Exam Section -->
                             <div>
-                                <label for="exam_section_id" class="block text-sm font-medium text-gray-700">{{ __('Exam Section (Optional)') }}</label>
+                                <label for="exam_section_id" class="block text-sm font-medium text-gray-700">{{ __('Section d\'examen (Optionnel)') }}</label>
                                 <select name="exam_section_id" id="exam_section_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">{{ __('None') }}</option>
                                     @foreach($examSections as $id => $name)
                                     <option value="{{ $id }}" {{ (old('exam_section_id', $course->exam_section_id) == $id) ? 'selected' : '' }}>{{ $name }}</option>
                                     @endforeach
                                 </select>
-                                <p class="mt-1 text-sm text-gray-500">{{ __('Associate this course with a specific exam section.') }}</p>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Associer ce cours à une section d\'examen spécifique.') }}</p>
                             </div>
 
                             <!-- Permit Category -->
                             <div>
-                                <label for="permit_category_id" class="block text-sm font-medium text-gray-700">{{ __('Permit Category (Optional)') }}</label>
+                                <label for="permit_category_id" class="block text-sm font-medium text-gray-700">{{ __('Catégorie de permis (Optionnel)') }}</label>
                                 <select name="permit_category_id" id="permit_category_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="">{{ __('None - Available to All') }}</option>
                                     @foreach($permitCategories as $id => $name)
                                     <option value="{{ $id }}" {{ (old('permit_category_id', $course->permit_category_id) == $id) ? 'selected' : '' }}>{{ $name }}</option>
                                     @endforeach
                                 </select>
-                                <p class="mt-1 text-sm text-gray-500">{{ __('Assign this course to a specific permit category (C, CE, D, etc.). If selected, the course will ONLY be visible to candidates with this permit category. If not selected, the course will be available to all candidates.') }}</p>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Assigner ce cours à une catégorie de permis spécifique (C, CE, D, etc.). Si sélectionné, le cours ne sera visible que pour les candidats ayant cette catégorie de permis. Si non sélectionné, le cours sera disponible pour tous les candidats.') }}</p>
                             </div>
                         </div>
                         
@@ -69,7 +69,7 @@
                         <div class="space-y-6">
                             <!-- Thumbnail -->
                             <div>
-                                <label for="thumbnail" class="block text-sm font-medium text-gray-700">{{ __('Thumbnail Image') }}</label>
+                                <label for="thumbnail" class="block text-sm font-medium text-gray-700">{{ __('Image miniature') }}</label>
                                 <div class="mt-1 flex items-center">
                                     <div class="w-full">
                                         <div id="thumbnail-preview" class="{{ $course->thumbnail ? '' : 'hidden' }} mb-4">
@@ -85,17 +85,17 @@
                                                     @if($course->thumbnail)
                                                         <span class="font-semibold">{{ __('Change image') }}</span>
                                                     @else
-                                                        <span class="font-semibold">{{ __('Click to upload') }}</span> {{ __('or drag and drop') }}
+                                                        <span class="font-semibold">{{ __('Cliquer pour télécharger') }}</span> {{ __('ou glisser-déposer') }}
                                                     @endif
                                                     </p>
-                                                    <p class="text-xs text-gray-500">{{ __('PNG, JPG or JPEG (MAX. 2MB)') }}</p>
+                                                    <p class="text-xs text-gray-500">{{ __('PNG, JPG ou JPEG (MAX. 2MB)') }}</p>
                                                 </div>
                                                 <input id="thumbnail" name="thumbnail" type="file" class="hidden" accept="image/png,image/jpeg,image/jpg" onchange="previewImage(event)"/>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="mt-1 text-sm text-gray-500">{{ __('Upload a thumbnail image for the course. It will be displayed on the candidate\'s course listing page.') }}</p>
+                                <p class="mt-1 text-sm text-gray-500">{{ __('Télécharger une image miniature pour le cours. Elle sera affichée sur la page de liste des cours des candidats.') }}</p>
                             </div>
                         </div>
                     </div>
@@ -107,7 +107,7 @@
                         <div>
                             <!-- Save button -->
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                {{ __('Save Changes') }}
+                                {{ __('Enregistrer les modifications') }}
                             </button>
                         </div>
                     </div>
@@ -115,11 +115,11 @@
                 
                 <!-- Delete form moved outside of the main form -->
                 <div class="mt-4">
-                    <form action="{{ route('inspector.courses.destroy', $course) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('Are you sure you want to delete this course? All associated materials will also be deleted.') }}');">
+                    <form action="{{ route('inspector.courses.destroy', $course) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('Êtes-vous sûr de vouloir supprimer ce cours? Tous les matériaux associés seront également supprimés.') }}');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:border-red-700 focus:ring ring-red-300 disabled:opacity-25 transition ease-in-out duration-150">
-                            {{ __('Delete Course') }}
+                            {{ __('Supprimer le cours') }}
                         </button>
                     </form>
                 </div>

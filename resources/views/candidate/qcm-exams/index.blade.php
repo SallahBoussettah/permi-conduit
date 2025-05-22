@@ -161,31 +161,31 @@
                                                 <div class="text-sm text-gray-900">{{ $exam->correct_answers_count }} / {{ $exam->total_questions }}</div>
                                                 <div class="text-sm text-gray-500">{{ number_format(($exam->correct_answers_count / $exam->total_questions) * 100, 1) }}%</div>
                                             @else
-                                                <span class="text-sm text-yellow-500">{{ __('In Progress') }}</span>
+                                                <span class="text-sm text-yellow-500">{{ __('En cours') }}</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($exam->completed_at)
                                                 @if(!$exam->is_eliminatory)
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                        {{ __('Passed') }}
+                                                        {{ __('Passé') }}
                                                     </span>
                                                 @else
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                        {{ __('Eliminatory') }}
+                                                        {{ __('Eliminatoire') }}
                                                     </span>
                                                 @endif
                                             @else
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    {{ __('In Progress') }}
+                                                    {{ __('En cours') }}
                                                 </span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             @if($exam->completed_at)
-                                                <a href="{{ route('candidate.qcm-exams.results', $exam) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('View Results') }}</a>
+                                                <a href="{{ route('candidate.qcm-exams.results', $exam) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Voir les résultats') }}</a>
                                             @else
-                                                <a href="{{ route('candidate.qcm-exams.show', $exam) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Continue') }}</a>
+                                                <a href="{{ route('candidate.qcm-exams.show', $exam) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Continuer') }}</a>
                                             @endif
                                         </td>
                                     </tr>
@@ -198,8 +198,8 @@
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('No exam history') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500">{{ __('You have not taken any QCM exams yet.') }}</p>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('Aucun historique d\'examen') }}</h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ __('Vous n\'avez pas passé d\'examen QCM.') }}</p>
                     </div>
                 @endif
             </div>

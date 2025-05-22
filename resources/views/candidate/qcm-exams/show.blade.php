@@ -9,12 +9,12 @@
                 <h1 class="text-3xl font-bold text-gray-900">{{ $qcmExam->paper->title }}</h1>
                 <p class="mt-2 text-sm text-gray-700">{{ $qcmExam->paper->permitCategory->name }}</p>
                 <p class="mt-2 text-sm font-medium text-red-600">
-                    {{ __('This QCM has 10 questions to be completed in 6 minutes. You need at least 6 correct answers to pass.') }}
+                    {{ __('Cet examen QCM comporte 10 questions à compléter en 6 minutes. Vous devez avoir au moins 6 réponses correctes pour passer.') }}
                 </p>
             </div>
             <div class="flex items-center">
                 <div class="px-4 py-2 bg-white shadow rounded-lg mr-4">
-                    <div class="text-sm text-gray-500">{{ __('Time Remaining') }}</div>
+                    <div class="text-sm text-gray-500">{{ __('Temps restant') }}</div>
                     <div id="timer" class="text-2xl font-bold text-gray-900" 
                          data-end-time="{{ $qcmExam->expires_at ? $qcmExam->expires_at->timestamp : now()->addMinutes(6)->timestamp }}"
                          data-remaining-seconds="{{ $remainingTime }}">
@@ -101,20 +101,20 @@
                             <button type="button" 
                                 class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 {{ $index === 0 ? 'invisible' : '' }}"
                                 onclick="document.getElementById('question-{{ $index + 1 }}').classList.add('hidden'); document.getElementById('question-{{ $index }}').classList.remove('hidden'); document.getElementById('current-question').textContent = '{{ $index }}'; document.getElementById('progress-bar').style.width = '{{ ($index / count($questions)) * 100 }}%';">
-                                {{ __('Previous') }}
+                                {{ __('Précédent') }}
                             </button>
                             
                             @if($index === count($questions) - 1)
                                 <button type="button" 
                                     onclick="document.getElementById('confirmation-modal').classList.remove('hidden');"
                                     class="finish-exam-btn ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    {{ __('Finish Exam') }}
+                                    {{ __('Terminer l\'examen') }}
                                 </button>
                             @else
                                 <button type="button"
                                     class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     onclick="document.getElementById('question-{{ $index + 1 }}').classList.add('hidden'); document.getElementById('question-{{ $index + 2 }}').classList.remove('hidden'); document.getElementById('current-question').textContent = '{{ $index + 2 }}'; document.getElementById('progress-bar').style.width = '{{ (($index + 2) / count($questions)) * 100 }}%';">
-                                    {{ __('Next') }}
+                                    {{ __('Suivant') }}
                                 </button>
                             @endif
                         </div>
@@ -136,13 +136,13 @@
                                     </svg>
                                 </div>
                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">{{ __('Submit Exam') }}</h3>
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">{{ __('Soumettre l\'examen') }}</h3>
                                     <div class="mt-2">
                                         <p class="text-sm text-gray-500">
-                                            {{ __('Are you sure you want to submit your exam? You cannot change your answers after submission.') }}
+                                            {{ __('Êtes-vous sûr de vouloir soumettre votre examen ? Vous ne pouvez pas modifier vos réponses après la soumission.') }}
                                         </p>
                                         <div id="unanswered-warning" class="mt-2 text-sm text-red-600 hidden">
-                                            {{ __('Warning: You have unanswered questions.') }}
+                                            {{ __('Attention: Vous avez des questions non répondues.') }}
                                         </div>
                                     </div>
                                 </div>
@@ -152,10 +152,10 @@
                             <button type="button" 
                                 onclick="document.getElementById('exam-form').submit();" 
                                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                {{ __('Submit') }}
+                                {{ __('Soumettre') }}
                             </button>
                             <button type="button" id="cancel-submit" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                {{ __('Continue Exam') }}
+                                {{ __('Continuer l\'examen') }}
                             </button>
                         </div>
                     </div>
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // If time's up, submit the form
                 if (diff <= 0) {
                     clearInterval(timerUpdateInterval);
-                    alert('Time is up! Your exam will be submitted automatically.');
+                    alert('{{ __('Le temps est écoulé ! Votre examen sera soumis automatiquement.') }}');
                     examForm.submit();
                 }
             } catch (error) {
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create debug button (in development only)
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             const debugBtn = document.createElement('button');
-            debugBtn.textContent = 'Debug Timer';
+            debugBtn.textContent = '{{ __('Déboguer le timer') }}';
             debugBtn.style.position = 'fixed';
             debugBtn.style.bottom = '10px';
             debugBtn.style.right = '10px';
