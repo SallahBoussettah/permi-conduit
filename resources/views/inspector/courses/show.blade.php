@@ -43,13 +43,13 @@
                         <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        {{ __('Edit Course') }}
+                        {{ __('Modifier le cours') }}
                     </a>
                     <a href="{{ route('inspector.courses.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        {{ __('Back to Courses') }}
+                        {{ __('Retour aux cours') }}
                     </a>
                 </div>
             </div>
@@ -89,7 +89,7 @@
         <!-- Course Metadata -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
             <div class="px-4 py-5 sm:px-6 bg-gray-50">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Course Information') }}</h3>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Informations du cours') }}</h3>
             </div>
             <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -97,7 +97,7 @@
                         <!-- Thumbnail -->
                         @if($course->thumbnail)
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Thumbnail Image') }}</p>
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Image miniature') }}</p>
                                 <div class="rounded-lg overflow-hidden border border-gray-200 w-40">
                                     <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-auto">
                                 </div>
@@ -106,21 +106,21 @@
                         
                         @if($course->category)
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Category') }}</p>
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Catégorie') }}</p>
                                 <p class="text-sm text-gray-900">{{ $course->category->name }}</p>
                             </div>
                         @endif
                         
                         @if($course->permitCategory)
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Permit Category') }}</p>
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Catégorie de permis') }}</p>
                                 <p class="text-sm text-gray-900">{{ $course->permitCategory->name }} ({{ $course->permitCategory->code }})</p>
                             </div>
                         @endif
                         
                         @if($course->examSection)
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Exam Section') }}</p>
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Section d\'examen') }}</p>
                                 <p class="text-sm text-gray-900">{{ $course->examSection->name }}</p>
                             </div>
                         @endif
@@ -129,7 +129,7 @@
                     <div>
                         <!-- Additional course metadata can be added here -->
                         <div class="mb-4">
-                            <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Status') }}</p>
+                            <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Statut') }}</p>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $course->status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ $course->status ? __('Active') : __('Inactive') }}
                             </span>
@@ -137,19 +137,19 @@
                         
                         @if($course->inspector)
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Inspector') }}</p>
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Inspecteur') }}</p>
                                 <p class="text-sm text-gray-900">{{ $course->inspector->name }}</p>
                             </div>
                         @endif
                         
                         <div class="mb-4">
-                            <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Created At') }}</p>
+                            <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Créé le') }}</p>
                             <p class="text-sm text-gray-900">{{ $course->created_at->format('M d, Y H:i') }}</p>
                         </div>
                         
                         @if($course->updated_at && $course->updated_at->ne($course->created_at))
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Last Updated') }}</p>
+                                <p class="text-sm font-medium text-gray-500 mb-2">{{ __('Dernière mise à jour') }}</p>
                                 <p class="text-sm text-gray-900">{{ $course->updated_at->format('M d, Y H:i') }}</p>
                             </div>
                         @endif
@@ -161,14 +161,14 @@
         <!-- Course Description -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
             <div class="px-4 py-5 sm:px-6 bg-gray-50">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Course Description') }}</h3>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Description du cours') }}</h3>
             </div>
             <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
                 <div class="prose max-w-none text-gray-700">
                     @if($course->description)
                         {{ $course->description }}
                     @else
-                        <p class="text-gray-500 italic">{{ __('No description provided.') }}</p>
+                        <p class="text-gray-500 italic">{{ __('Aucune description fournie.') }}</p>
                     @endif
                 </div>
             </div>
@@ -177,12 +177,12 @@
         <!-- Course Materials Section -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6 bg-gray-50 flex items-center justify-between">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Course Materials') }}</h3>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">{{ __('Matériaux du cours') }}</h3>
                 <a href="{{ route('inspector.courses.materials.create', $course) }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    {{ __('Add Material') }}
+                    {{ __('Ajouter un matériau') }}
                 </a>
             </div>
             <div class="border-t border-gray-200">
@@ -191,14 +191,14 @@
                         <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('No materials') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500">{{ __('No materials have been added to this course yet.') }}</p>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('Aucun matériau') }}</h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ __('Aucun matériau n\'a été ajouté à ce cours.') }}</p>
                         <div class="mt-6">
                             <a href="{{ route('inspector.courses.materials.create', $course) }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
-                                {{ __('Add First Material') }}
+                                {{ __('Ajouter le premier matériau') }}
                             </a>
                         </div>
                     </div>
@@ -207,8 +207,8 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Order') }}</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Title') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Ordre') }}</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Titre') }}</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Type') }}</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Pages') }}</th>
                                     <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
@@ -254,6 +254,13 @@
                                                     </svg>
                                                     Video
                                                 </span>
+                                            @elseif($material->material_type === 'audio')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    <svg class="mr-1 h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                                    </svg>
+                                                    Audio
+                                                </span>
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                     {{ ucfirst($material->material_type) }}
@@ -270,6 +277,15 @@
                                                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
                                                         </svg>
                                                         YouTube
+                                                    </span>
+                                                </div>
+                                            @elseif($material->material_type === 'audio')
+                                                <div class="text-sm text-gray-500">
+                                                    <span class="inline-flex items-center">
+                                                        <svg class="mr-1 h-3 w-3 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14v-8l6 4-6 4z" />
+                                                        </svg>
+                                                        {{ $material->duration_seconds ? gmdate('i:s', $material->duration_seconds) : 'Audio' }}
                                                     </span>
                                                 </div>
                                             @else
@@ -315,7 +331,7 @@
                 <svg class="mr-1 h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                {{ __('Back to Courses') }}
+                {{ __('Retour aux cours') }}
             </a>
         </div>
     </div>

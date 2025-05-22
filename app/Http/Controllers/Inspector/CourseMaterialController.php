@@ -299,24 +299,8 @@ class CourseMaterialController extends Controller
                 $thumbnail->storeAs('public/thumbnails', $thumbnailName);
                 $thumbnailPath = 'thumbnails/' . $thumbnailName;
             } else {
-                // Use YouTube thumbnail
-                $thumbnailPath = 'thumbnails/youtube_' . $videoId . '.jpg';
-                
-                // Download YouTube thumbnail if it doesn't exist
-                $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
-                $localThumbPath = storage_path('app/public/' . $thumbnailPath);
-                
-                // Create directory if it doesn't exist
-                if (!file_exists(dirname($localThumbPath))) {
-                    mkdir(dirname($localThumbPath), 0755, true);
-                }
-                
-                // Try to download the maxresdefault thumbnail (HD)
-                if (!@copy($youtubeThumbUrl, $localThumbPath)) {
-                    // If HD thumbnail not available, use the default thumbnail
-                    $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/0.jpg";
-                    @copy($youtubeThumbUrl, $localThumbPath);
-                }
+                // Use default video thumbnail from storage/thumbnails
+                $thumbnailPath = 'thumbnails/default_video.jpg';
             }
 
             // Set video-specific data
@@ -634,25 +618,8 @@ class CourseMaterialController extends Controller
                         Storage::delete('public/' . $material->thumbnail_path);
                     }
                     
-                    // Use YouTube thumbnail
-                    $thumbnailPath = 'thumbnails/youtube_' . $videoId . '.jpg';
-                    
-                    // Download YouTube thumbnail if it doesn't exist
-                    $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/maxresdefault.jpg";
-                    $localThumbPath = storage_path('app/public/' . $thumbnailPath);
-                    
-                    // Create directory if it doesn't exist
-                    if (!file_exists(dirname($localThumbPath))) {
-                        mkdir(dirname($localThumbPath), 0755, true);
-                    }
-                    
-                    // Try to download the maxresdefault thumbnail (HD)
-                    if (!@copy($youtubeThumbUrl, $localThumbPath)) {
-                        // If HD thumbnail not available, use the default thumbnail
-                        $youtubeThumbUrl = "https://img.youtube.com/vi/{$videoId}/0.jpg";
-                        @copy($youtubeThumbUrl, $localThumbPath);
-                    }
-                    
+                    // Use default video thumbnail from storage/thumbnails
+                    $thumbnailPath = 'thumbnails/default_video.jpg';
                     $material->thumbnail_path = $thumbnailPath;
                 }
             }
@@ -901,6 +868,56 @@ class CourseMaterialController extends Controller
                 return 'A PHP extension stopped the file upload';
             default:
                 return 'Unknown upload error';
+        }
+    }
+
+    /**
+     * Create a default video thumbnail image.
+     */
+    private function createDefaultVideoThumbnail($path)
+    {
+        try {
+            // Create a simple video icon image
+            $width = 300;
+            $height = 200;
+            $image = imagecreatetruecolor($width, $height);
+            
+            // Set background color (dark gray)
+            $bgColor = imagecolorallocate($image, 45, 45, 45);
+            imagefill($image, 0, 0, $bgColor);
+            
+            // Draw video play button icon
+            $iconColor = imagecolorallocate($image, 255, 0, 0);
+            $triangleColor = imagecolorallocate($image, 255, 255, 255);
+            
+            // Circle for play button
+            imagefilledellipse($image, $width/2, $height/2, 80, 80, $iconColor);
+            
+            // Triangle for play symbol
+            $centerX = $width/2;
+            $centerY = $height/2;
+            $trianglePoints = [
+                $centerX - 15, $centerY - 25,
+                $centerX - 15, $centerY + 25,
+                $centerX + 30, $centerY
+            ];
+            imagefilledpolygon($image, $trianglePoints, 3, $triangleColor);
+            
+            // Ensure the directory exists
+            $fullPath = $path;
+            if (!file_exists(dirname($fullPath))) {
+                mkdir(dirname($fullPath), 0755, true);
+            }
+            
+            // Save the image
+            imagejpeg($image, $fullPath, 90);
+            imagedestroy($image);
+            
+            Log::info('Default video thumbnail created at ' . $fullPath);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Default video thumbnail creation failed: ' . $e->getMessage());
+            return false;
         }
     }
 }
