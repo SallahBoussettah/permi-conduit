@@ -12,6 +12,11 @@
     @endauth
 
     <title>{{ config('app.name', 'ECF') }}</title>
+    
+    <!-- Alpine.js styles -->
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,9 +63,6 @@
     @if($jsFile)
     <script src="{{ $jsFile }}" defer></script>
     @endif
-
-    <!-- Alpine.js CDN - add if not already included in your build -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-gray-50 text-gray-900 flex flex-col min-h-screen @auth user-authenticated @endauth">
     <header class="bg-gray-900 text-white fixed top-0 left-0 right-0 z-50">
@@ -160,7 +162,13 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                     </svg>
-                                    <span x-show="unreadCount > 0" x-text="unreadCount" id="notification-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"></span>
+                                    <span 
+                                        x-cloak
+                                        x-show="unreadCount > 0" 
+                                        x-text="unreadCount" 
+                                        id="notification-count" 
+                                        class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                                    </span>
                                 </button>
                                 <div x-show="isOpen" @click.away="isOpen = false" class="absolute right-0 mt-2 w-[400px] bg-white rounded-md shadow-lg overflow-hidden z-50" style="display: none;">
                                     <div class="py-2">
@@ -507,125 +515,7 @@
         
         // Update notification count when page loads and every minute
         updateMobileNotificationCount();
-        setInterval(updateMobileNotificationCount, 60000); // Every minute
-    </script>
-
-    <script>
-        // Alpine.js notification dropdown component
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('notificationDropdown', () => ({
-                isOpen: false,
-                unreadCount: 0,
-                notifications: [],
-                notificationListHtml: '',
-                
-                init() {
-                    // Initialize handler reference
-                    this.handler = null;
-                    
-                    // Subscribe to notification updates
-                    window.addEventListener('notification-count-updated', (e) => {
-                        this.unreadCount = e.detail.count;
-                    });
-                    
-                    window.addEventListener('notifications-updated', (e) => {
-                        this.notifications = e.detail.notifications;
-                        this.updateNotificationListHtml();
-                    });
-                    
-                    // Initial fetch
-                    this.fetchNotifications();
-                },
-                
-                toggleDropdown() {
-                    this.isOpen = !this.isOpen;
-                    if (this.isOpen) {
-                        this.fetchNotifications();
-                    }
-                },
-                
-                fetchNotifications() {
-                    fetch('/notifications/unread')
-                        .then(response => response.json())
-                        .then(data => {
-                            this.unreadCount = data.count;
-                            this.notifications = data.notifications;
-                            this.updateNotificationListHtml();
-                        });
-                },
-                
-                updateNotificationListHtml() {
-                    if (this.notifications.length === 0) {
-                        this.notificationListHtml = `
-                            <div class="px-4 py-8 text-center">
-                                <p class="text-sm text-gray-500">{{ __('Aucune notification non lue') }}</p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    let html = '';
-                    this.notifications.forEach(notification => {
-                        html += `
-                            <div class="px-5 py-4 border-b border-gray-200 hover:bg-gray-50">
-                                <div class="flex justify-between">
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">${notification.message}</p>
-                                        <p class="text-xs text-gray-500 mt-2">${new Date(notification.created_at).toLocaleString()}</p>
-                                    </div>
-                                    <div class="flex space-x-3 ml-4 flex-shrink-0 items-start">
-                                        <button 
-                                            @click="markAsRead(${notification.id})" 
-                                            class="text-xs text-blue-600 hover:text-blue-800 font-medium">
-                                            {{ __('Marquer comme lu') }}
-                                        </button>
-                                        ${notification.link ? `
-                                            <a href="${notification.link}" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
-                                                {{ __('Voir') }}
-                                            </a>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    this.notificationListHtml = html;
-                },
-                
-                markAsRead(id) {
-                    fetch(`/notifications/${id}/read`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        this.unreadCount = data.count;
-                        this.notifications = this.notifications.filter(n => n.id != id);
-                        this.updateNotificationListHtml();
-                    });
-                },
-                
-                markAllAsRead() {
-                    fetch('/notifications/read-all', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        this.unreadCount = 0;
-                        this.notifications = [];
-                        this.updateNotificationListHtml();
-                    });
-                }
-            }));
-        });
+        setInterval(updateMobileNotificationCount, 60000);
     </script>
 </body>
 </html> 

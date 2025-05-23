@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mt-16">
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 sm:px-0 py-6 flex justify-between items-center">
             <h2 class="text-2xl font-semibold text-gray-900">{{ __('Notifications') }}</h2>
             <form action="{{ route('notifications.mark-all-read') }}" method="POST" class="flex space-x-2">

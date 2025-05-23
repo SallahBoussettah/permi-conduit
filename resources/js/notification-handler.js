@@ -16,8 +16,19 @@ export default class NotificationHandler {
 
         console.log('NotificationHandler initialized');
         
+        // First dispatch an initial update to ensure Alpine components are in sync
+        // even before we fetch from the server and hope it works
+        this.dispatchUpdateEvents();
+        
         this.setupEventListeners();
-        this.fetchNotifications();
+        
+        // Now fetch notifications and dispatch again when done
+        this.fetchNotifications()
+            .then(() => {
+                console.log('Initial notification fetch complete, dispatching updates');
+                this.dispatchUpdateEvents();
+            });
+            
         this.setupEchoListeners();
         
         // Show a notification when the page loads to confirm the system is working
@@ -50,7 +61,7 @@ export default class NotificationHandler {
     fetchNotifications() {
         console.log('Fetching notifications from server');
         
-        fetch('/notifications/unread')
+        return fetch('/notifications/unread')
             .then(response => response.json())
             .then(data => {
                 console.log('Notifications fetched:', data);
@@ -60,9 +71,12 @@ export default class NotificationHandler {
                 
                 // Dispatch event for Alpine
                 this.dispatchUpdateEvents();
+                
+                return data;
             })
             .catch(error => {
                 console.error('Error fetching notifications:', error);
+                return { notifications: [], count: 0 };
             });
     }
 
@@ -109,7 +123,12 @@ export default class NotificationHandler {
                             this.updateUI();
                             
                             // Dispatch events for Alpine
-                            this.dispatchUpdateEvents();
+                            this.dispatchUpdateEvents(true);
+                            
+                            // Dispatch a specific event for new notifications to trigger the dropdown
+                            window.dispatchEvent(new CustomEvent('new-notification-received', {
+                                detail: { notification: data }
+                            }));
                             
                             // Show browser notification
                             this.showBrowserNotification(data);
@@ -149,11 +168,12 @@ export default class NotificationHandler {
         }
     }
     
-    dispatchUpdateEvents() {
+    dispatchUpdateEvents(isNewNotification = false) {
         // Dispatch count update event
         window.dispatchEvent(new CustomEvent('notification-count-updated', {
             detail: {
-                count: this.unreadCount
+                count: this.unreadCount,
+                autoOpen: isNewNotification
             }
         }));
         
@@ -163,6 +183,13 @@ export default class NotificationHandler {
                 notifications: this.unreadNotifications
             }
         }));
+        
+        if (isNewNotification) {
+            // Dispatch a specific event for new notifications to trigger the dropdown
+            window.dispatchEvent(new CustomEvent('new-notification-received', {
+                detail: { notification: this.unreadNotifications[0] }
+            }));
+        }
     }
 
     updateCountBadges() {

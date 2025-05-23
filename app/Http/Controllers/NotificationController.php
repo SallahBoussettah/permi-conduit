@@ -208,6 +208,7 @@ class NotificationController extends Controller
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
+                'count' => Auth::user()->notifications()->whereNull('read_at')->count(),
             ]);
         }
 
@@ -247,6 +248,7 @@ class NotificationController extends Controller
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
+                'count' => Auth::user()->notifications()->whereNull('read_at')->count(),
             ]);
         }
 
