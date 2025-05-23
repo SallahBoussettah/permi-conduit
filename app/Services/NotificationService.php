@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\NewNotification;
 use App\Models\Course;
 use App\Models\Notification;
 use App\Models\User;
@@ -55,9 +56,18 @@ class NotificationService
                 $notification = Notification::create([
                     'user_id' => $user->id,
                     'message' => "New course available: {$course->title}",
+                    'type' => Notification::TYPE_COURSE,
                     'link' => route('candidate.courses.show', $course),
                     'read_at' => null,
+                    'data' => [
+                        'course_id' => $course->id,
+                        'course_title' => $course->title,
+                        'permit_category_id' => $course->permit_category_id,
+                    ],
                 ]);
+                
+                // Broadcast the new notification event
+                event(new NewNotification($notification));
                 
                 Log::info('Created notification', [
                     'notification_id' => $notification->id,
@@ -98,12 +108,29 @@ class NotificationService
                     ->exists();
                 
                 if (!$existingNotification) {
-                    Notification::create([
+                    // Get the last progress for the course
+                    $lastProgress = $candidate->courseMaterialProgress()
+                        ->whereHas('courseMaterial', function ($query) use ($course) {
+                            $query->where('course_id', $course->id);
+                        })
+                        ->orderBy('updated_at', 'desc')
+                        ->first();
+                    
+                    $notification = Notification::create([
                         'user_id' => $candidate->id,
                         'message' => "Don't forget to complete: {$course->title}",
+                        'type' => Notification::TYPE_REMINDER,
                         'link' => route('candidate.courses.show', $course),
                         'read_at' => null,
+                        'data' => [
+                            'course_id' => $course->id,
+                            'course_title' => $course->title,
+                            'last_activity' => $lastProgress ? $lastProgress->updated_at->toDateTimeString() : null,
+                        ],
                     ]);
+                    
+                    // Broadcast the new notification event
+                    event(new NewNotification($notification));
                 }
             }
         }
@@ -130,12 +157,21 @@ class NotificationService
                 ->exists();
             
             if (!$existingNotification) {
-                Notification::create([
+                $notification = Notification::create([
                     'user_id' => $exam->candidate_id,
                     'message' => "Upcoming exam on " . Carbon::parse($exam->exam_date)->format('d/m/Y'),
+                    'type' => Notification::TYPE_EXAM,
                     'link' => route('dashboard'), // Should point to exam details page when implemented
                     'read_at' => null,
+                    'data' => [
+                        'exam_id' => $exam->id,
+                        'exam_date' => $exam->exam_date,
+                        'days_until_exam' => Carbon::now()->diffInDays(Carbon::parse($exam->exam_date)),
+                    ],
                 ]);
+                
+                // Broadcast the new notification event
+                event(new NewNotification($notification));
             }
         }
     }

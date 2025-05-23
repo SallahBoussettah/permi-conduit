@@ -187,6 +187,8 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
     Route::get('/notifications/unread', [NotificationController::class, 'getUnread'])->name('notifications.unread');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroy-all');
 });
 
 // Super Admin routes
@@ -462,5 +464,26 @@ Route::post('/laravel-upload-test', function (\Illuminate\Http\Request $request)
 Route::get('/laravel-upload-test', function () {
     return view('laravel-upload-test');
 });
+
+// Add a test route for real-time notifications
+Route::middleware(['auth'])->get('/test-notification', function () {
+    $user = auth()->user();
+    $notification = new \App\Models\Notification([
+        'user_id' => $user->id,
+        'message' => 'This is a test real-time notification! ' . date('H:i:s'),
+        'type' => \App\Models\Notification::TYPE_SYSTEM,
+        'link' => route('dashboard'),
+        'data' => ['test' => true],
+    ]);
+    $notification->save();
+    
+    // Broadcast the new notification
+    event(new \App\Events\NewNotification($notification));
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Test notification sent!'
+    ]);
+})->name('test-notification');
 
 require __DIR__.'/auth.php';

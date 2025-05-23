@@ -108,17 +108,50 @@ class NotificationController extends Controller
     }
 
     /**
-     * Get all user notifications for the notifications page
+     * Get all user notifications for the notifications page with filtering and sorting
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $notifications = $user->notifications()
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-            
+        $query = $user->notifications();
+        
+        // Apply filters
+        if ($request->has('read_status')) {
+            if ($request->read_status === 'read') {
+                $query->read();
+            } elseif ($request->read_status === 'unread') {
+                $query->unread();
+            }
+        }
+        
+        if ($request->has('type') && $request->type) {
+            $query->ofType($request->type);
+        }
+        
+        if ($request->has('start_date') && $request->start_date) {
+            $startDate = $request->start_date;
+            $endDate = $request->has('end_date') && $request->end_date ? $request->end_date : null;
+            $query->inDateRange($startDate, $endDate);
+        }
+        
+        // Apply sorting
+        $sortField = $request->input('sort_by', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        
+        // Validate sort field to prevent SQL injection
+        $allowedSortFields = ['created_at', 'read_at', 'type'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'created_at';
+        }
+        
+        $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
+        
+        // Get paginated results
+        $notifications = $query->paginate(15)->withQueryString();
+        
         // Process notifications to validate links
         $notifications->getCollection()->transform(function ($notification) {
             // If there's a link, verify the resource exists
@@ -140,6 +173,85 @@ class NotificationController extends Controller
             return $notification;
         });
 
-        return view('notifications.index', compact('notifications'));
+        // Get notification types for the filter dropdown
+        $notificationTypes = [
+            Notification::TYPE_COURSE => 'Course',
+            Notification::TYPE_EXAM => 'Exam',
+            Notification::TYPE_REMINDER => 'Reminder',
+            Notification::TYPE_SYSTEM => 'System',
+        ];
+
+        return view('notifications.index', compact('notifications', 'notificationTypes'));
+    }
+    
+    /**
+     * Delete a notification
+     *
+     * @param  Notification  $notification
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Notification $notification, Request $request)
+    {
+        // Security check - ensure the notification belongs to the current user
+        if (Auth::id() !== $notification->user_id) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+            return redirect()->route('notifications.index')
+                ->with('error', 'You are not authorized to delete this notification');
+        }
+
+        $notification->delete();
+
+        // Check if the request wants JSON (AJAX request)
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+            ]);
+        }
+
+        // For regular form submissions, redirect back to the notifications page
+        return redirect()->route('notifications.index')
+            ->with('success', 'Notification deleted successfully');
+    }
+    
+    /**
+     * Delete all notifications
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyAll(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Apply filters if they exist in the request
+        $query = $user->notifications();
+        
+        if ($request->has('read_status')) {
+            if ($request->read_status === 'read') {
+                $query->read();
+            } elseif ($request->read_status === 'unread') {
+                $query->unread();
+            }
+        }
+        
+        if ($request->has('type') && $request->type) {
+            $query->ofType($request->type);
+        }
+        
+        $query->delete();
+
+        // Check if the request wants JSON (AJAX request)
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+            ]);
+        }
+
+        // For regular form submissions, redirect back to the notifications page
+        return redirect()->route('notifications.index')
+            ->with('success', 'Notifications deleted successfully');
     }
 } 
