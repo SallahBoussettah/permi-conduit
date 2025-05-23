@@ -40,12 +40,13 @@ export default defineConfig({
             },
         },
     },
-    // Expose Pusher environment variables
+    // Directly set Pusher environment variables
     define: {
-        'import.meta.env.VITE_PUSHER_APP_KEY': JSON.stringify(process.env.PUSHER_APP_KEY || ''),
-        'import.meta.env.VITE_PUSHER_APP_CLUSTER': JSON.stringify(process.env.PUSHER_APP_CLUSTER || 'eu'),
-        'import.meta.env.VITE_PUSHER_APP_HOST': JSON.stringify(process.env.PUSHER_HOST || 'api.pusher.com'),
-        'import.meta.env.VITE_PUSHER_APP_PORT': JSON.stringify(process.env.PUSHER_PORT || '443'),
-        'import.meta.env.VITE_PUSHER_APP_SCHEME': JSON.stringify(process.env.PUSHER_SCHEME || 'https'),
+        // Use hardcoded values to ensure they're available
+        'import.meta.env.VITE_PUSHER_APP_KEY': JSON.stringify('183f5986f6b077841475'),
+        'import.meta.env.VITE_PUSHER_APP_CLUSTER': JSON.stringify('eu'),
+        'import.meta.env.VITE_PUSHER_APP_HOST': JSON.stringify(''),
+        'import.meta.env.VITE_PUSHER_APP_PORT': JSON.stringify('443'),
+        'import.meta.env.VITE_PUSHER_APP_SCHEME': JSON.stringify('https'),
     },
 });

@@ -468,7 +468,10 @@ Route::get('/laravel-upload-test', function () {
 // Add a test route for real-time notifications
 Route::middleware(['auth'])->get('/test-notification', function () {
     try {
+        \Log::info('Starting test notification');
         $user = auth()->user();
+        
+        \Log::info('Creating notification for user', ['user_id' => $user->id]);
         $notification = new \App\Models\Notification([
             'user_id' => $user->id,
             'message' => 'This is a test real-time notification! ' . date('H:i:s'),
@@ -476,21 +479,50 @@ Route::middleware(['auth'])->get('/test-notification', function () {
             'link' => route('dashboard'),
             'data' => ['test' => true],
         ]);
+        
+        \Log::info('Saving notification');
         $notification->save();
+        
+        \Log::info('Preparing to broadcast notification', ['notification_id' => $notification->id]);
+        
+        // Check if broadcasting is configured
+        \Log::info('Broadcast driver: ' . config('broadcasting.default'));
+        \Log::info('Pusher config', [
+            'key' => config('broadcasting.connections.pusher.key') ? 'Set' : 'Not set',
+            'app_id' => config('broadcasting.connections.pusher.app_id') ? 'Set' : 'Not set',
+            'secret' => config('broadcasting.connections.pusher.secret') ? 'Set' : 'Not set',
+            'cluster' => config('broadcasting.connections.pusher.options.cluster')
+        ]);
         
         // Broadcast the new notification
         event(new \App\Events\NewNotification($notification));
+        \Log::info('Notification broadcasted successfully');
         
         return response()->json([
             'success' => true,
             'message' => 'Test notification sent!',
-            'notification_id' => $notification->id
+            'notification_id' => $notification->id,
+            'config' => [
+                'broadcast_driver' => config('broadcasting.default'),
+                'pusher_key_set' => !empty(config('broadcasting.connections.pusher.key')),
+                'pusher_app_id_set' => !empty(config('broadcasting.connections.pusher.app_id')),
+                'pusher_secret_set' => !empty(config('broadcasting.connections.pusher.secret')),
+                'pusher_cluster' => config('broadcasting.connections.pusher.options.cluster')
+            ]
         ]);
     } catch (\Exception $e) {
-        \Log::error('Test notification error: ' . $e->getMessage());
+        \Log::error('Test notification error', [
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        
         return response()->json([
             'success' => false,
-            'message' => 'Error sending notification: ' . $e->getMessage()
+            'message' => 'Error sending notification: ' . $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
         ], 500);
     }
 })->name('test-notification');

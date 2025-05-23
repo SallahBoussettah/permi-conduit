@@ -9,45 +9,53 @@ import Pusher from 'pusher-js';
 
 window.Pusher = Pusher;
 
+// Add debug logging for environment variables
+console.log('Pusher Environment Variables:');
+console.log('VITE_PUSHER_APP_KEY:', import.meta.env.VITE_PUSHER_APP_KEY);
+console.log('VITE_PUSHER_APP_CLUSTER:', import.meta.env.VITE_PUSHER_APP_CLUSTER);
+console.log('VITE_PUSHER_APP_HOST:', import.meta.env.VITE_PUSHER_APP_HOST);
+console.log('VITE_PUSHER_APP_PORT:', import.meta.env.VITE_PUSHER_APP_PORT);
+console.log('VITE_PUSHER_APP_SCHEME:', import.meta.env.VITE_PUSHER_APP_SCHEME);
+
 // Initialize Laravel Echo for real-time events only if Pusher is properly configured
 try {
-    const pusherKey = import.meta.env.VITE_PUSHER_APP_KEY;
+    // Hard-coded key for testing - this ensures Pusher will be initialized
+    const pusherKey = '183f5986f6b077841475';
     
-    // Only initialize Echo if we have a Pusher key
-    if (pusherKey && pusherKey !== 'your_pusher_app_key') {
-        window.Echo = new Echo({
-            broadcaster: 'pusher',
-            key: pusherKey,
-            cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-            wsHost: import.meta.env.VITE_PUSHER_APP_HOST,
-            wsPort: import.meta.env.VITE_PUSHER_APP_PORT,
-            wssPort: import.meta.env.VITE_PUSHER_APP_PORT,
-            forceTLS: import.meta.env.VITE_PUSHER_APP_SCHEME === 'https',
-            enabledTransports: ['ws', 'wss'],
-            disableStats: true,
-            authEndpoint: '/broadcasting/auth',
-            auth: {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                }
+    // Always initialize Echo with the Pusher key
+    console.log('Initializing Echo with pusher key:', pusherKey);
+    
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: pusherKey,
+        cluster: 'eu',
+        wsHost: import.meta.env.VITE_PUSHER_APP_HOST || undefined,
+        wsPort: import.meta.env.VITE_PUSHER_APP_PORT || undefined,
+        wssPort: import.meta.env.VITE_PUSHER_APP_PORT || undefined,
+        forceTLS: true,
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true,
+        authEndpoint: '/broadcasting/auth',
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
             }
+        }
+    });
+    
+    // Add Pusher connection status logging
+    if (window.Echo.connector && window.Echo.connector.pusher) {
+        window.Echo.connector.pusher.connection.bind('connected', () => {
+            console.log('✅ Pusher connected successfully');
         });
         
-        // Log that Echo is initialized
-        console.log('Laravel Echo initialized with Pusher');
-    } else {
-        console.log('Pusher key not configured, Echo initialization skipped');
-        
-        // Create a dummy Echo object that doesn't do anything
-        window.Echo = {
-            private: () => ({
-                listen: () => {}
-            }),
-            channel: () => ({
-                listen: () => {}
-            })
-        };
+        window.Echo.connector.pusher.connection.bind('error', (err) => {
+            console.error('❌ Pusher connection error:', err);
+        });
     }
+    
+    // Log that Echo is initialized
+    console.log('Laravel Echo initialized with Pusher');
 } catch (error) {
     console.error('Failed to initialize Laravel Echo:', error);
     
