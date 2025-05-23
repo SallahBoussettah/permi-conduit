@@ -433,18 +433,39 @@
             const testNotificationBtn = document.getElementById('test-notification-btn');
             if (testNotificationBtn) {
                 testNotificationBtn.addEventListener('click', function() {
-                    fetch('{{ route("test-notification") }}')
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Test notification sent:', data);
-                            if (data.success) {
-                                alert('Test notification sent! Check your notification dropdown.');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error sending test notification:', error);
-                            alert('Error sending notification. Check console for details.');
-                        });
+                    fetch('{{ route("test-notification") }}', {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        
+                        // Check if response is JSON
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json();
+                        } else {
+                            // Get text content for debugging
+                            return response.text().then(text => {
+                                console.error('Server returned non-JSON response:', text);
+                                throw new Error('Expected JSON response but got HTML/Text');
+                            });
+                        }
+                    })
+                    .then(data => {
+                        console.log('Test notification sent:', data);
+                        if (data.success) {
+                            alert('Test notification sent! Check your notification dropdown.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending test notification:', error);
+                        alert('Error sending notification: ' + error.message + '. Check console for details.');
+                    });
                 });
             }
         });

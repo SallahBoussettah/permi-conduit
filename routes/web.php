@@ -467,23 +467,32 @@ Route::get('/laravel-upload-test', function () {
 
 // Add a test route for real-time notifications
 Route::middleware(['auth'])->get('/test-notification', function () {
-    $user = auth()->user();
-    $notification = new \App\Models\Notification([
-        'user_id' => $user->id,
-        'message' => 'This is a test real-time notification! ' . date('H:i:s'),
-        'type' => \App\Models\Notification::TYPE_SYSTEM,
-        'link' => route('dashboard'),
-        'data' => ['test' => true],
-    ]);
-    $notification->save();
-    
-    // Broadcast the new notification
-    event(new \App\Events\NewNotification($notification));
-    
-    return response()->json([
-        'success' => true,
-        'message' => 'Test notification sent!'
-    ]);
+    try {
+        $user = auth()->user();
+        $notification = new \App\Models\Notification([
+            'user_id' => $user->id,
+            'message' => 'This is a test real-time notification! ' . date('H:i:s'),
+            'type' => \App\Models\Notification::TYPE_SYSTEM,
+            'link' => route('dashboard'),
+            'data' => ['test' => true],
+        ]);
+        $notification->save();
+        
+        // Broadcast the new notification
+        event(new \App\Events\NewNotification($notification));
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Test notification sent!',
+            'notification_id' => $notification->id
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Test notification error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Error sending notification: ' . $e->getMessage()
+        ], 500);
+    }
 })->name('test-notification');
 
 require __DIR__.'/auth.php';
