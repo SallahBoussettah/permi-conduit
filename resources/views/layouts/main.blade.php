@@ -73,7 +73,7 @@
                         <img src="{{ asset('images/logo.png') }}" alt="ECF Logo" class="h-10 w-auto">
                     </a>
                     <nav class="hidden md:ml-10 md:flex md:space-x-8">
-                        @if(!request()->routeIs('dashboard') && !Str::startsWith(request()->route()->getName(), 'admin.') && !Str::startsWith(request()->route()->getName(), 'inspector.') && !Str::startsWith(request()->route()->getName(), 'candidate.') && !Str::startsWith(request()->route()->getName(), 'super_admin.'))
+                        @if(!request()->routeIs('dashboard') && !Str::startsWith(request()->route()->getName(), 'admin.') && !Str::startsWith(request()->route()->getName(), 'inspector.') && !Str::startsWith(request()->route()->getName(), 'candidate.') && !Str::startsWith(request()->route()->getName(), 'super_admin.') && !Str::startsWith(request()->route()->getName(), 'notifications.'))
                             <a href="{{ route('home') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('home') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
                                 {{ __('app.home') }}
                             </a>
@@ -87,6 +87,9 @@
                             @endauth
                         @else
                             @auth
+                                <a href="{{ route('dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('dashboard') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                    {{ __('Tableau de bord') }}
+                                </a>
                                 @if(Auth::user()->hasRole('candidate'))
                                     <a href="{{ route('candidate.courses.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('candidate.courses.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
                                         {{ __('Courses') }}
@@ -166,6 +169,7 @@
                                         x-cloak
                                         x-show="unreadCount > 0" 
                                         x-text="unreadCount" 
+                                        x-effect="console.log('Count effect triggered:', unreadCount)"
                                         id="notification-count" 
                                         class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                                     </span>
@@ -263,7 +267,7 @@
         <!-- Mobile menu, show/hide based on menu state -->
         <div id="mobile-menu" class="hidden md:hidden absolute w-full bg-gray-900 shadow-lg">
             <div class="pt-2 pb-3 space-y-1">
-                @if(!request()->routeIs('dashboard') && !Str::startsWith(request()->route()->getName(), 'admin.') && !Str::startsWith(request()->route()->getName(), 'inspector.') && !Str::startsWith(request()->route()->getName(), 'candidate.') && !Str::startsWith(request()->route()->getName(), 'super_admin.'))
+                @if(!request()->routeIs('dashboard') && !Str::startsWith(request()->route()->getName(), 'admin.') && !Str::startsWith(request()->route()->getName(), 'inspector.') && !Str::startsWith(request()->route()->getName(), 'candidate.') && !Str::startsWith(request()->route()->getName(), 'super_admin.') && !Str::startsWith(request()->route()->getName(), 'notifications.'))
                     <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                         {{ __('app.home') }}
                     </a>
@@ -277,6 +281,9 @@
                     @endauth
                 @else
                     @auth
+                        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                            {{ __('Tableau de bord') }}
+                        </a>
                         @if(Auth::user()->hasRole('candidate'))
                             <a href="{{ route('candidate.courses.index') }}" class="{{ request()->routeIs('candidate.courses.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                                 {{ __('Courses') }}
@@ -318,7 +325,13 @@
                         <!-- Notifications Link for Mobile -->
                         <a href="{{ route('notifications.index') }}" class="{{ request()->routeIs('notifications.index') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-3 border-l-4 text-base font-medium flex justify-between items-center">
                             <span>{{ __('Notifications') }}</span>
-                            <span id="mobile-notification-count" class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full"></span>
+                            <span 
+                                x-data="{ count: 0 }"
+                                x-init="window.addEventListener('notification-count-updated', e => { count = e.detail.count; })"
+                                x-show="count > 0"
+                                x-text="count"
+                                id="mobile-notification-count" 
+                                class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full"></span>
                         </a>
                         <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                             {{ __('app.profile') }}

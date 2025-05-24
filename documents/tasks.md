@@ -123,6 +123,7 @@ This document outlines the specific tasks needed to complete the Laravel-based d
   - [ ] Candidate user guide
   - [ ] Inspector user guide
   - [ ] Admin user guide
+  - [ ] SuperAdmin user guide
 - [ ] Deploy application
 - [ ] Post-deployment testing and monitoring
 

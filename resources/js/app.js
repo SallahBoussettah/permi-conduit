@@ -19,6 +19,12 @@ Alpine.data('notificationDropdown', () => ({
             const previousCount = this.unreadCount;
             this.unreadCount = e.detail.count;
             
+            // Force Alpine to update the DOM
+            this.$nextTick(() => {
+                // This ensures the DOM is updated with the new count
+                console.log('DOM updated with new count:', this.unreadCount);
+            });
+            
             // Open dropdown if count increased and autoOpen flag is true
             if (this.unreadCount > previousCount && e.detail.autoOpen) {
                 this.isOpen = true;
@@ -39,6 +45,14 @@ Alpine.data('notificationDropdown', () => ({
             
             // Ensure dropdown is open
             this.isOpen = true;
+            
+            // Increment the unread count
+            this.unreadCount += 1;
+            
+            // Force Alpine to update the DOM
+            this.$nextTick(() => {
+                console.log('DOM updated with new count after notification:', this.unreadCount);
+            });
             
             // Check if we have notification details
             if (e.detail.notification) {
@@ -95,6 +109,11 @@ Alpine.data('notificationDropdown', () => ({
             this.unreadCount = data.count || 0;
             this.notifications = data.notifications || [];
             this.updateNotificationListHtml();
+            
+            // Force Alpine to update the DOM
+            this.$nextTick(() => {
+                console.log('DOM updated after fetch, new count:', this.unreadCount);
+            });
         })
         .catch(error => {
             console.error('Error fetching notifications:', error);
