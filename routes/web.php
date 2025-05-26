@@ -100,6 +100,12 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::get('/qcm-reports/candidate/{user}', [\App\Http\Controllers\Admin\QcmReportController::class, 'candidateDetail'])->name('qcm-reports.candidate-detail');
         Route::get('/qcm-reports/statistics', [\App\Http\Controllers\Admin\QcmReportController::class, 'statistics'])->name('qcm-reports.statistics');
         Route::get('/qcm-reports/export', [\App\Http\Controllers\Admin\QcmReportController::class, 'export'])->name('qcm-reports.export');
+        
+        // AI Chat FAQ Management
+        Route::resource('ai-chat-faqs', \App\Http\Controllers\Admin\AiChatFaqController::class);
+        Route::post('/ai-chat-faqs/{aiChatFaq}/toggle-active', [\App\Http\Controllers\Admin\AiChatFaqController::class, 'toggleActive'])->name('ai-chat-faqs.toggle-active');
+        Route::get('/chat-conversations', [\App\Http\Controllers\Admin\AiChatFaqController::class, 'listConversations'])->name('chat-conversations.index');
+        Route::get('/chat-conversations/{conversation}', [\App\Http\Controllers\Admin\AiChatFaqController::class, 'viewConversation'])->name('chat-conversations.show');
     });
     
     // Inspector routes
@@ -157,6 +163,13 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::get('/qcm-papers/{qcmPaper}/import', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'showImportForm'])->name('qcm-papers.questions.import');
         Route::post('/qcm-papers/{qcmPaper}/import', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'import'])->name('qcm-papers.questions.import.submit');
         Route::get('/qcm-papers/template/download', [\App\Http\Controllers\Inspector\QcmQuestionController::class, 'downloadTemplate'])->name('qcm-papers.questions.template');
+        
+        // Chat routes
+        Route::get('/chat', [\App\Http\Controllers\Inspector\ChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/{conversation}', [\App\Http\Controllers\Inspector\ChatController::class, 'show'])->name('chat.show');
+        Route::post('/chat/{conversation}/messages', [\App\Http\Controllers\Inspector\ChatController::class, 'sendMessage'])->name('chat.send-message');
+        Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\Inspector\ChatController::class, 'getNewMessages'])->name('chat.get-messages');
+        Route::post('/chat/{conversation}/close', [\App\Http\Controllers\Inspector\ChatController::class, 'closeConversation'])->name('chat.close');
     });
     
     // Candidate routes
@@ -180,6 +193,12 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         Route::post('/qcm-exams/{qcmExam}/answer', [\App\Http\Controllers\Candidate\QcmExamController::class, 'answer'])->name('qcm-exams.answer');
         Route::post('/qcm-exams/{qcmExam}/submit', [\App\Http\Controllers\Candidate\QcmExamController::class, 'submit'])->name('qcm-exams.submit');
         Route::get('/qcm-exams/{qcmExam}/results', [\App\Http\Controllers\Candidate\QcmExamController::class, 'results'])->name('qcm-exams.results');
+        
+        // Chat routes
+        Route::get('/chat', [\App\Http\Controllers\Candidate\ChatController::class, 'index'])->name('chat.index');
+        Route::post('/chat/{conversation}/messages', [\App\Http\Controllers\Candidate\ChatController::class, 'sendMessage'])->name('chat.send-message');
+        Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\Candidate\ChatController::class, 'getNewMessages'])->name('chat.get-messages');
+        Route::post('/chat/{conversation}/close', [\App\Http\Controllers\Candidate\ChatController::class, 'closeConversation'])->name('chat.close');
     });
 
     // Notification routes

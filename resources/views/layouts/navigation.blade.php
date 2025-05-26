@@ -26,7 +26,7 @@
                     init() {
                         this.fetchNotifications();
                         // Refresh notifications every minute
-                        setInterval(() => this.fetchNotifications(), 60000);
+                        setInterval(() => this.fetchNotifications(), 10000);
                     },
                     fetchNotifications() {
                         fetch('{{ route('notifications.unread') }}')

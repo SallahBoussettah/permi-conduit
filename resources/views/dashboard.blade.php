@@ -216,6 +216,54 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Chat Support Section -->
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Support Client') }}</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="p-6">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-5">
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('FAQ Chat IA') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Gérer les questions fréquentes pour le chat IA.') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6">
+                                        <a href="{{ route('admin.ai-chat-faqs.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            {{ __('Gérer les FAQ') }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="p-6">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-5">
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Conversations') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Voir toutes les conversations des candidats avec le support.') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6">
+                                        <a href="{{ route('admin.chat-conversations.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                            {{ __('Voir les conversations') }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                         
                     @elseif(Auth::user()->role->name === 'inspector')
@@ -310,6 +358,28 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Chat Support Card -->
+                            <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="p-6">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-5">
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Support par chat') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Répondre aux questions des candidats.') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6">
+                                        <a href="{{ route('inspector.chat.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            {{ __('Accéder au chat') }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -381,6 +451,28 @@
                                     <div class="mt-6">
                                         <a href="{{ route('profile.edit') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                             {{ __('Modifier le profil') }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Chat Support Card -->
+                            <div class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+                                <div class="p-6">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-5">
+                                            <h3 class="text-lg font-medium text-gray-900">{{ __('Support par chat') }}</h3>
+                                            <p class="mt-1 text-sm text-gray-500">{{ __('Besoin d\'aide ? Discutez avec notre assistant IA ou un inspecteur.') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-6">
+                                        <a href="{{ route('candidate.chat.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            {{ __('Accéder au chat') }}
                                         </a>
                                     </div>
                                 </div>

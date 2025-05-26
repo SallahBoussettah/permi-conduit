@@ -352,6 +352,38 @@ class User extends Authenticatable
      */
     public function isCandidate(): bool
     {
-        return $this->role && $this->role->name === 'candidate';
+        return $this->hasRole('candidate');
+    }
+
+    /**
+     * Get the chat conversations where the user is a candidate.
+     */
+    public function candidateConversations()
+    {
+        return $this->hasMany(ChatConversation::class, 'candidate_id');
+    }
+    
+    /**
+     * Get the chat conversations where the user is an inspector.
+     */
+    public function inspectorConversations()
+    {
+        return $this->hasMany(ChatConversation::class, 'inspector_id');
+    }
+    
+    /**
+     * Get all chat messages sent by the user.
+     */
+    public function chatMessages()
+    {
+        return $this->hasMany(ChatMessage::class);
+    }
+    
+    /**
+     * Get all AI Chat FAQs created by the user.
+     */
+    public function aiChatFaqs()
+    {
+        return $this->hasMany(AiChatFaq::class, 'created_by');
     }
 }

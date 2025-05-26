@@ -97,6 +97,9 @@
                                     <a href="{{ route('candidate.qcm-exams.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('candidate.qcm-exams.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
                                         {{ __('QCM Exams') }}
                                     </a>
+                                    <a href="{{ route('candidate.chat.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('candidate.chat.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Support Chat') }}
+                                    </a>
                                 @elseif(Auth::user()->hasRole('inspector'))
                                     <a href="{{ route('inspector.courses.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('inspector.courses.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
                                         {{ __('Gérer les cours') }}
@@ -106,6 +109,9 @@
                                     </a>
                                     <a href="{{ route('inspector.permit-categories.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('inspector.permit-categories.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
                                         {{ __('Catégories de permis') }}
+                                    </a>
+                                    <a href="{{ route('inspector.chat.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('inspector.chat.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Support Chat') }}
                                     </a>
                                 @elseif(Auth::user()->hasRole('admin'))
                                     <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.users.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
@@ -119,6 +125,9 @@
                                     </a>
                                     <a href="{{ route('admin.permit-categories.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.permit-categories.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
                                         {{ __('Catégories de permis') }}
+                                    </a>
+                                    <a href="{{ route('admin.ai-chat-faqs.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('admin.ai-chat-faqs.*') || request()->routeIs('admin.chat-conversations.*') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
+                                        {{ __('Support Chat') }}
                                     </a>
                                 @elseif(Auth::user()->hasRole('super_admin'))
                                     <a href="{{ route('super_admin.dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('super_admin.dashboard') ? 'border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-300' }}">
@@ -213,6 +222,9 @@
                                         <a href="{{ route('candidate.qcm-exams.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('QCM Exams') }}
                                         </a>
+                                        <a href="{{ route('candidate.chat.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Support Chat') }}
+                                        </a>
                                     @elseif(Auth::user()->hasRole('inspector'))
                                         <a href="{{ route('inspector.courses.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('Gérer les cours') }}
@@ -222,6 +234,9 @@
                                         </a>
                                         <a href="{{ route('inspector.permit-categories.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('Catégories de permis') }}
+                                        </a>
+                                        <a href="{{ route('inspector.chat.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Support Chat') }}
                                         </a>
                                     @elseif(Auth::user()->hasRole('admin'))
                                         <a href="{{ route('admin.users.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -235,6 +250,9 @@
                                         </a>
                                         <a href="{{ route('admin.permit-categories.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             {{ __('Catégories de permis') }}
+                                        </a>
+                                        <a href="{{ route('admin.ai-chat-faqs.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            {{ __('Support Chat') }}
                                         </a>
                                     @elseif(Auth::user()->hasRole('super_admin'))
                                         <a href="{{ route('super_admin.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -291,6 +309,9 @@
                             <a href="{{ route('candidate.qcm-exams.index') }}" class="{{ request()->routeIs('candidate.qcm-exams.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                                 {{ __('QCM Exams') }}
                             </a>
+                            <a href="{{ route('candidate.chat.index') }}" class="{{ request()->routeIs('candidate.chat.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Support Chat') }}
+                            </a>
                         @elseif(Auth::user()->hasRole('inspector'))
                             <a href="{{ route('inspector.courses.index') }}" class="{{ request()->routeIs('inspector.courses.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                                 {{ __('Gérer les cours') }}
@@ -300,6 +321,9 @@
                             </a>
                             <a href="{{ route('inspector.permit-categories.index') }}" class="{{ request()->routeIs('inspector.permit-categories.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                                 {{ __('Catégories de permis') }}
+                            </a>
+                            <a href="{{ route('inspector.chat.index') }}" class="{{ request()->routeIs('inspector.chat.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Support Chat') }}
                             </a>
                         @elseif(Auth::user()->hasRole('admin'))
                             <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
@@ -313,6 +337,9 @@
                             </a>
                             <a href="{{ route('admin.permit-categories.index') }}" class="{{ request()->routeIs('admin.permit-categories.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
                                 {{ __('Catégories de permis') }}
+                            </a>
+                            <a href="{{ route('admin.ai-chat-faqs.index') }}" class="{{ request()->routeIs('admin.ai-chat-faqs.*') || request()->routeIs('admin.chat-conversations.*') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+                                {{ __('Support Chat') }}
                             </a>
                         @elseif(Auth::user()->hasRole('super_admin'))
                             <a href="{{ route('super_admin.dashboard') }}" class="{{ request()->routeIs('super_admin.dashboard') ? 'bg-gray-800 border-yellow-500 text-white' : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
@@ -547,9 +574,9 @@
             }
         }
         
-        // Update notification count when page loads and every minute
+        // Update notification count when page loads and every 10 seconds
         updateMobileNotificationCount();
-        setInterval(updateMobileNotificationCount, 60000);
+        setInterval(updateMobileNotificationCount, 10000);
     </script>
 </body>
 </html> 
