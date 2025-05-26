@@ -196,6 +196,8 @@ Route::middleware(['auth', 'App\Http\Middleware\CheckUserApproved'])->group(func
         
         // Chat routes
         Route::get('/chat', [\App\Http\Controllers\Candidate\ChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/history', [\App\Http\Controllers\Candidate\ChatController::class, 'history'])->name('chat.history');
+        Route::post('/chat/start', [\App\Http\Controllers\Candidate\ChatController::class, 'startConversation'])->name('chat.start');
         Route::post('/chat/{conversation}/messages', [\App\Http\Controllers\Candidate\ChatController::class, 'sendMessage'])->name('chat.send-message');
         Route::get('/chat/{conversation}/messages', [\App\Http\Controllers\Candidate\ChatController::class, 'getNewMessages'])->name('chat.get-messages');
         Route::post('/chat/{conversation}/close', [\App\Http\Controllers\Candidate\ChatController::class, 'closeConversation'])->name('chat.close');

@@ -25,31 +25,97 @@ class ChatController extends Controller
     {
         $user = Auth::user();
         
-        // Get or create active conversation
+        // Get active conversation
         $conversation = $user->candidateConversations()
             ->where('status', '!=', 'closed')
             ->first();
             
-        if (!$conversation) {
-            $conversation = $this->aiChatService->createConversation($user);
-        }
+        // Do not automatically create a conversation - let the user fill out the form first
         
-        // Get messages for the conversation
-        $messages = $conversation->messages()
-            ->with('user')
-            ->orderBy('created_at', 'asc')
-            ->get();
+        // If there is an active conversation, get messages
+        $messages = [];
+        if ($conversation) {
+            $messages = $conversation->messages()
+                ->with('user')
+                ->orderBy('created_at', 'asc')
+                ->get();
+                
+            // Mark all unread messages as read
+            $unreadMessages = $messages->filter(function ($message) use ($user) {
+                return !$message->is_from_ai && $message->user_id !== $user->id && is_null($message->read_at);
+            });
             
-        // Mark all unread messages as read
-        $unreadMessages = $messages->filter(function ($message) use ($user) {
-            return !$message->is_from_ai && $message->user_id !== $user->id && is_null($message->read_at);
-        });
-        
-        foreach ($unreadMessages as $message) {
-            $message->markAsRead();
+            foreach ($unreadMessages as $message) {
+                $message->markAsRead();
+            }
         }
         
         return view('candidate.chat.index', compact('conversation', 'messages'));
+    }
+    
+    /**
+     * Start a new conversation with the provided details.
+     */
+    public function startConversation(Request $request)
+    {
+        $request->validate([
+            'topic' => 'required|string',
+            'question' => 'required|string|max:1000',
+            'urgency' => 'required|string|in:low,medium,high',
+        ]);
+        
+        $user = Auth::user();
+        
+        // Check if there's already an active conversation
+        $activeConversation = $user->candidateConversations()
+            ->where('status', '!=', 'closed')
+            ->first();
+            
+        if ($activeConversation) {
+            // Just redirect to the existing conversation
+            return redirect()->route('candidate.chat.index');
+        }
+        
+        // Create a new conversation
+        $conversation = $this->aiChatService->createConversation($user);
+        
+        // Create the initial message summarizing the topic and question
+        $initialMessage = "Topic: " . ucfirst(str_replace('_', ' ', $request->topic)) . 
+                          "\nUrgency: " . ucfirst($request->urgency) . 
+                          "\nQuestion: " . $request->question;
+        
+        $message = ChatMessage::create([
+            'conversation_id' => $conversation->id,
+            'user_id' => $user->id,
+            'is_from_ai' => false,
+            'message' => $initialMessage,
+        ]);
+        
+        // Process the message with AI
+        $aiResponse = $this->aiChatService->processMessage($conversation, $initialMessage);
+        
+        if ($aiResponse) {
+            $this->aiChatService->saveAiMessage($conversation, $aiResponse);
+        }
+        
+        return redirect()->route('candidate.chat.index');
+    }
+    
+    /**
+     * Display chat history for the candidate.
+     */
+    public function history()
+    {
+        $user = Auth::user();
+        
+        // Get all conversations, including closed ones
+        $conversations = $user->candidateConversations()
+            ->with(['lastMessage'])
+            ->withCount('messages')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
+            
+        return view('candidate.chat.history', compact('conversations'));
     }
     
     /**
@@ -155,7 +221,7 @@ class ChatController extends Controller
             'read_at' => now()
         ]);
         
-        return redirect()->route('candidate.chat.index')
-            ->with('success', 'Chat conversation closed successfully. You can start a new one at any time.');
+        return redirect()->route('candidate.chat.history')
+            ->with('success', 'Chat conversation closed successfully. You can view your chat history or start a new conversation.');
     }
 } 

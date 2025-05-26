@@ -106,9 +106,20 @@
                                 </svg>
                                 <p class="text-gray-600 font-medium mb-1">{{ __('This conversation has been closed') }}</p>
                                 <p class="text-gray-500 text-sm mb-4">{{ __('No new messages can be sent in this conversation.') }}</p>
-                                <a href="{{ route('candidate.chat.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    {{ __('Start New Conversation') }}
-                                </a>
+                                <div class="flex justify-center space-x-4">
+                                    <a href="{{ route('candidate.chat.history') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ __('Chat History') }}
+                                    </a>
+                                    <a href="{{ route('candidate.chat.start') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        {{ __('Start New Conversation') }}
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -121,16 +132,53 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('No active conversation') }}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('Start a new support conversation') }}</h3>
                     <p class="text-base text-gray-600 mb-8 max-w-md mx-auto">
-                        {{ __('Start a new conversation with our AI Assistant to get help or ask questions about your driving courses and exams.') }}
+                        {{ __('Tell us about your question so we can help you more effectively') }}
                     </p>
-                    <a href="{{ route('candidate.chat.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        {{ __('Start New Conversation') }}
-                    </a>
+                    
+                    <!-- Pre-conversation Form -->
+                    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-sm">
+                        <form action="{{ route('candidate.chat.start') }}" method="POST" class="space-y-4">
+                            @csrf
+                            
+                            <div class="text-left">
+                                <label for="topic" class="block text-sm font-medium text-gray-700 mb-1">{{ __('What topic is your question about?') }}</label>
+                                <select id="topic" name="topic" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    <option value="">{{ __('Select a topic') }}</option>
+                                    <option value="driving_course">{{ __('Driving Course') }}</option>
+                                    <option value="exam_preparation">{{ __('Exam Preparation') }}</option>
+                                    <option value="license_requirements">{{ __('License Requirements') }}</option>
+                                    <option value="payments">{{ __('Payments and Billing') }}</option>
+                                    <option value="technical_issues">{{ __('Technical Issues') }}</option>
+                                    <option value="other">{{ __('Other') }}</option>
+                                </select>
+                            </div>
+                            
+                            <div class="text-left">
+                                <label for="question" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Briefly describe your question') }}</label>
+                                <textarea id="question" name="question" rows="3" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="{{ __('Please describe your question in detail...') }}"></textarea>
+                            </div>
+                            
+                            <div class="text-left">
+                                <label for="urgency" class="block text-sm font-medium text-gray-700 mb-1">{{ __('How urgent is your question?') }}</label>
+                                <select id="urgency" name="urgency" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                                    <option value="low">{{ __('Not urgent - Just looking for information') }}</option>
+                                    <option value="medium">{{ __('Somewhat urgent - Need help soon') }}</option>
+                                    <option value="high">{{ __('Very urgent - Need immediate assistance') }}</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    {{ __('Start Conversation') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             @endif
         </div>
