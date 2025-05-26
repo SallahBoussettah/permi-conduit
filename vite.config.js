@@ -21,11 +21,10 @@ export default defineConfig({
         hmr: {
             host: 'localhost',
         },
-        // Allow access from local network IP
-        host: '192.168.3.233',
-        // Enable listening on all network interfaces
-        strictPort: true,
-        port: 5173, // Default Vite port
+        // // Allow access from local network IP
+        // host: '192.168.3.233',
+        // strictPort: true,
+        // port: 5173,
     },
     build: {
         // Ensure manifest is generated
