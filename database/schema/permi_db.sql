@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: May 21, 2025 at 08:27 AM
+-- Generation Time: May 26, 2025 at 08:56 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -24,6 +24,26 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `ai_chat_faqs`
+--
+
+DROP TABLE IF EXISTS `ai_chat_faqs`;
+CREATE TABLE IF NOT EXISTS `ai_chat_faqs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `trigger_phrase` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `question` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `answer` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_by` bigint UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ai_chat_faqs_created_by_foreign` (`created_by`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `cache`
 --
 
@@ -34,6 +54,13 @@ CREATE TABLE IF NOT EXISTS `cache` (
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('ecf_cache_candidate_role_id', 'N;', 1748253099);
 
 -- --------------------------------------------------------
 
@@ -89,6 +116,47 @@ CREATE TABLE IF NOT EXISTS `candidate_qcm_attempts` (
   UNIQUE KEY `exam_question_unique` (`exam_id`,`qcm_question_id`),
   KEY `candidate_qcm_attempts_qcm_question_id_foreign` (`qcm_question_id`),
   KEY `candidate_qcm_attempts_selected_qcm_answer_id_foreign` (`selected_qcm_answer_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat_conversations`
+--
+
+DROP TABLE IF EXISTS `chat_conversations`;
+CREATE TABLE IF NOT EXISTS `chat_conversations` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `candidate_id` bigint UNSIGNED NOT NULL,
+  `inspector_id` bigint UNSIGNED DEFAULT NULL,
+  `status` enum('active','inspector_joined','closed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `closed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `chat_conversations_candidate_id_foreign` (`candidate_id`),
+  KEY `chat_conversations_inspector_id_foreign` (`inspector_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat_messages`
+--
+
+DROP TABLE IF EXISTS `chat_messages`;
+CREATE TABLE IF NOT EXISTS `chat_messages` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `conversation_id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED DEFAULT NULL,
+  `is_from_ai` tinyint(1) NOT NULL DEFAULT '0',
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `chat_messages_conversation_id_foreign` (`conversation_id`),
+  KEY `chat_messages_user_id_foreign` (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -380,7 +448,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `migrations`
@@ -440,7 +508,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (51, '2025_05_19_014740_restructure_qcm_questions_system', 4),
 (52, '2025_05_19_021435_add_section_id_to_qcm_questions_table', 3),
 (53, '2025_05_19_033936_add_expires_at_to_qcm_exams_table', 3),
-(54, '2025_05_20_115155_add_duration_seconds_to_course_materials_table', 3);
+(54, '2025_05_19_100000_add_type_and_data_to_notifications_table', 3),
+(55, '2025_05_20_115155_add_duration_seconds_to_course_materials_table', 3),
+(56, '2025_06_01_000000_create_chat_support_tables', 3);
 
 -- --------------------------------------------------------
 
@@ -453,8 +523,10 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` bigint UNSIGNED NOT NULL,
   `message` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `read_at` timestamp NULL DEFAULT NULL,
   `link` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `data` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -668,7 +740,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
 --
 
 INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`) VALUES
-(1, 'super_admin', '2025-05-21 07:26:04', '2025-05-21 07:26:04');
+(1, 'super_admin', '2025-05-26 07:51:39', '2025-05-26 07:51:39');
 
 -- --------------------------------------------------------
 
@@ -722,8 +794,7 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('6RkYW6NVFB0BItqIDphCKm05j356wG7gkgYtQ0Js', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoidmNuMDZlODB1ZkkwSTJ5NU02cmlnYnl5dDBxVTFTN0I4QU9NbDVQOSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDM6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9zdXBlci1hZG1pbi9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1747816017),
-('ejefSfCp8quOFvBS7aDTOdvYJFkPb0qNcASSSDmk', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoidXRsYjVoQWpJUmpvbFNBRjR3ZDFzeGtES1hjR1Bkd1RBQWR0MnpRWCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747816038);
+('k4nxQdbroboMO0sqaiytED8w9UJNYndBqtQUUXik', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiekhKampTQ1JUQVlwdURwOHc0emd3azd3Ynd4eXcyUk94enI1bDAzTCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1748249776);
 
 -- --------------------------------------------------------
 
@@ -763,7 +834,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `role_id`, `school_id`, `permit_category_id`, `approval_status`, `rejection_reason`, `is_active`, `approved_at`, `approved_by`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `expires_at`) VALUES
-(1, 'Super Admin', 'superadmin@example.com', 1, NULL, NULL, 'approved', NULL, 1, '2025-05-21 07:26:04', NULL, NULL, '$2y$12$t8ysBAwmeKezsIVVqtwcKe0DrMmcERvHYFFdv.k90s/7v4YzErQSG', NULL, '2025-05-21 07:26:04', '2025-05-21 07:26:04', NULL);
+(1, 'Super Admin', 'superadmin@example.com', 1, NULL, NULL, 'approved', NULL, 1, '2025-05-26 07:51:39', NULL, NULL, '$2y$12$PuIpsk6DpqssfV/7LX5/n.4wrW8vmFJyhNKl9rvZCcmD/Ejb4BwQC', NULL, '2025-05-26 07:51:39', '2025-05-26 07:51:39', NULL);
 
 -- --------------------------------------------------------
 
